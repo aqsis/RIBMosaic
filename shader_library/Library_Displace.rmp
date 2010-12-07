@@ -1,0 +1,891 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Library_Displace build="True" compile="True" dependecies="" enabled="True" filepath="Library_Displace.rmp" filter="LIBRARY_DISPLACE" library="//shader_library/displacement/" version="0.1">
+
+	<python_scripts>
+	</python_scripts>
+
+	<shader_sources>
+	</shader_sources>
+
+	<shader_panels filter="SHADER">
+		<droop delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@droop.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+			<rib target="">
+@[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@droop"
+    "uniform float Km" @[DATA:///properties/Km_prop0:RIB]@
+
+			</rib>
+			<regexes target="">
+			</regexes>
+			<properties>
+				<sl_name default="droop" description="Shader&apos;s name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+				<sl_type default="Displacement" description="Choose shader type" items="[(&apos;Displacement&apos;, &apos;Displacement&apos;, &apos;&apos;)]" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+				<Km_prop0 default="0.05" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+			</properties>
+			<layout>
+				<info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
+					<sl_name expand="False" icon="" prop="sl_name" slider="False" text="Name" toggle="False" trigger="" type="PROP" />
+					<sl_type expand="False" icon="" prop="sl_type" slider="False" text="" toggle="False" trigger="" type="PROP" />
+				</info_row>
+				<Km_row0 active="@[EVAL:not @[ATTR:///properties/Km_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<Km_lb0 expand="False" icon="" prop="" slider="False" text="Km" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<Km_prop0 expand="False" icon="" prop="Km_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<Km_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/Km_prop0:]@" type="LINK" />
+				</Km_row0>
+			</layout>
+		</droop>
+		<slateroofd delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@slateroofd.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+			<rib target="">
+@[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@slateroofd"
+    "uniform float Km" @[DATA:///properties/Km_prop0:RIB]@
+    "uniform float sfreq" @[DATA:///properties/sfreq_prop0:RIB]@
+    "uniform float tfreq" @[DATA:///properties/tfreq_prop0:RIB]@
+    "uniform float maxadd" @[DATA:///properties/maxadd_prop0:RIB]@
+    "uniform float ramp" @[DATA:///properties/ramp_prop0:RIB]@
+    "uniform float gap" @[DATA:///properties/gap_prop0:RIB]@
+    "uniform float factor" @[DATA:///properties/factor_prop0:RIB]@
+
+			</rib>
+			<regexes target="">
+			</regexes>
+			<properties>
+				<sl_name default="slateroofd" description="Shader&apos;s name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+				<sl_type default="Displacement" description="Choose shader type" items="[(&apos;Displacement&apos;, &apos;Displacement&apos;, &apos;&apos;)]" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+				<Km_prop0 default="1.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<sfreq_prop0 default="10.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<tfreq_prop0 default="10.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<maxadd_prop0 default="0.5" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<ramp_prop0 default="0.1" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<gap_prop0 default="0.05" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<factor_prop0 default="22.838" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+			</properties>
+			<layout>
+				<info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
+					<sl_name expand="False" icon="" prop="sl_name" slider="False" text="Name" toggle="False" trigger="" type="PROP" />
+					<sl_type expand="False" icon="" prop="sl_type" slider="False" text="" toggle="False" trigger="" type="PROP" />
+				</info_row>
+				<Km_row0 active="@[EVAL:not @[ATTR:///properties/Km_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<Km_lb0 expand="False" icon="" prop="" slider="False" text="Km" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<Km_prop0 expand="False" icon="" prop="Km_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<Km_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/Km_prop0:]@" type="LINK" />
+				</Km_row0>
+				<sfreq_row0 active="@[EVAL:not @[ATTR:///properties/sfreq_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<sfreq_lb0 expand="False" icon="" prop="" slider="False" text="sfreq" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<sfreq_prop0 expand="False" icon="" prop="sfreq_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<sfreq_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/sfreq_prop0:]@" type="LINK" />
+				</sfreq_row0>
+				<tfreq_row0 active="@[EVAL:not @[ATTR:///properties/tfreq_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<tfreq_lb0 expand="False" icon="" prop="" slider="False" text="tfreq" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<tfreq_prop0 expand="False" icon="" prop="tfreq_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<tfreq_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/tfreq_prop0:]@" type="LINK" />
+				</tfreq_row0>
+				<maxadd_row0 active="@[EVAL:not @[ATTR:///properties/maxadd_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<maxadd_lb0 expand="False" icon="" prop="" slider="False" text="maxadd" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<maxadd_prop0 expand="False" icon="" prop="maxadd_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<maxadd_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/maxadd_prop0:]@" type="LINK" />
+				</maxadd_row0>
+				<ramp_row0 active="@[EVAL:not @[ATTR:///properties/ramp_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<ramp_lb0 expand="False" icon="" prop="" slider="False" text="ramp" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<ramp_prop0 expand="False" icon="" prop="ramp_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<ramp_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/ramp_prop0:]@" type="LINK" />
+				</ramp_row0>
+				<gap_row0 active="@[EVAL:not @[ATTR:///properties/gap_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<gap_lb0 expand="False" icon="" prop="" slider="False" text="gap" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<gap_prop0 expand="False" icon="" prop="gap_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<gap_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/gap_prop0:]@" type="LINK" />
+				</gap_row0>
+				<factor_row0 active="@[EVAL:not @[ATTR:///properties/factor_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<factor_lb0 expand="False" icon="" prop="" slider="False" text="factor" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<factor_prop0 expand="False" icon="" prop="factor_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<factor_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/factor_prop0:]@" type="LINK" />
+				</factor_row0>
+			</layout>
+		</slateroofd>
+		<bubbly delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@bubbly.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+			<rib target="">
+@[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@bubbly"
+    "uniform float mult" @[DATA:///properties/mult_prop0:RIB]@
+    "uniform float Nzscale" @[DATA:///properties/Nzscale_prop0:RIB]@
+    "uniform float Kd" @[DATA:///properties/Kd_prop0:RIB]@
+    "uniform float bubsize" @[DATA:///properties/bubsize_prop0:RIB]@
+
+			</rib>
+			<regexes target="">
+			</regexes>
+			<properties>
+				<sl_name default="bubbly" description="Shader&apos;s name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+				<sl_type default="Displacement" description="Choose shader type" items="[(&apos;Displacement&apos;, &apos;Displacement&apos;, &apos;&apos;)]" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+				<mult_prop0 default="5.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<Nzscale_prop0 default="1.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<Kd_prop0 default="0.2" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<bubsize_prop0 default="1.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+			</properties>
+			<layout>
+				<info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
+					<sl_name expand="False" icon="" prop="sl_name" slider="False" text="Name" toggle="False" trigger="" type="PROP" />
+					<sl_type expand="False" icon="" prop="sl_type" slider="False" text="" toggle="False" trigger="" type="PROP" />
+				</info_row>
+				<mult_row0 active="@[EVAL:not @[ATTR:///properties/mult_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<mult_lb0 expand="False" icon="" prop="" slider="False" text="mult" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<mult_prop0 expand="False" icon="" prop="mult_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<mult_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/mult_prop0:]@" type="LINK" />
+				</mult_row0>
+				<Nzscale_row0 active="@[EVAL:not @[ATTR:///properties/Nzscale_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<Nzscale_lb0 expand="False" icon="" prop="" slider="False" text="Nzscale" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<Nzscale_prop0 expand="False" icon="" prop="Nzscale_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<Nzscale_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/Nzscale_prop0:]@" type="LINK" />
+				</Nzscale_row0>
+				<Kd_row0 active="@[EVAL:not @[ATTR:///properties/Kd_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<Kd_lb0 expand="False" icon="" prop="" slider="False" text="Kd" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<Kd_prop0 expand="False" icon="" prop="Kd_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<Kd_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/Kd_prop0:]@" type="LINK" />
+				</Kd_row0>
+				<bubsize_row0 active="@[EVAL:not @[ATTR:///properties/bubsize_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<bubsize_lb0 expand="False" icon="" prop="" slider="False" text="bubsize" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<bubsize_prop0 expand="False" icon="" prop="bubsize_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<bubsize_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/bubsize_prop0:]@" type="LINK" />
+				</bubsize_row0>
+			</layout>
+		</bubbly>
+		<fur1 delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@fur1.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+			<rib target="">
+@[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@fur1"
+    "uniform float height" @[DATA:///properties/height_prop0:RIB]@
+    "uniform float fac" @[DATA:///properties/fac_prop0:RIB]@
+
+			</rib>
+			<regexes target="">
+			</regexes>
+			<properties>
+				<sl_name default="fur1" description="Shader&apos;s name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+				<sl_type default="Displacement" description="Choose shader type" items="[(&apos;Displacement&apos;, &apos;Displacement&apos;, &apos;&apos;)]" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+				<height_prop0 default="1.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<fac_prop0 default="1.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+			</properties>
+			<layout>
+				<info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
+					<sl_name expand="False" icon="" prop="sl_name" slider="False" text="Name" toggle="False" trigger="" type="PROP" />
+					<sl_type expand="False" icon="" prop="sl_type" slider="False" text="" toggle="False" trigger="" type="PROP" />
+				</info_row>
+				<height_row0 active="@[EVAL:not @[ATTR:///properties/height_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<height_lb0 expand="False" icon="" prop="" slider="False" text="height" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<height_prop0 expand="False" icon="" prop="height_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<height_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/height_prop0:]@" type="LINK" />
+				</height_row0>
+				<fac_row0 active="@[EVAL:not @[ATTR:///properties/fac_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<fac_lb0 expand="False" icon="" prop="" slider="False" text="fac" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<fac_prop0 expand="False" icon="" prop="fac_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<fac_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/fac_prop0:]@" type="LINK" />
+				</fac_row0>
+			</layout>
+		</fur1>
+		<displacementmap delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@displacementmap.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+			<rib target="">
+@[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@displacementmap"
+    "uniform float Km" @[DATA:///properties/Km_prop0:RIB]@
+    "uniform float ZeroPoint" @[DATA:///properties/ZeroPoint_prop0:RIB]@
+    "uniform string texturename" @[DATA:///properties/texturename_prop0:RIB]@
+
+			</rib>
+			<regexes target="">
+			</regexes>
+			<properties>
+				<sl_name default="displacementmap" description="Shader&apos;s name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+				<sl_type default="Displacement" description="Choose shader type" items="[(&apos;Displacement&apos;, &apos;Displacement&apos;, &apos;&apos;)]" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+				<Km_prop0 default="1.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<ZeroPoint_prop0 default="0.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<texturename_prop0 default="" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+			</properties>
+			<layout>
+				<info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
+					<sl_name expand="False" icon="" prop="sl_name" slider="False" text="Name" toggle="False" trigger="" type="PROP" />
+					<sl_type expand="False" icon="" prop="sl_type" slider="False" text="" toggle="False" trigger="" type="PROP" />
+				</info_row>
+				<Km_row0 active="@[EVAL:not @[ATTR:///properties/Km_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<Km_lb0 expand="False" icon="" prop="" slider="False" text="Km" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<Km_prop0 expand="False" icon="" prop="Km_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<Km_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/Km_prop0:]@" type="LINK" />
+				</Km_row0>
+				<ZeroPoint_row0 active="@[EVAL:not @[ATTR:///properties/ZeroPoint_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<ZeroPoint_lb0 expand="False" icon="" prop="" slider="False" text="ZeroPoint" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<ZeroPoint_prop0 expand="False" icon="" prop="ZeroPoint_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<ZeroPoint_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/ZeroPoint_prop0:]@" type="LINK" />
+				</ZeroPoint_row0>
+				<texturename_row0 active="@[EVAL:not @[ATTR:///properties/texturename_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<texturename_lb0 expand="False" icon="" prop="" slider="False" text="texturename" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<texturename_prop0 expand="False" icon="" prop="texturename_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<texturename_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/texturename_prop0:]@" type="LINK" />
+				</texturename_row0>
+			</layout>
+		</displacementmap>
+		<gouge delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@gouge.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+			<rib target="">
+@[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@gouge"
+    "uniform float Km" @[DATA:///properties/Km_prop0:RIB]@
+    "uniform float spin" @[DATA:///properties/spin_prop0:RIB]@
+    "uniform string texturename" @[DATA:///properties/texturename_prop0:RIB]@
+
+			</rib>
+			<regexes target="">
+			</regexes>
+			<properties>
+				<sl_name default="gouge" description="Shader&apos;s name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+				<sl_type default="Displacement" description="Choose shader type" items="[(&apos;Displacement&apos;, &apos;Displacement&apos;, &apos;&apos;)]" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+				<Km_prop0 default="0.03" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<spin_prop0 default="0.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<texturename_prop0 default="" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+			</properties>
+			<layout>
+				<info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
+					<sl_name expand="False" icon="" prop="sl_name" slider="False" text="Name" toggle="False" trigger="" type="PROP" />
+					<sl_type expand="False" icon="" prop="sl_type" slider="False" text="" toggle="False" trigger="" type="PROP" />
+				</info_row>
+				<Km_row0 active="@[EVAL:not @[ATTR:///properties/Km_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<Km_lb0 expand="False" icon="" prop="" slider="False" text="Km" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<Km_prop0 expand="False" icon="" prop="Km_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<Km_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/Km_prop0:]@" type="LINK" />
+				</Km_row0>
+				<spin_row0 active="@[EVAL:not @[ATTR:///properties/spin_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<spin_lb0 expand="False" icon="" prop="" slider="False" text="spin" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<spin_prop0 expand="False" icon="" prop="spin_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<spin_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/spin_prop0:]@" type="LINK" />
+				</spin_row0>
+				<texturename_row0 active="@[EVAL:not @[ATTR:///properties/texturename_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<texturename_lb0 expand="False" icon="" prop="" slider="False" text="texturename" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<texturename_prop0 expand="False" icon="" prop="texturename_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<texturename_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/texturename_prop0:]@" type="LINK" />
+				</texturename_row0>
+			</layout>
+		</gouge>
+		<stucco delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@stucco.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+			<rib target="">
+@[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@stucco"
+    "uniform float Km" @[DATA:///properties/Km_prop0:RIB]@
+    "uniform float power" @[DATA:///properties/power_prop0:RIB]@
+    "uniform float frequency" @[DATA:///properties/frequency_prop0:RIB]@
+
+			</rib>
+			<regexes target="">
+			</regexes>
+			<properties>
+				<sl_name default="stucco" description="Shader&apos;s name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+				<sl_type default="Displacement" description="Choose shader type" items="[(&apos;Displacement&apos;, &apos;Displacement&apos;, &apos;&apos;)]" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+				<Km_prop0 default="0.05" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<power_prop0 default="5.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<frequency_prop0 default="10.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+			</properties>
+			<layout>
+				<info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
+					<sl_name expand="False" icon="" prop="sl_name" slider="False" text="Name" toggle="False" trigger="" type="PROP" />
+					<sl_type expand="False" icon="" prop="sl_type" slider="False" text="" toggle="False" trigger="" type="PROP" />
+				</info_row>
+				<Km_row0 active="@[EVAL:not @[ATTR:///properties/Km_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<Km_lb0 expand="False" icon="" prop="" slider="False" text="Km" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<Km_prop0 expand="False" icon="" prop="Km_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<Km_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/Km_prop0:]@" type="LINK" />
+				</Km_row0>
+				<power_row0 active="@[EVAL:not @[ATTR:///properties/power_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<power_lb0 expand="False" icon="" prop="" slider="False" text="power" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<power_prop0 expand="False" icon="" prop="power_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<power_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/power_prop0:]@" type="LINK" />
+				</power_row0>
+				<frequency_row0 active="@[EVAL:not @[ATTR:///properties/frequency_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<frequency_lb0 expand="False" icon="" prop="" slider="False" text="frequency" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<frequency_prop0 expand="False" icon="" prop="frequency_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<frequency_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/frequency_prop0:]@" type="LINK" />
+				</frequency_row0>
+			</layout>
+		</stucco>
+		<round delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@round.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+			<rib target="">
+@[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@round"
+    "uniform float radius" @[DATA:///properties/radius_prop0:RIB]@
+
+			</rib>
+			<regexes target="">
+			</regexes>
+			<properties>
+				<sl_name default="round" description="Shader&apos;s name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+				<sl_type default="Displacement" description="Choose shader type" items="[(&apos;Displacement&apos;, &apos;Displacement&apos;, &apos;&apos;)]" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+				<radius_prop0 default="0.1" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+			</properties>
+			<layout>
+				<info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
+					<sl_name expand="False" icon="" prop="sl_name" slider="False" text="Name" toggle="False" trigger="" type="PROP" />
+					<sl_type expand="False" icon="" prop="sl_type" slider="False" text="" toggle="False" trigger="" type="PROP" />
+				</info_row>
+				<radius_row0 active="@[EVAL:not @[ATTR:///properties/radius_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<radius_lb0 expand="False" icon="" prop="" slider="False" text="radius" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<radius_prop0 expand="False" icon="" prop="radius_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<radius_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/radius_prop0:]@" type="LINK" />
+				</radius_row0>
+			</layout>
+		</round>
+		<ripple delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@ripple.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+			<rib target="">
+@[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@ripple"
+    "uniform float amplitude" @[DATA:///properties/amplitude_prop0:RIB]@
+    "uniform float wavelength" @[DATA:///properties/wavelength_prop0:RIB]@
+    "uniform float fac" @[DATA:///properties/fac_prop0:RIB]@
+    "uniform float size" @[DATA:///properties/size_prop0:RIB]@
+
+			</rib>
+			<regexes target="">
+			</regexes>
+			<properties>
+				<sl_name default="ripple" description="Shader&apos;s name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+				<sl_type default="Displacement" description="Choose shader type" items="[(&apos;Displacement&apos;, &apos;Displacement&apos;, &apos;&apos;)]" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+				<amplitude_prop0 default="1.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<wavelength_prop0 default="0.25" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<fac_prop0 default="1.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<size_prop0 default="5.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+			</properties>
+			<layout>
+				<info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
+					<sl_name expand="False" icon="" prop="sl_name" slider="False" text="Name" toggle="False" trigger="" type="PROP" />
+					<sl_type expand="False" icon="" prop="sl_type" slider="False" text="" toggle="False" trigger="" type="PROP" />
+				</info_row>
+				<amplitude_row0 active="@[EVAL:not @[ATTR:///properties/amplitude_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<amplitude_lb0 expand="False" icon="" prop="" slider="False" text="amplitude" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<amplitude_prop0 expand="False" icon="" prop="amplitude_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<amplitude_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/amplitude_prop0:]@" type="LINK" />
+				</amplitude_row0>
+				<wavelength_row0 active="@[EVAL:not @[ATTR:///properties/wavelength_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<wavelength_lb0 expand="False" icon="" prop="" slider="False" text="wavelength" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<wavelength_prop0 expand="False" icon="" prop="wavelength_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<wavelength_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/wavelength_prop0:]@" type="LINK" />
+				</wavelength_row0>
+				<fac_row0 active="@[EVAL:not @[ATTR:///properties/fac_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<fac_lb0 expand="False" icon="" prop="" slider="False" text="fac" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<fac_prop0 expand="False" icon="" prop="fac_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<fac_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/fac_prop0:]@" type="LINK" />
+				</fac_row0>
+				<size_row0 active="@[EVAL:not @[ATTR:///properties/size_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<size_lb0 expand="False" icon="" prop="" slider="False" text="size" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<size_prop0 expand="False" icon="" prop="size_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<size_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/size_prop0:]@" type="LINK" />
+				</size_row0>
+			</layout>
+		</ripple>
+		<waterdisplacement delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@waterdisplacement.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+			<rib target="">
+@[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@waterdisplacement"
+    "uniform float Km" @[DATA:///properties/Km_prop0:RIB]@
+    "uniform string bumpmap" @[DATA:///properties/bumpmap_prop0:RIB]@
+
+			</rib>
+			<regexes target="">
+			</regexes>
+			<properties>
+				<sl_name default="waterdisplacement" description="Shader&apos;s name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+				<sl_type default="Displacement" description="Choose shader type" items="[(&apos;Displacement&apos;, &apos;Displacement&apos;, &apos;&apos;)]" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+				<Km_prop0 default="1.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<bumpmap_prop0 default="" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+			</properties>
+			<layout>
+				<info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
+					<sl_name expand="False" icon="" prop="sl_name" slider="False" text="Name" toggle="False" trigger="" type="PROP" />
+					<sl_type expand="False" icon="" prop="sl_type" slider="False" text="" toggle="False" trigger="" type="PROP" />
+				</info_row>
+				<Km_row0 active="@[EVAL:not @[ATTR:///properties/Km_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<Km_lb0 expand="False" icon="" prop="" slider="False" text="Km" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<Km_prop0 expand="False" icon="" prop="Km_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<Km_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/Km_prop0:]@" type="LINK" />
+				</Km_row0>
+				<bumpmap_row0 active="@[EVAL:not @[ATTR:///properties/bumpmap_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<bumpmap_lb0 expand="False" icon="" prop="" slider="False" text="bumpmap" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<bumpmap_prop0 expand="False" icon="" prop="bumpmap_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<bumpmap_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/bumpmap_prop0:]@" type="LINK" />
+				</bumpmap_row0>
+			</layout>
+		</waterdisplacement>
+		<square_ridges delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@square_ridges.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+			<rib target="">
+@[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@square_ridges"
+    "uniform float Km" @[DATA:///properties/Km_prop0:RIB]@
+    "uniform float Frequency" @[DATA:///properties/Frequency_prop0:RIB]@
+    "uniform float Offset" @[DATA:///properties/Offset_prop0:RIB]@
+
+			</rib>
+			<regexes target="">
+			</regexes>
+			<properties>
+				<sl_name default="square_ridges" description="Shader&apos;s name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+				<sl_type default="Displacement" description="Choose shader type" items="[(&apos;Displacement&apos;, &apos;Displacement&apos;, &apos;&apos;)]" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+				<Km_prop0 default="1.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<Frequency_prop0 default="8.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<Offset_prop0 default="0.25" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+			</properties>
+			<layout>
+				<info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
+					<sl_name expand="False" icon="" prop="sl_name" slider="False" text="Name" toggle="False" trigger="" type="PROP" />
+					<sl_type expand="False" icon="" prop="sl_type" slider="False" text="" toggle="False" trigger="" type="PROP" />
+				</info_row>
+				<Km_row0 active="@[EVAL:not @[ATTR:///properties/Km_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<Km_lb0 expand="False" icon="" prop="" slider="False" text="Km" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<Km_prop0 expand="False" icon="" prop="Km_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<Km_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/Km_prop0:]@" type="LINK" />
+				</Km_row0>
+				<Frequency_row0 active="@[EVAL:not @[ATTR:///properties/Frequency_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<Frequency_lb0 expand="False" icon="" prop="" slider="False" text="Frequency" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<Frequency_prop0 expand="False" icon="" prop="Frequency_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<Frequency_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/Frequency_prop0:]@" type="LINK" />
+				</Frequency_row0>
+				<Offset_row0 active="@[EVAL:not @[ATTR:///properties/Offset_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<Offset_lb0 expand="False" icon="" prop="" slider="False" text="Offset" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<Offset_prop0 expand="False" icon="" prop="Offset_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<Offset_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/Offset_prop0:]@" type="LINK" />
+				</Offset_row0>
+			</layout>
+		</square_ridges>
+		<bubbles delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@bubbles.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+			<rib target="">
+@[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@bubbles"
+    "uniform float radius" @[DATA:///properties/radius_prop0:RIB]@
+    "uniform float Kmag" @[DATA:///properties/Kmag_prop0:RIB]@
+    "uniform float frequency" @[DATA:///properties/frequency_prop0:RIB]@
+
+			</rib>
+			<regexes target="">
+			</regexes>
+			<properties>
+				<sl_name default="bubbles" description="Shader&apos;s name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+				<sl_type default="Displacement" description="Choose shader type" items="[(&apos;Displacement&apos;, &apos;Displacement&apos;, &apos;&apos;)]" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+				<radius_prop0 default="0.5" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<Kmag_prop0 default="1.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<frequency_prop0 default="1.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+			</properties>
+			<layout>
+				<info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
+					<sl_name expand="False" icon="" prop="sl_name" slider="False" text="Name" toggle="False" trigger="" type="PROP" />
+					<sl_type expand="False" icon="" prop="sl_type" slider="False" text="" toggle="False" trigger="" type="PROP" />
+				</info_row>
+				<radius_row0 active="@[EVAL:not @[ATTR:///properties/radius_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<radius_lb0 expand="False" icon="" prop="" slider="False" text="radius" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<radius_prop0 expand="False" icon="" prop="radius_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<radius_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/radius_prop0:]@" type="LINK" />
+				</radius_row0>
+				<Kmag_row0 active="@[EVAL:not @[ATTR:///properties/Kmag_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<Kmag_lb0 expand="False" icon="" prop="" slider="False" text="Kmag" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<Kmag_prop0 expand="False" icon="" prop="Kmag_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<Kmag_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/Kmag_prop0:]@" type="LINK" />
+				</Kmag_row0>
+				<frequency_row0 active="@[EVAL:not @[ATTR:///properties/frequency_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<frequency_lb0 expand="False" icon="" prop="" slider="False" text="frequency" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<frequency_prop0 expand="False" icon="" prop="frequency_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<frequency_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/frequency_prop0:]@" type="LINK" />
+				</frequency_row0>
+			</layout>
+		</bubbles>
+		<bumpy delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@bumpy.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+			<rib target="">
+@[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@bumpy"
+    "uniform float Km" @[DATA:///properties/Km_prop0:RIB]@
+    "uniform string texturename" @[DATA:///properties/texturename_prop0:RIB]@
+
+			</rib>
+			<regexes target="">
+			</regexes>
+			<properties>
+				<sl_name default="bumpy" description="Shader&apos;s name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+				<sl_type default="Displacement" description="Choose shader type" items="[(&apos;Displacement&apos;, &apos;Displacement&apos;, &apos;&apos;)]" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+				<Km_prop0 default="1.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<texturename_prop0 default="" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+			</properties>
+			<layout>
+				<info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
+					<sl_name expand="False" icon="" prop="sl_name" slider="False" text="Name" toggle="False" trigger="" type="PROP" />
+					<sl_type expand="False" icon="" prop="sl_type" slider="False" text="" toggle="False" trigger="" type="PROP" />
+				</info_row>
+				<Km_row0 active="@[EVAL:not @[ATTR:///properties/Km_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<Km_lb0 expand="False" icon="" prop="" slider="False" text="Km" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<Km_prop0 expand="False" icon="" prop="Km_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<Km_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/Km_prop0:]@" type="LINK" />
+				</Km_row0>
+				<texturename_row0 active="@[EVAL:not @[ATTR:///properties/texturename_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<texturename_lb0 expand="False" icon="" prop="" slider="False" text="texturename" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<texturename_prop0 expand="False" icon="" prop="texturename_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<texturename_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/texturename_prop0:]@" type="LINK" />
+				</texturename_row0>
+			</layout>
+		</bumpy>
+		<gloop delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@gloop.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+			<rib target="">
+@[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@gloop"
+    "uniform float freq" @[DATA:///properties/freq_prop0:RIB]@
+    "uniform float magnitude" @[DATA:///properties/magnitude_prop0:RIB]@
+
+			</rib>
+			<regexes target="">
+			</regexes>
+			<properties>
+				<sl_name default="gloop" description="Shader&apos;s name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+				<sl_type default="Displacement" description="Choose shader type" items="[(&apos;Displacement&apos;, &apos;Displacement&apos;, &apos;&apos;)]" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+				<freq_prop0 default="5.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<magnitude_prop0 default="0.2" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+			</properties>
+			<layout>
+				<info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
+					<sl_name expand="False" icon="" prop="sl_name" slider="False" text="Name" toggle="False" trigger="" type="PROP" />
+					<sl_type expand="False" icon="" prop="sl_type" slider="False" text="" toggle="False" trigger="" type="PROP" />
+				</info_row>
+				<freq_row0 active="@[EVAL:not @[ATTR:///properties/freq_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<freq_lb0 expand="False" icon="" prop="" slider="False" text="freq" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<freq_prop0 expand="False" icon="" prop="freq_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<freq_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/freq_prop0:]@" type="LINK" />
+				</freq_row0>
+				<magnitude_row0 active="@[EVAL:not @[ATTR:///properties/magnitude_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<magnitude_lb0 expand="False" icon="" prop="" slider="False" text="magnitude" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<magnitude_prop0 expand="False" icon="" prop="magnitude_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<magnitude_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/magnitude_prop0:]@" type="LINK" />
+				</magnitude_row0>
+			</layout>
+		</gloop>
+		<emboss delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@emboss.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+			<rib target="">
+@[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@emboss"
+    "uniform float Km" @[DATA:///properties/Km_prop0:RIB]@
+    "uniform string texturename" @[DATA:///properties/texturename_prop0:RIB]@
+
+			</rib>
+			<regexes target="">
+			</regexes>
+			<properties>
+				<sl_name default="emboss" description="Shader&apos;s name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+				<sl_type default="Displacement" description="Choose shader type" items="[(&apos;Displacement&apos;, &apos;Displacement&apos;, &apos;&apos;)]" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+				<Km_prop0 default="0.05" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<texturename_prop0 default="" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+			</properties>
+			<layout>
+				<info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
+					<sl_name expand="False" icon="" prop="sl_name" slider="False" text="Name" toggle="False" trigger="" type="PROP" />
+					<sl_type expand="False" icon="" prop="sl_type" slider="False" text="" toggle="False" trigger="" type="PROP" />
+				</info_row>
+				<Km_row0 active="@[EVAL:not @[ATTR:///properties/Km_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<Km_lb0 expand="False" icon="" prop="" slider="False" text="Km" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<Km_prop0 expand="False" icon="" prop="Km_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<Km_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/Km_prop0:]@" type="LINK" />
+				</Km_row0>
+				<texturename_row0 active="@[EVAL:not @[ATTR:///properties/texturename_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<texturename_lb0 expand="False" icon="" prop="" slider="False" text="texturename" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<texturename_prop0 expand="False" icon="" prop="texturename_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<texturename_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/texturename_prop0:]@" type="LINK" />
+				</texturename_row0>
+			</layout>
+		</emboss>
+		<threads delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@threads.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+			<rib target="">
+@[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@threads"
+    "uniform float Km" @[DATA:///properties/Km_prop0:RIB]@
+    "uniform float frequency" @[DATA:///properties/frequency_prop0:RIB]@
+    "uniform float phase" @[DATA:///properties/phase_prop0:RIB]@
+    "uniform float offset" @[DATA:///properties/offset_prop0:RIB]@
+    "uniform float dampzone" @[DATA:///properties/dampzone_prop0:RIB]@
+
+			</rib>
+			<regexes target="">
+			</regexes>
+			<properties>
+				<sl_name default="threads" description="Shader&apos;s name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+				<sl_type default="Displacement" description="Choose shader type" items="[(&apos;Displacement&apos;, &apos;Displacement&apos;, &apos;&apos;)]" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+				<Km_prop0 default="0.1" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<frequency_prop0 default="5.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<phase_prop0 default="0.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<offset_prop0 default="0.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<dampzone_prop0 default="0.05" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+			</properties>
+			<layout>
+				<info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
+					<sl_name expand="False" icon="" prop="sl_name" slider="False" text="Name" toggle="False" trigger="" type="PROP" />
+					<sl_type expand="False" icon="" prop="sl_type" slider="False" text="" toggle="False" trigger="" type="PROP" />
+				</info_row>
+				<Km_row0 active="@[EVAL:not @[ATTR:///properties/Km_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<Km_lb0 expand="False" icon="" prop="" slider="False" text="Km" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<Km_prop0 expand="False" icon="" prop="Km_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<Km_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/Km_prop0:]@" type="LINK" />
+				</Km_row0>
+				<frequency_row0 active="@[EVAL:not @[ATTR:///properties/frequency_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<frequency_lb0 expand="False" icon="" prop="" slider="False" text="frequency" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<frequency_prop0 expand="False" icon="" prop="frequency_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<frequency_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/frequency_prop0:]@" type="LINK" />
+				</frequency_row0>
+				<phase_row0 active="@[EVAL:not @[ATTR:///properties/phase_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<phase_lb0 expand="False" icon="" prop="" slider="False" text="phase" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<phase_prop0 expand="False" icon="" prop="phase_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<phase_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/phase_prop0:]@" type="LINK" />
+				</phase_row0>
+				<offset_row0 active="@[EVAL:not @[ATTR:///properties/offset_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<offset_lb0 expand="False" icon="" prop="" slider="False" text="offset" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<offset_prop0 expand="False" icon="" prop="offset_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<offset_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/offset_prop0:]@" type="LINK" />
+				</offset_row0>
+				<dampzone_row0 active="@[EVAL:not @[ATTR:///properties/dampzone_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<dampzone_lb0 expand="False" icon="" prop="" slider="False" text="dampzone" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<dampzone_prop0 expand="False" icon="" prop="dampzone_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<dampzone_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/dampzone_prop0:]@" type="LINK" />
+				</dampzone_row0>
+			</layout>
+		</threads>
+		<slateroof delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@slateroof.slx.slmeta" type="SURFACE" windows="MATERIAL">
+			<rib target="">
+@[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@slateroof"
+    "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
+    "uniform float Kd" @[DATA:///properties/Kd_prop0:RIB]@
+    "uniform float sfreq" @[DATA:///properties/sfreq_prop0:RIB]@
+    "uniform float tfreq" @[DATA:///properties/tfreq_prop0:RIB]@
+    "uniform float maxadd" @[DATA:///properties/maxadd_prop0:RIB]@
+    "uniform float ramp" @[DATA:///properties/ramp_prop0:RIB]@
+    "uniform float gap" @[DATA:///properties/gap_prop0:RIB]@
+    "uniform float maxcolorvary" @[DATA:///properties/maxcolorvary_prop0:RIB]@
+    "uniform float factor" @[DATA:///properties/factor_prop0:RIB]@
+    "uniform float txtscale" @[DATA:///properties/txtscale_prop0:RIB]@
+
+			</rib>
+			<regexes target="">
+			</regexes>
+			<properties>
+				<sl_name default="slateroof" description="Shader&apos;s name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+				<sl_type default="Surface" description="Choose shader type" items="[(&apos;Surface&apos;, &apos;Surface&apos;, &apos;&apos;)]" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+				<Ka_prop0 default="0.2" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<Kd_prop0 default="0.8" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<sfreq_prop0 default="10.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<tfreq_prop0 default="10.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<maxadd_prop0 default="0.5" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<ramp_prop0 default="0.1" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<gap_prop0 default="0.05" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<maxcolorvary_prop0 default="0.2" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<factor_prop0 default="22.238" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<txtscale_prop0 default="1.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+			</properties>
+			<layout>
+				<info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
+					<sl_name expand="False" icon="" prop="sl_name" slider="False" text="Name" toggle="False" trigger="" type="PROP" />
+					<sl_type expand="False" icon="" prop="sl_type" slider="False" text="" toggle="False" trigger="" type="PROP" />
+				</info_row>
+				<Ka_row0 active="@[EVAL:not @[ATTR:///properties/Ka_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<Ka_lb0 expand="False" icon="" prop="" slider="False" text="Ka" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<Ka_prop0 expand="False" icon="" prop="Ka_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<Ka_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/Ka_prop0:]@" type="LINK" />
+				</Ka_row0>
+				<Kd_row0 active="@[EVAL:not @[ATTR:///properties/Kd_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<Kd_lb0 expand="False" icon="" prop="" slider="False" text="Kd" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<Kd_prop0 expand="False" icon="" prop="Kd_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<Kd_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/Kd_prop0:]@" type="LINK" />
+				</Kd_row0>
+				<sfreq_row0 active="@[EVAL:not @[ATTR:///properties/sfreq_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<sfreq_lb0 expand="False" icon="" prop="" slider="False" text="sfreq" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<sfreq_prop0 expand="False" icon="" prop="sfreq_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<sfreq_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/sfreq_prop0:]@" type="LINK" />
+				</sfreq_row0>
+				<tfreq_row0 active="@[EVAL:not @[ATTR:///properties/tfreq_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<tfreq_lb0 expand="False" icon="" prop="" slider="False" text="tfreq" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<tfreq_prop0 expand="False" icon="" prop="tfreq_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<tfreq_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/tfreq_prop0:]@" type="LINK" />
+				</tfreq_row0>
+				<maxadd_row0 active="@[EVAL:not @[ATTR:///properties/maxadd_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<maxadd_lb0 expand="False" icon="" prop="" slider="False" text="maxadd" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<maxadd_prop0 expand="False" icon="" prop="maxadd_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<maxadd_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/maxadd_prop0:]@" type="LINK" />
+				</maxadd_row0>
+				<ramp_row0 active="@[EVAL:not @[ATTR:///properties/ramp_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<ramp_lb0 expand="False" icon="" prop="" slider="False" text="ramp" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<ramp_prop0 expand="False" icon="" prop="ramp_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<ramp_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/ramp_prop0:]@" type="LINK" />
+				</ramp_row0>
+				<gap_row0 active="@[EVAL:not @[ATTR:///properties/gap_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<gap_lb0 expand="False" icon="" prop="" slider="False" text="gap" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<gap_prop0 expand="False" icon="" prop="gap_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<gap_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/gap_prop0:]@" type="LINK" />
+				</gap_row0>
+				<maxcolorvary_row0 active="@[EVAL:not @[ATTR:///properties/maxcolorvary_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<maxcolorvary_lb0 expand="False" icon="" prop="" slider="False" text="maxcolorvary" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<maxcolorvary_prop0 expand="False" icon="" prop="maxcolorvary_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<maxcolorvary_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/maxcolorvary_prop0:]@" type="LINK" />
+				</maxcolorvary_row0>
+				<factor_row0 active="@[EVAL:not @[ATTR:///properties/factor_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<factor_lb0 expand="False" icon="" prop="" slider="False" text="factor" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<factor_prop0 expand="False" icon="" prop="factor_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<factor_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/factor_prop0:]@" type="LINK" />
+				</factor_row0>
+				<txtscale_row0 active="@[EVAL:not @[ATTR:///properties/txtscale_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<txtscale_lb0 expand="False" icon="" prop="" slider="False" text="txtscale" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<txtscale_prop0 expand="False" icon="" prop="txtscale_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<txtscale_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/txtscale_prop0:]@" type="LINK" />
+				</txtscale_row0>
+			</layout>
+		</slateroof>
+		<dented delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@dented.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+			<rib target="">
+@[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@dented"
+    "uniform float Km" @[DATA:///properties/Km_prop0:RIB]@
+    "uniform float power" @[DATA:///properties/power_prop0:RIB]@
+    "uniform float frequency" @[DATA:///properties/frequency_prop0:RIB]@
+    "uniform float maxoctaves" @[DATA:///properties/maxoctaves_prop0:RIB]@
+
+			</rib>
+			<regexes target="">
+			</regexes>
+			<properties>
+				<sl_name default="dented" description="Shader&apos;s name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+				<sl_type default="Displacement" description="Choose shader type" items="[(&apos;Displacement&apos;, &apos;Displacement&apos;, &apos;&apos;)]" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+				<Km_prop0 default="1.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<power_prop0 default="3.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<frequency_prop0 default="1.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<maxoctaves_prop0 default="6.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+			</properties>
+			<layout>
+				<info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
+					<sl_name expand="False" icon="" prop="sl_name" slider="False" text="Name" toggle="False" trigger="" type="PROP" />
+					<sl_type expand="False" icon="" prop="sl_type" slider="False" text="" toggle="False" trigger="" type="PROP" />
+				</info_row>
+				<Km_row0 active="@[EVAL:not @[ATTR:///properties/Km_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<Km_lb0 expand="False" icon="" prop="" slider="False" text="Km" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<Km_prop0 expand="False" icon="" prop="Km_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<Km_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/Km_prop0:]@" type="LINK" />
+				</Km_row0>
+				<power_row0 active="@[EVAL:not @[ATTR:///properties/power_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<power_lb0 expand="False" icon="" prop="" slider="False" text="power" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<power_prop0 expand="False" icon="" prop="power_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<power_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/power_prop0:]@" type="LINK" />
+				</power_row0>
+				<frequency_row0 active="@[EVAL:not @[ATTR:///properties/frequency_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<frequency_lb0 expand="False" icon="" prop="" slider="False" text="frequency" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<frequency_prop0 expand="False" icon="" prop="frequency_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<frequency_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/frequency_prop0:]@" type="LINK" />
+				</frequency_row0>
+				<maxoctaves_row0 active="@[EVAL:not @[ATTR:///properties/maxoctaves_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<maxoctaves_lb0 expand="False" icon="" prop="" slider="False" text="maxoctaves" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<maxoctaves_prop0 expand="False" icon="" prop="maxoctaves_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<maxoctaves_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/maxoctaves_prop0:]@" type="LINK" />
+				</maxoctaves_row0>
+			</layout>
+		</dented>
+	</shader_panels>
+
+	<utility_panels filter="UTILITY">
+	</utility_panels>
+
+	<command_panels filter="COMMAND">
+	</command_panels>
+</Library_Displace>

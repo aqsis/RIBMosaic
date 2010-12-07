@@ -1,0 +1,198 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Library_Volume build="True" compile="True" dependecies="" enabled="True" filepath="Library_Volume.rmp" filter="LIBRARY_VOLUME" library="//shader_library/volume/" version="0.1">
+
+	<python_scripts>
+	</python_scripts>
+
+	<shader_sources>
+	</shader_sources>
+
+	<shader_panels filter="SHADER">
+		<depthcue_surf delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@depthcue_surf.slx.slmeta" type="SURFACE" windows="MATERIAL">
+			<rib target="">
+@[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@depthcue_surf"
+    "uniform float mindistance" @[DATA:///properties/mindistance_prop0:RIB]@
+    "uniform float maxdistance" @[DATA:///properties/maxdistance_prop0:RIB]@
+    "uniform float CScale" @[DATA:///properties/CScale_prop0:RIB]@
+    "uniform string debug" @[DATA:///properties/debug_prop0:RIB]@
+
+			</rib>
+			<regexes target="">
+			</regexes>
+			<properties>
+				<sl_name default="depthcue_surf" description="Shader&apos;s name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+				<sl_type default="Surface" description="Choose shader type" items="[(&apos;Surface&apos;, &apos;Surface&apos;, &apos;&apos;)]" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+				<mindistance_prop0 default="0.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<maxdistance_prop0 default="1.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<CScale_prop0 default="1000.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<debug_prop0 default="y" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+			</properties>
+			<layout>
+				<info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
+					<sl_name expand="False" icon="" prop="sl_name" slider="False" text="Name" toggle="False" trigger="" type="PROP" />
+					<sl_type expand="False" icon="" prop="sl_type" slider="False" text="" toggle="False" trigger="" type="PROP" />
+				</info_row>
+				<mindistance_row0 active="@[EVAL:not @[ATTR:///properties/mindistance_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<mindistance_lb0 expand="False" icon="" prop="" slider="False" text="mindistance" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<mindistance_prop0 expand="False" icon="" prop="mindistance_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<mindistance_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/mindistance_prop0:]@" type="LINK" />
+				</mindistance_row0>
+				<maxdistance_row0 active="@[EVAL:not @[ATTR:///properties/maxdistance_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<maxdistance_lb0 expand="False" icon="" prop="" slider="False" text="maxdistance" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<maxdistance_prop0 expand="False" icon="" prop="maxdistance_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<maxdistance_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/maxdistance_prop0:]@" type="LINK" />
+				</maxdistance_row0>
+				<CScale_row0 active="@[EVAL:not @[ATTR:///properties/CScale_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<CScale_lb0 expand="False" icon="" prop="" slider="False" text="CScale" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<CScale_prop0 expand="False" icon="" prop="CScale_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<CScale_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/CScale_prop0:]@" type="LINK" />
+				</CScale_row0>
+				<debug_row0 active="@[EVAL:not @[ATTR:///properties/debug_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<debug_lb0 expand="False" icon="" prop="" slider="False" text="debug" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<debug_prop0 expand="False" icon="" prop="debug_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<debug_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/debug_prop0:]@" type="LINK" />
+				</debug_row0>
+			</layout>
+		</depthcue_surf>
+		<depthcue delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="VOLUME" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@depthcue.slx.slmeta" type="VOLUME" windows="WORLD">
+			<rib target="">
+@[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@depthcue"
+    "uniform float mindistance" @[DATA:///properties/mindistance_prop0:RIB]@
+    "uniform float maxdistance" @[DATA:///properties/maxdistance_prop0:RIB]@
+    "uniform color background" @[DATA:///properties/background_prop0:RIB]@
+
+			</rib>
+			<regexes target="">
+			</regexes>
+			<properties>
+				<sl_name default="depthcue" description="Shader&apos;s name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+				<sl_type default="Atmosphere" description="Choose shader type" items="[(&apos;Atmosphere&apos;, &apos;Atmosphere&apos;, &apos;&apos;), (&apos;Interior&apos;, &apos;Interior&apos;, &apos;&apos;), (&apos;Exterior&apos;, &apos;Exterior&apos;, &apos;&apos;)]" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+				<mindistance_prop0 default="0.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<maxdistance_prop0 default="1.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<background_prop0 default="(0, 0, 0)" description="" items="" link="" max="1.0" maxlen="" min="0.0" precision="" size="" softmax="1.0" softmin="0.0" step="" type="COLOR" />
+			</properties>
+			<layout>
+				<info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
+					<sl_name expand="False" icon="" prop="sl_name" slider="False" text="Name" toggle="False" trigger="" type="PROP" />
+					<sl_type expand="False" icon="" prop="sl_type" slider="False" text="" toggle="False" trigger="" type="PROP" />
+				</info_row>
+				<mindistance_row0 active="@[EVAL:not @[ATTR:///properties/mindistance_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<mindistance_lb0 expand="False" icon="" prop="" slider="False" text="mindistance" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<mindistance_prop0 expand="False" icon="" prop="mindistance_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<mindistance_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/mindistance_prop0:]@" type="LINK" />
+				</mindistance_row0>
+				<maxdistance_row0 active="@[EVAL:not @[ATTR:///properties/maxdistance_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<maxdistance_lb0 expand="False" icon="" prop="" slider="False" text="maxdistance" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<maxdistance_prop0 expand="False" icon="" prop="maxdistance_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<maxdistance_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/maxdistance_prop0:]@" type="LINK" />
+				</maxdistance_row0>
+				<background_row0 active="@[EVAL:not @[ATTR:///properties/background_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<background_lb0 expand="False" icon="" prop="" slider="False" text="background" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<background_prop0 expand="False" icon="" prop="background_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<background_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/background_prop0:]@" type="LINK" />
+				</background_row0>
+			</layout>
+		</depthcue>
+		<altitude_fog delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="VOLUME" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@altitude_fog.slx.slmeta" type="VOLUME" windows="WORLD">
+			<rib target="">
+@[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@altitude_fog"
+    "uniform float max_height" @[DATA:///properties/max_height_prop0:RIB]@
+    "uniform float min_height" @[DATA:///properties/min_height_prop0:RIB]@
+    "uniform color background" @[DATA:///properties/background_prop0:RIB]@
+
+			</rib>
+			<regexes target="">
+			</regexes>
+			<properties>
+				<sl_name default="altitude_fog" description="Shader&apos;s name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+				<sl_type default="Atmosphere" description="Choose shader type" items="[(&apos;Atmosphere&apos;, &apos;Atmosphere&apos;, &apos;&apos;), (&apos;Interior&apos;, &apos;Interior&apos;, &apos;&apos;), (&apos;Exterior&apos;, &apos;Exterior&apos;, &apos;&apos;)]" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+				<max_height_prop0 default="1.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<min_height_prop0 default="0.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<background_prop0 default="(0, 0, 0)" description="" items="" link="" max="1.0" maxlen="" min="0.0" precision="" size="" softmax="1.0" softmin="0.0" step="" type="COLOR" />
+			</properties>
+			<layout>
+				<info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
+					<sl_name expand="False" icon="" prop="sl_name" slider="False" text="Name" toggle="False" trigger="" type="PROP" />
+					<sl_type expand="False" icon="" prop="sl_type" slider="False" text="" toggle="False" trigger="" type="PROP" />
+				</info_row>
+				<max_height_row0 active="@[EVAL:not @[ATTR:///properties/max_height_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<max_height_lb0 expand="False" icon="" prop="" slider="False" text="max_height" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<max_height_prop0 expand="False" icon="" prop="max_height_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<max_height_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/max_height_prop0:]@" type="LINK" />
+				</max_height_row0>
+				<min_height_row0 active="@[EVAL:not @[ATTR:///properties/min_height_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<min_height_lb0 expand="False" icon="" prop="" slider="False" text="min_height" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<min_height_prop0 expand="False" icon="" prop="min_height_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<min_height_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/min_height_prop0:]@" type="LINK" />
+				</min_height_row0>
+				<background_row0 active="@[EVAL:not @[ATTR:///properties/background_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<background_lb0 expand="False" icon="" prop="" slider="False" text="background" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<background_prop0 expand="False" icon="" prop="background_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<background_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/background_prop0:]@" type="LINK" />
+				</background_row0>
+			</layout>
+		</altitude_fog>
+		<fog delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="VOLUME" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@fog.slx.slmeta" type="VOLUME" windows="WORLD">
+			<rib target="">
+@[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@fog"
+    "uniform float distance" @[DATA:///properties/distance_prop0:RIB]@
+    "uniform color background" @[DATA:///properties/background_prop0:RIB]@
+
+			</rib>
+			<regexes target="">
+			</regexes>
+			<properties>
+				<sl_name default="fog" description="Shader&apos;s name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+				<sl_type default="Atmosphere" description="Choose shader type" items="[(&apos;Atmosphere&apos;, &apos;Atmosphere&apos;, &apos;&apos;), (&apos;Interior&apos;, &apos;Interior&apos;, &apos;&apos;), (&apos;Exterior&apos;, &apos;Exterior&apos;, &apos;&apos;)]" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+				<distance_prop0 default="1.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<background_prop0 default="(0, 0, 0)" description="" items="" link="" max="1.0" maxlen="" min="0.0" precision="" size="" softmax="1.0" softmin="0.0" step="" type="COLOR" />
+			</properties>
+			<layout>
+				<info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
+					<sl_name expand="False" icon="" prop="sl_name" slider="False" text="Name" toggle="False" trigger="" type="PROP" />
+					<sl_type expand="False" icon="" prop="sl_type" slider="False" text="" toggle="False" trigger="" type="PROP" />
+				</info_row>
+				<distance_row0 active="@[EVAL:not @[ATTR:///properties/distance_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<distance_lb0 expand="False" icon="" prop="" slider="False" text="distance" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<distance_prop0 expand="False" icon="" prop="distance_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<distance_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/distance_prop0:]@" type="LINK" />
+				</distance_row0>
+				<background_row0 active="@[EVAL:not @[ATTR:///properties/background_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<background_lb0 expand="False" icon="" prop="" slider="False" text="background" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<background_prop0 expand="False" icon="" prop="background_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<background_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/background_prop0:]@" type="LINK" />
+				</background_row0>
+			</layout>
+		</fog>
+	</shader_panels>
+
+	<utility_panels filter="UTILITY">
+	</utility_panels>
+
+	<command_panels filter="COMMAND">
+	</command_panels>
+</Library_Volume>

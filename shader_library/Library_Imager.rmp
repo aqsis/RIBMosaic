@@ -1,0 +1,99 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Library_Imager build="True" compile="True" dependecies="" enabled="True" filepath="Library_Imager.rmp" filter="LIBRARY_IMAGER" library="//shader_library/imager/" version="0.1">
+
+	<python_scripts>
+	</python_scripts>
+
+	<shader_sources>
+	</shader_sources>
+
+	<shader_panels filter="SHADER">
+		<bluescreen delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="IMAGER" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@bluescreen.slx.slmeta" type="IMAGER" windows="CAMERA">
+			<rib target="">
+@[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@bluescreen"
+    "uniform color background" @[DATA:///properties/background_prop0:RIB]@
+    "uniform string texturename" @[DATA:///properties/texturename_prop0:RIB]@
+
+			</rib>
+			<regexes target="">
+			</regexes>
+			<properties>
+				<sl_name default="bluescreen" description="Shader&apos;s name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+				<sl_type default="Imager" description="Choose shader type" items="[(&apos;Imager&apos;, &apos;Imager&apos;, &apos;&apos;)]" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+				<background_prop0 default="(0, 0, 1)" description="" items="" link="" max="1.0" maxlen="" min="0.0" precision="" size="" softmax="1.0" softmin="0.0" step="" type="COLOR" />
+				<texturename_prop0 default="" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+			</properties>
+			<layout>
+				<info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
+					<sl_name expand="False" icon="" prop="sl_name" slider="False" text="Name" toggle="False" trigger="" type="PROP" />
+					<sl_type expand="False" icon="" prop="sl_type" slider="False" text="" toggle="False" trigger="" type="PROP" />
+				</info_row>
+				<background_row0 active="@[EVAL:not @[ATTR:///properties/background_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<background_lb0 expand="False" icon="" prop="" slider="False" text="background" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<background_prop0 expand="False" icon="" prop="background_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<background_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/background_prop0:]@" type="LINK" />
+				</background_row0>
+				<texturename_row0 active="@[EVAL:not @[ATTR:///properties/texturename_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<texturename_lb0 expand="False" icon="" prop="" slider="False" text="texturename" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<texturename_prop0 expand="False" icon="" prop="texturename_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<texturename_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/texturename_prop0:]@" type="LINK" />
+				</texturename_row0>
+			</layout>
+		</bluescreen>
+		<background delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="IMAGER" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@background.slx.slmeta" type="IMAGER" windows="CAMERA">
+			<rib target="">
+@[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@background"
+    "uniform color bgcolor" @[DATA:///properties/bgcolor_prop0:RIB]@
+
+			</rib>
+			<regexes target="">
+			</regexes>
+			<properties>
+				<sl_name default="background" description="Shader&apos;s name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+				<sl_type default="Imager" description="Choose shader type" items="[(&apos;Imager&apos;, &apos;Imager&apos;, &apos;&apos;)]" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+				<bgcolor_prop0 default="(1, 1, 1)" description="" items="" link="" max="1.0" maxlen="" min="0.0" precision="" size="" softmax="1.0" softmin="0.0" step="" type="COLOR" />
+			</properties>
+			<layout>
+				<info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
+					<sl_name expand="False" icon="" prop="sl_name" slider="False" text="Name" toggle="False" trigger="" type="PROP" />
+					<sl_type expand="False" icon="" prop="sl_type" slider="False" text="" toggle="False" trigger="" type="PROP" />
+				</info_row>
+				<bgcolor_row0 active="@[EVAL:not @[ATTR:///properties/bgcolor_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<bgcolor_lb0 expand="False" icon="" prop="" slider="False" text="bgcolor" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<bgcolor_prop0 expand="False" icon="" prop="bgcolor_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<bgcolor_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/bgcolor_prop0:]@" type="LINK" />
+				</bgcolor_row0>
+			</layout>
+		</background>
+		<clamptoalpha delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="IMAGER" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@clamptoalpha.slx.slmeta" type="IMAGER" windows="CAMERA">
+			<rib target="">
+@[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@clamptoalpha"
+
+			</rib>
+			<regexes target="">
+			</regexes>
+			<properties>
+				<sl_name default="clamptoalpha" description="Shader&apos;s name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+				<sl_type default="Imager" description="Choose shader type" items="[(&apos;Imager&apos;, &apos;Imager&apos;, &apos;&apos;)]" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+			</properties>
+			<layout>
+				<info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
+					<sl_name expand="False" icon="" prop="sl_name" slider="False" text="Name" toggle="False" trigger="" type="PROP" />
+					<sl_type expand="False" icon="" prop="sl_type" slider="False" text="" toggle="False" trigger="" type="PROP" />
+				</info_row>
+			</layout>
+		</clamptoalpha>
+	</shader_panels>
+
+	<utility_panels filter="UTILITY">
+	</utility_panels>
+
+	<command_panels filter="COMMAND">
+	</command_panels>
+</Library_Imager>

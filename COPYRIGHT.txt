@@ -1,0 +1,4 @@
+The RenderMan(R) Interface Procedures and Protocol are:
+Copyright 1988, 1989, 2000, 2005 Pixar
+All Rights Reserved
+RenderMan(R) is a registered trademark of Pixar

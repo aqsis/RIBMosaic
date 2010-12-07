@@ -1,0 +1,58 @@
+Instructions for building the ribify C module for RIB Mosaic.
+NOTE: This is NOT required to use RIB Mosaic as a Blender add-on, see README.txt!
+
+INTRODUCTION:
+RIB Mosaic contains a class responsible for exporting all Blender geometry called
+"ribify". Although fully functional "as is" ribify cannot process large amounts
+of geometry efficiently as a Python script. Therefore the rm_ribify.py script has
+been designed to work with Cython to be compiled into a low level C python module.
+Although not strictly neccessary you can attain significant performance gains by
+compiling and installing ribify as a C module. Since RIB Mosaic is already fully
+funtional and this process can be very difficult this is ONLY recommend for
+advanced users (comfortable with compiling sources from the command line)!
+
+BUILDING AND INSTALLATION:
+The following is a basic outline for compiling and installing ribify...
+
+- To build you'll first need to setup a build environment. The procedure for this
+  can vary greatly depending on your OS so I'll only cover the high points...
+  - You'll need the latest copy of Python 3.1 along with all source headers. For
+    Windows these are already in in the installer otherwise you may have to
+    specify what modules and sources to install.
+  - You'll need the latest copy of Cython compatible with Python 3.1 sources.
+  - You'll need a compiler. If on Windows this is usually MSVC or mingw32
+    otherwise probably GCC.
+  - Depending on your OS you may also want to verify that both Python and the
+    compiler are setup in your env paths by testing them in the console.
+  I recommend using the same version of Python and compiler used to build your
+  copy of Blender (to head off any problems). If using Linux you probably already
+  have a build environment setup otherwise it may take a good bit of effort and
+  skill to get this all working correctly. Here's some links that may help...
+  <http://www.python.org>
+  <http://www.cython.org>
+  <http://www.mingw.org>
+  <http://www.microsoft.com/express/Downloads>
+- Once you have a working build environment we can build ribify using Python's
+  setup tools. Do this by starting a console session in this folder and entering
+  "python setup.py build" to begin the build process. If setup cannot find your
+  compiler you may also need to use the -c switch to specify the compiler such
+  as "python setup.py build -c mingw32".
+  If all goes well you should see the folders ./build/build.<plat> where <plat>
+  is the name of your platform. Contained in the build folder should be the file
+  ribify.<ext> where <ext> is the file extension of the Python modules for your
+  platform (such as ".so" or ".pyd").
+- This next step depends on whether Blender is using it's bundled python or
+  your system's installed python...
+  - Start Blender, if it says "found bundled python:" in the console then copy
+    your ribify module to the "lib" directory in the path listed by Blender.
+  - Otherwise we can automatically install the module by using setup tools with
+    the command "python setup.py install" from the "ribify_module" folder.
+
+Test if the installation was successful by starting Blender with RIB Mosaic
+enabled and check the console. If you see "ribify module found, using C level
+exporter" then the installation was successful. If you see "ribify module not
+found, using script level exporter" then you need to verify that the module
+is installed in the correct folder and properly compiled for your OS.
+
+Enjoy,
+Eric Back (WHiTeRaBBiT)
