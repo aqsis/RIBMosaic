@@ -219,13 +219,13 @@ for module in modules:
 
 # #### Global classes
 
-class RibmosaicFiles(bpy.types.IDPropertyGroup):
+class RibmosaicFiles(bpy.types.PropertyGroup):
     """Group for name property collection of multiple file selections"""
     
     pass
 
 
-class RibmosaicCollectionProps(bpy.types.IDPropertyGroup):
+class RibmosaicCollectionProps(bpy.types.PropertyGroup):
     """Generic collection properties"""
     
     
@@ -247,7 +247,7 @@ class RibmosaicCollectionProps(bpy.types.IDPropertyGroup):
                 default="")
 
 
-class RibmosaicCollectionGroup(bpy.types.IDPropertyGroup):
+class RibmosaicCollectionGroup(bpy.types.PropertyGroup):
     """Generic collection group"""
     
     
@@ -277,7 +277,7 @@ class RibmosaicCollectionGroup(bpy.types.IDPropertyGroup):
 
 # #### Render space classes
 
-class RibmosaicPassProps(bpy.types.IDPropertyGroup):
+class RibmosaicPassProps(bpy.types.PropertyGroup):
     """Render passes properties"""
     
     
@@ -554,7 +554,7 @@ class RibmosaicPassProps(bpy.types.IDPropertyGroup):
                 default="")
 
 
-class RibmosaicPassGroup(bpy.types.IDPropertyGroup):
+class RibmosaicPassGroup(bpy.types.PropertyGroup):
     """Render passes group"""
     
     
@@ -601,22 +601,22 @@ def create_props():
         pass
     
     try:
-        bpy.types.register(RibmosaicCollectionProps)
+        bpy.utils.register_class(RibmosaicCollectionProps)
     except:
         pass
     
     try:
-        bpy.types.register(RibmosaicCollectionGroup)
+        bpy.utils.register_class(RibmosaicCollectionGroup)
     except:
         pass
     
     try:
-        bpy.types.register(RibmosaicPassProps)
+        bpy.utils.register_class(RibmosaicPassProps)
     except:
         pass
     
     try:
-        bpy.types.register(RibmosaicPassGroup)
+        bpy.utils.register_class(RibmosaicPassGroup)
     except:
         pass
     

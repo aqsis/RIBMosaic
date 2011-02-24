@@ -51,17 +51,18 @@
 # END BLOCKS
 # #############################################################################
 
-bl_addon_info = {'name':"RIB Mosaic",
-                'author':"Eric Back (WHiTeRaBBiT)",
-                'version':(0, 1),
-                'blender':(2, 5, 5),
-                'api':33226,
-                'category':"Render",
-                'warning':"GIT Alpha",
-                'location':"Info Header (engine dropdown)",
-                'description':"RenderMan production environment for Blender",
-                'wiki_url':"http://sourceforge.net/apps/mediawiki/ribmosaic",
-                'tracker_url':"http://sourceforge.net/projects/ribmosaic/develop"}
+bl_info = {
+    "name": "RIB Mosaic",
+    "author": "Eric Back (WHiTeRaBBiT), Jeff Doyle (nfz)",
+    "version": (0, 1, 1),
+    "blender": (2, 5, 6),
+    "api": 35000,
+    "location": "Info Header (engine dropdown)",
+    "description": "RenderMan production environment for Blender",
+    "warning": "GIT Alpha",
+    "wiki_url": "http://sourceforge.net/apps/mediawiki/ribmosaic",
+    "tracker_url": "http://sourceforge.net/projects/ribmosaic/develop",
+    "category": "Render"}
 
 import os
 import bpy
@@ -76,8 +77,8 @@ import bpy
 # #### Global variables
 
 MODULE = os.path.dirname(__file__).split(os.sep)[-1]
-ENGINE = bl_addon_info['name']
-VERSION = ".".join([str(d) for d in bl_addon_info['version']])
+ENGINE = bl_info['name']
+VERSION = ".".join([str(d) for d in bl_info['version']])
 pipeline_manager = None
 export_manager = None
 ribify = None
@@ -167,6 +168,7 @@ def register():
         ribify = rm_ribify.Ribify()
         RibmosaicInfo("ribify module not found, using script level exporter")
 
+    bpy.utils.register_module(__name__)
 
 def unregister():
     """Unregister Blender classes"""
@@ -187,6 +189,7 @@ def unregister():
     # Destroy our properties
     rm_property.destroy_props()
 
+    bpy.utils.unregister_module(__name__)
 
 if __name__ == "__main__":
     register()
