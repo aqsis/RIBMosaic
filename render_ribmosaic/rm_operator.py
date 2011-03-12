@@ -554,7 +554,7 @@ class WM_OT_ribmosaic_xml_file(rm_context.ExportContext,
         if path:
             self.event = path
          
-        context.window_manager.add_fileselect(self)
+        context.window_manager.fileselect_add(self)
         
         return {'RUNNING_MODAL'}
 
@@ -640,7 +640,7 @@ class WM_OT_ribmosaic_panel_delete(rm_context.ExportContext,
             rm.pipeline_manager.remove_panel(self.xmlpath)
             self._refresh_panels()
             
-            rm.RibmosaicInfo("Panel " + self.xmlpath + " removed")
+            rm.RibmosaicInfo("WM_OT_ribmosaic_panel_delete.execute: Panel " + self.xmlpath + " removed")
         except rm_error.RibmosaicError as err:
             err.ReportError(self)
             return {'CANCELLED'}
@@ -964,7 +964,7 @@ class WM_OT_ribmosaic_library_set(rm_context.ExportContext,
             err.ReportError(self)
             return {'CANCELLED'}
         
-        context.window_manager.add_fileselect(self)
+        context.window_manager.fileselect_add(self)
         
         return {'RUNNING_MODAL'}
 
@@ -1222,7 +1222,7 @@ class WM_OT_ribmosaic_library_addpanel(rm_context.ExportContext,
             err.ReportError(self)
             return {'CANCELLED'}
         
-        context.window_manager.add_fileselect(self)
+        context.window_manager.fileselect_add(self)
         
         return {'RUNNING_MODAL'}
 
@@ -1391,7 +1391,7 @@ class WM_OT_ribmosaic_pipeline_load(rm_context.ExportContext,
     def invoke(self, context, event):
         wm = context.window_manager
         
-        wm.add_fileselect(self)
+        wm.fileselect_add(self)
         
         return {'RUNNING_MODAL'}
 
@@ -1421,7 +1421,7 @@ class WM_OT_ribmosaic_pipeline_remove(rm_context.ExportContext,
         try:
             rm.pipeline_manager.remove_pipeline(self.pipeline)
             
-            rm.RibmosaicInfo("Pipeline " + self.pipeline + " removed")
+            rm.RibmosaicInfo("WM_OT_ribmosaic_pipeline_remove.execute: Pipeline " + self.pipeline + " removed")
             self._refresh_panels()
         except rm_error.RibmosaicError as err:
             err.ReportError(self)
@@ -1590,7 +1590,7 @@ class WM_OT_ribmosaic_pipeline_register(rm_context.ExportContext,
         try:
             for panel in rm.pipeline_manager.list_elements(category):
                 xmlpath = category + "/" + panel
-                rm.RibmosaicInfo("Registering panel " + panel + "...")
+                rm.RibmosaicInfo("WM_OT_ribmosaic_pipeline_register.execute: Registering panel " + panel + "...")
                 rm.pipeline_manager.set_attrs(xmlpath, True, False, register="True")
             
             rm.pipeline_manager._write_xml(self.pipeline)
@@ -1637,7 +1637,7 @@ class WM_OT_ribmosaic_pipeline_unregister(rm_context.ExportContext,
         try:
             for panel in rm.pipeline_manager.list_elements(category):
                 xmlpath = category + "/" + panel
-                rm.RibmosaicInfo("Unregistering panel " + panel + "...")
+                rm.RibmosaicInfo("WM_OT_ribmosaic_pipeline_unregister.execute: Unregistering panel " + panel + "...")
                 rm.pipeline_manager.set_attrs(xmlpath, True, False, register="False")
             
             rm.pipeline_manager._write_xml(self.pipeline)
@@ -1684,7 +1684,7 @@ class WM_OT_ribmosaic_pipeline_purge(rm_context.ExportContext,
         try:
             for panel in rm.pipeline_manager.list_elements(category):
                 xmlpath = category + "/" + panel
-                rm.RibmosaicInfo("Purging shader panel " + panel + "...")
+                rm.RibmosaicInfo("WM_OT_ribmosaic_pipeline_purge.execute: Purging shader panel " + panel + "...")
                 rm.pipeline_manager.remove_panel(xmlpath)
             
             rm.pipeline_manager._write_xml(self.pipeline)
@@ -2314,7 +2314,7 @@ class SCENE_OT_ribmosaic_searchpath(rm_context.ExportContext,
         return {'FINISHED'}
     
     def invoke(self, context, event):
-        context.window_manager.add_fileselect(self)
+        context.window_manager.fileselect_add(self)
         
         return {'RUNNING_MODAL'}
 
@@ -2360,7 +2360,7 @@ class SCENE_OT_ribmosaic_exportpath(rm_context.ExportContext,
         return {'FINISHED'}
     
     def invoke(self, context, event):
-        context.window_manager.add_fileselect(self)
+        context.window_manager.fileselect_add(self)
         
         return {'RUNNING_MODAL'}
 
