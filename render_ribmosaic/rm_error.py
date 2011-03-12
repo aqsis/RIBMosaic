@@ -87,7 +87,8 @@ class RibmosaicError(Exception):
     
     def ReportError(self, operator=None):
         print(rm.ENGINE + " Error: " + self._message)
-        
+        traceback.print_exc()
+
         if self._exc_info:
             traceback.print_tb(self._exc_info[2])
             for t in self._exc_info[:2]:
