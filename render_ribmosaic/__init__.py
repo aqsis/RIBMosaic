@@ -64,11 +64,8 @@ bl_info = {
     "tracker_url": "http://sourceforge.net/projects/ribmosaic/develop",
     "category": "Render"}
 
+
 import os
-import bpy
-
-
-
 
 # #############################################################################
 # GLOBAL VARIABLES, FUNCTIONS AND CLASSES
@@ -83,7 +80,25 @@ pipeline_manager = None
 export_manager = None
 ribify = None
 
-exec("from " + MODULE + " import rm_panel")
+
+# #### Manage modules
+if "bpy" in locals():
+    import imp
+    imp.reload(rm_pipeline)
+    imp.reload(rm_export)
+    imp.reload(rm_ribify)
+    imp.reload(rm_property)
+    imp.reload(rm_panel)
+    imp.reload(rm_operator)
+else:
+    import bpy
+    from bpy.props import StringProperty, BoolProperty, IntProperty, FloatProperty, FloatVectorProperty, EnumProperty
+    exec("from " + MODULE + " import rm_pipeline")
+    exec("from " + MODULE + " import rm_export")
+    exec("from " + MODULE + " import rm_ribify")
+    exec("from " + MODULE + " import rm_property")
+    exec("from " + MODULE + " import rm_panel")
+    exec("from " + MODULE + " import rm_operator")
 
 
 # #### Global functions
@@ -109,21 +124,6 @@ def RibPath(path):
     return path.strip().replace(os.sep, "/")
 
 
-# #### Manage modules
-if "rm_pipeline" in locals():
-    reload(rm_pipeline)
-    reload(rm_export)
-    reload(rm_ribify)
-    reload(rm_property)
-    reload(rm_panel)
-    reload(rm_operator)
-else:
-    exec("from " + MODULE + " import rm_pipeline")
-    exec("from " + MODULE + " import rm_export")
-    exec("from " + MODULE + " import rm_ribify")
-    exec("from " + MODULE + " import rm_property")
-    exec("from " + MODULE + " import rm_panel")
-    exec("from " + MODULE + " import rm_operator")
 
 
 
