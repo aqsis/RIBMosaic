@@ -270,7 +270,7 @@ in the "trigger" attribute of a BUTTON control would create a new render pass
 the panels "mybut" control.
 
 Pass Design:
-Render passes in the new RIB Mosaic are not scenes but a collection os data on the
+Render passes in the new RIB Mosaic are not scenes but a collection of data on the
 scene datablock. They can be found in the Render property window under RenderMan
 passes (to distiguish them from Blender's passes). Passes function in much the
 same way as in the previous RIB Mosaic as they define the active camera and how
@@ -321,7 +321,7 @@ The following is an outline of the RIB Mosaic source modules:
 __init__.py
 The initialization module is the first started by Blender when add-on is enabled.
 This module has several responsibilities:
-- Initializes the bl_addon_info dictionary for Blender add-on's.
+- Initializes the bl_info dictionary for Blender add-on's.
 - Initializes global variables and defines global functions used throughout
   all other modules. It's also important to note this is the only module
   defining globals as all other modules contain class definitions only.
