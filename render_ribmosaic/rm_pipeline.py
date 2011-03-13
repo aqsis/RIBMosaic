@@ -65,8 +65,8 @@ exec("from " + MODULE + " import rm_error")
 exec("from " + MODULE + " import rm_context")
 exec("import " + MODULE + " as rm")
 
-
-
+# if DEBUG_PRINT set true then each method with print its method name and important vars to console io
+DEBUG_PRINT = True;
 
 # #############################################################################
 # PIPELINE MANAGER CLASS
@@ -918,6 +918,8 @@ class PipelineManager():
         return = the new element object
         """
         
+        if DEBUG_PRINT:
+            print("PipelineManager._new_element()")
         try:
             element = self._pipeline_tree.find(xmlpath)
             children = element.getchildren()
@@ -968,7 +970,7 @@ class PipelineManager():
             
             element.insert(eindex, sub)
         except:
-            raise rm_error.RibmosaicError("Could not create element, check console",
+            raise rm_error.RibmosaicError("PipelineManager._new_element: Could not create element, check console",
                                           sys.exc_info())
         
         return sub
@@ -981,24 +983,27 @@ class PipelineManager():
         return = the generated tree element
         """
         
+        if DEBUG_PRINT:
+            print("PipelineManager._load_xml()")
+
         try:
             text_data = bpy.data.texts[text]
             text_xml = text_data.as_string()
             element = ET.XML(text_xml)
             element.attrib["filepath"] = text # Update attr with current filename
         except:
-            raise rm_error.RibmosaicError("Could not parse XML, check console",
+            raise rm_error.RibmosaicError("PipelineManager._load_xml: Could not parse XML, check console",
                                           sys.exc_info())
         
         # Don't load this pipeline if one already has the same element name
         if self._pipeline_tree.findall(element.tag):
-            raise rm_error.RibmosaicError("Pipeline already loaded")
+            raise rm_error.RibmosaicError("PipelineManager._load_xml: Pipeline already loaded")
         
         self._pipeline_tree.getroot().append(element)
         
         # Print pipeline description silently to console
         if description:
-            rm.RibmosaicInfo(element.tag + " description...")
+            rm.RibmosaicInfo("PipelineManager._load_xml: " + element.tag + " description...")
             
             for l in self.list_help(element.tag):
                 print(l)
@@ -1013,6 +1018,10 @@ class PipelineManager():
         return = the text file this pipeline was loaded from
         """
         
+        if DEBUG_PRINT:
+            print("PipelineManager._unload_xml()")
+            print("xmlpath: " + xmlpath)
+
         try:
             # Get XML path to parent element
             parentpath = "/".join(xmlpath.split("/")[:-1])
@@ -1021,6 +1030,11 @@ class PipelineManager():
             parent = self._pipeline_tree.find(parentpath)
             element = self._pipeline_tree.find(xmlpath)
             
+            if DEBUG_PRINT:
+                print("parentpath: ", parentpath)
+                print("parent: ", parent)
+                print("element: ", element)
+
             # Retrieve filepath attribute for return if exists
             if element and "filepath" in element.attrib:
                 filename = element.attrib["filepath"]
@@ -1047,7 +1061,7 @@ class PipelineManager():
             # Get rid of it
             parent.remove(element)
         except:
-            raise rm_error.RibmosaicError("Could not unload pipeline, check console",
+            raise rm_error.RibmosaicError("PipelineManager._unload_xml: Could not unload pipeline, check console",
                                           sys.exc_info())
         
         return filename
@@ -1059,6 +1073,8 @@ class PipelineManager():
         pipeline = the element tag name in the tree to write to text
         """
         
+        if DEBUG_PRINT:
+            print("PipelineManager._write_xml()")
         try:
             element = self._pipeline_tree.find(pipeline)
             text = element.attrib["filepath"]
@@ -1073,7 +1089,7 @@ class PipelineManager():
             
             self.revisions += 1
         except:
-            raise rm_error.RibmosaicError("Could not write pipeline to text, check console",
+            raise rm_error.RibmosaicError("PipelineManager._write_xml: Could not write pipeline to text, check console",
                                           sys.exc_info())
     
     def _register_panel(self, pipeline, category, panel):
@@ -1098,7 +1114,10 @@ class PipelineManager():
             """
             
             code = []
-            
+            if DEBUG_PRINT:
+                print("PipelineManager._register_panel().unfold_layout()")
+                print("xmlpath: " + xmlpath)
+
             # Generate code from sub elements
             for l_name in self.list_elements(xmlpath):
                 h = "" # Layout header
@@ -1211,6 +1230,9 @@ class PipelineManager():
                         code.extend(p)
             return code
         
+        if DEBUG_PRINT:
+            print("PipelineManager._register_panel()")
+
         ec = rm_context.ExportContext()
         ec.context_pipeline = pipeline
         ec.context_category = category
@@ -1378,7 +1400,7 @@ class PipelineManager():
             # Validate window filters against panel's category
             for wt in window_types:
                 if wt not in self._category_windows[category]:
-                    raise rm_error.RibmosaicError("Panel '" + panel + \
+                    raise rm_error.RibmosaicError("PipelineManager._register_panel: Panel '" + panel + \
                                     "' in panels category '" + category + \
                                     "' using wrong windows filter '" + wt + "'")
             
@@ -1509,11 +1531,13 @@ class PipelineManager():
                         properties.append("del " + props[wt] + "." + attr)
                         prop.append("")
             
-            #print("\n".join(prop + head + func + draw + tail))
+            if DEBUG_PRINT:
+                print("\n".join(prop + head + func + draw + tail))
+
             try:
                 exec("\n".join(prop + head + func + draw + tail), globals(), local)
             except:
-                raise rm_error.RibmosaicError("Failed to generate panel " + path,
+                raise rm_error.RibmosaicError("PipelineManager._register_panel: Failed to generate panel " + path,
                                               sys.exc_info())
             
             classes.append(local['panel'])
@@ -1538,7 +1562,10 @@ class PipelineManager():
         category = sub element containing panel
         panel = name of panel to unregister
         """
-        
+
+        if DEBUG_PRINT:
+            print("PipelineManager._unregister_panel()")
+
         if pipeline in self._pipeline_panels:
             if category in self._pipeline_panels[pipeline]:
                 if panel in self._pipeline_panels[pipeline][category]:
@@ -1568,13 +1595,17 @@ class PipelineManager():
             self._unregister_pipeline(pipeline)
         else:
             self._pipeline_panels[pipeline] = {}
-        
+        if DEBUG_PRINT:
+            print("PipelineManager._register_pipeline()")
+
         for category in ['shader_panels', 'utility_panels', 'command_panels']:
             for panel in self.list_elements(pipeline + "/" + category):
                 self._register_panel(pipeline, category, panel)
     
     def _unregister_pipeline(self, pipeline):
         """Unregister all panels in pipeline"""
+        if DEBUG_PRINT:
+            print("PipelineManager._unregister_pipeline()")
         if pipeline in self._pipeline_panels:
             for category in ['shader_panels', 'utility_panels', 'command_panels']:
                 for panel in self.list_elements(pipeline + "/" + category):
@@ -1592,6 +1623,9 @@ class PipelineManager():
         info = information displayed when pipeline is loaded
         """
         
+        if DEBUG_PRINT:
+            print("PipelineManager.new_pipeline()")
+
         try:
             if name:
                 if name.endswith(".rmp"):
@@ -1611,7 +1645,7 @@ class PipelineManager():
                 self._write_xml(name)
                 self._register_pipeline(name)
         except:
-            raise rm_error.RibmosaicError("Pipeline creation failed" + \
+            raise rm_error.RibmosaicError("PipelineManager.newpipeline: Pipeline creation failed" + \
                                           self._error_con,
                                           sys.exc_info())
         
@@ -1624,20 +1658,23 @@ class PipelineManager():
         return = pipeline element name
         """
         
+        if DEBUG_PRINT:
+            print("PipelineManager.load_pipeline()")
+
         filename = os.path.split(filepath)[1]
         
         if not filepath:
-            raise rm_error.RibmosaicError("No path specified")
+            raise rm_error.RibmosaicError("PipelineManager.load_pipeline: No path specified")
         elif not filename:
-            raise rm_error.RibmosaicError("No filename specified")
+            raise rm_error.RibmosaicError("PipelineManager.load_pipeline: No filename specified")
         elif os.path.splitext(filename)[1] != ".rmp":
-            raise rm_error.RibmosaicError("Invalid file extension (*.rmp)")
+            raise rm_error.RibmosaicError("PipelineManager.load_pipeline: Invalid file extension (*.rmp)")
         
         try:
             text = bpy.context.blend_data.texts.load(filepath)
             filename = text.name # Get text name again in case it was changed
         except:
-            raise rm_error.RibmosaicError("Load failed" + self._error_con,
+            raise rm_error.RibmosaicError("PipelineManager.load_pipeline: Load failed" + self._error_con,
                                 sys.exc_info())
         
         try:
@@ -1647,13 +1684,13 @@ class PipelineManager():
         except rm_error.RibmosaicError as err:
             err.ReportError()
             bpy.context.blend_data.texts.remove(bpy.data.texts[filename])
-            raise rm_error.RibmosaicError(self._error_load)
+            raise rm_error.RibmosaicError("PipelineManager.load_pipeline: " + self._error_load)
         
         try:
             self._register_pipeline(pipeline)
         except rm_error.RibmosaicError as err:
             err.ReportError()
-            raise rm_error.RibmosaicError(self._error_register)
+            raise rm_error.RibmosaicError("PipelineManager.load_pipeline: " + self._error_register)
         
         self.revisions += 1
         return pipeline
@@ -1663,23 +1700,25 @@ class PipelineManager():
         
         pipeline = name of pipeline to remove (the element name not text name)
         """
-        
+        if DEBUG_PRINT:
+            print("PipelineManager.remove_pipeline()")
+
         if not pipeline:
-            raise rm_error.RibmosaicError("No pipeline specified")
+            raise rm_error.RibmosaicError("PipelineManager.remove_pipeline: No pipeline specified")
         elif pipeline not in self._pipeline_panels:
-            raise rm_error.RibmosaicError("Pipeline not loaded")
+            raise rm_error.RibmosaicError("PipelineManager.remove_pipeline: Pipeline not loaded")
         
         try:
             self._unregister_pipeline(pipeline)
         except rm_error.RibmosaicError as err:
             err.ReportError()
-            raise rm_error.RibmosaicError(self._error_unregister)
+            raise rm_error.RibmosaicError("PipelineManager.remove_pipeline: " + self._error_unregister)
         
         try:
             filename = self._unload_xml(pipeline)
         except rm_error.RibmosaicError as err:
             err.ReportError()
-            raise rm_error.RibmosaicError(self._error_unload)
+            raise rm_error.RibmosaicError("PipelineManager.remove_pipeline: " + self._error_unload)
         
         path = bpy.data.texts[filename].filepath.replace("\\", "/")
         
@@ -1688,9 +1727,9 @@ class PipelineManager():
             self.revisions += 1
             self._pipeline_texts = self.list_rmp()
         except:
-            rm.RibmosaicInfo("Unavailable... reloading pipelines. try removal again")
+            rm.RibmosaicInfo("PipelineManager.remove_pipeline:Unavailable... reloading pipelines. try removal again")
             self.update_pipeline() # Update all pipelines so maybe text name will reset
-            raise rm_error.RibmosaicError("Removal failed" + self._error_con,
+            raise rm_error.RibmosaicError("PipelineManager.remove_pipeline: Removal failed" + self._error_con,
                                 sys.exc_info())
         
         # If addon pipeline was removed then force addon update
@@ -1707,31 +1746,35 @@ class PipelineManager():
         description = print pipeline descriptions to console when updating
         """
         
+        if DEBUG_PRINT:
+            print("PipelineManager.update_pipeline()")
+            print(pipeline)
+
         if pipeline:
             if pipeline in self._pipeline_panels:
                 try:
                     self._unregister_pipeline(pipeline)
                 except rm_error.RibmosaicError as err:
                     err.ReportError()
-                    raise rm_error.RibmosaicError(self._error_unregister)
+                    raise rm_error.RibmosaicError("PipelineManager.update_pipeline: " + self._error_unregister)
                 
                 try:
                     filename = self._unload_xml(pipeline)
                 except rm_error.RibmosaicError as err:
                     err.ReportError()
-                    raise rm_error.RibmosaicError(self._error_unload)
+                    raise rm_error.RibmosaicError("PipelineManager.update_pipeline: " + self._error_unload)
                 
                 try:
                     element = self._load_xml(filename)
                 except rm_error.RibmosaicError as err:
                     err.ReportError()
-                    raise rm_error.RibmosaicError(self._error_load)
+                    raise rm_error.RibmosaicError("PipelineManager.update_pipeline: " + self._error_load)
                 
                 try:
                     self._register_pipeline(element.tag)
                 except rm_error.RibmosaicError as err:
                     err.ReportError()
-                    raise rm_error.RibmosaicError(self._error_register)
+                    raise rm_error.RibmosaicError("PipelineManager.update_pipeline: " + self._error_register)
         else:
             self.flush()
             
@@ -1755,43 +1798,53 @@ class PipelineManager():
                         element = self._load_xml(p, description)
                     except rm_error.RibmosaicError as err:
                         err.ReportError()
-                        raise rm_error.RibmosaicError(self._error_load)
+                        raise rm_error.RibmosaicError("PipelineManager.update_pipeline: " + self._error_load)
                     
                     try:
                         self._register_pipeline(element.tag)
                     except rm_error.RibmosaicError as err:
                         err.ReportError()
-                        raise rm_error.RibmosaicError(self._error_register)
+                        raise rm_error.RibmosaicError("PipelineManager.update_pipeline: " + self._error_register)
         
         self._pipeline_texts = self.list_rmp()
         self.revisions += 1
     
     def sync(self):
         """Sync XML tree and panel registration with pipelines in text editor"""
-        
+
         if self.revisions == 0 or self._pipeline_texts != self.list_rmp():
+            if DEBUG_PRINT:
+                print("PipelineManager.sync()")
             self.update_pipeline()
+
     
     def flush(self):
         """Unregisters and removes all pipelines in pipeline tree"""
         
+        if DEBUG_PRINT:
+            print("PipelineManager.flush()")
+
         for p in self.list_pipelines():
             try:
                 self._unregister_pipeline(p)
             except rm_error.RibmosaicError as err:
                 err.ReportError()
-                raise rm_error.RibmosaicError(self._error_unregister)
+                raise rm_error.RibmosaicError("PipelineManager.flush:" + self._error_unregister)
             
             try:
                 self._unload_xml(p)
             except rm_error.RibmosaicError as err:
                 err.ReportError()
-                raise rm_error.RibmosaicError(self._error_unload)
+                raise rm_error.RibmosaicError("PipelineManager.flush:" + self._error_unload)
     
     def check_dependencies(self, pipeline):
         """Checks text file dependencies of specified pipeline and returns list
         of missing texts if any.
         """
+
+        if DEBUG_PRINT:
+            print("PipelineManager.checkdependecies()")
+            print(pipeline)
 
         dependencies = []
         
@@ -1806,7 +1859,7 @@ class PipelineManager():
                                   if p.strip() not in texts]
             except rm_error.RibmosaicError as err:
                 err.ReportError()
-                raise rm_error.RibmosaicError("Could not get dependencies")
+                raise rm_error.RibmosaicError("PipelineManager.check_dependencies: Could not get dependencies")
         
         return dependencies
     
@@ -1815,7 +1868,11 @@ class PipelineManager():
         
         xmlpath = full path to panel element to remove
         """
-        
+       
+        if DEBUG_PRINT:
+            print("PipelineManager.removepanel()")
+            print(xmlpath)
+ 
         try:
             segs = xmlpath.split("/")
             self._unregister_panel(segs[0], segs[1], segs[2])
@@ -1823,7 +1880,7 @@ class PipelineManager():
             self._write_xml(segs[0])
         except rm_error.RibmosaicError as err:
             err.ReportError()
-            raise rm_error.RibmosaicError("Could not remove panel" + self._error_con)
+            raise rm_error.RibmosaicError("PipelineManager.remove_panel: Could not remove panel" + self._error_con)
     
     def duplicate_panel(self, xmlpath, name, decoration=True):
         """Duplicate panel at specified xmlpath changing its name.
@@ -1833,6 +1890,10 @@ class PipelineManager():
         decoration = cleanup XML decorations
         """
         
+        if DEBUG_PRINT:
+            print("PipelineManager.duplicate_panel()")
+            print(xmlpath)
+
         try:
             # Separate path
             segs = xmlpath.split("/")
@@ -1866,7 +1927,7 @@ class PipelineManager():
             self._write_xml(segs[0])
         except rm_error.RibmosaicError as err:
             err.ReportError()
-            raise rm_error.RibmosaicError("Could not duplicate panel" + self._error_con)
+            raise rm_error.RibmosaicError("PipelineManager.duplicate_panel: Could not duplicate panel" + self._error_con)
     
     def new_element_tree(self, xmlpath, name, key, text="", attribs={}):
         """Creates an element and sub-elements in pipeline xmlpath from the
@@ -1880,6 +1941,12 @@ class PipelineManager():
         return = root element created
         """
         
+        if DEBUG_PRINT:
+            print("PipelineManager.new_element_tree()")
+            print("xmlpath: " + xmlpath)
+            print("name: " + name)
+            print("key: " + key)
+
         if not text:
             text = self.get_element_info(key, None, "text")
         
@@ -1908,6 +1975,9 @@ class PipelineManager():
     def list_rmp(self):
         """Return list of .rmp files in text editor"""
         
+        if DEBUG_PRINT:
+            print("PipelineManager.list_rmp()")
+
         return [t.name for t in bpy.data.texts \
                 if t.name.endswith(".rmp") or t.filepath.endswith(".rmp")]
     
@@ -1921,9 +1991,26 @@ class PipelineManager():
         """
         
         elements = []
-        
+        found_element = None
+
+        if DEBUG_PRINT:
+            print("PipelineManager.list_elements()")
+            print("xmlpath: " + xmlpath)
+            print(self._pipeline_tree.find(xmlpath))
+
         try:
-            for e in self._pipeline_tree.find(xmlpath).getchildren():
+            # if no path given then assume top level of pipelines
+            if xmlpath =='':
+                found_element = self._pipeline_tree
+            else:
+                found_element = self._pipeline_tree.find(xmlpath)
+
+            if found_element == None:
+                return elements;
+
+            for e in found_element.iterfind('*'):
+                if DEBUG_PRINT:
+                    print("element tag: " + e.tag)
                 # Build element attribute string if specified
                 if attrs:
                     attr_str = ""
@@ -1944,13 +2031,17 @@ class PipelineManager():
             if sort:
                 elements.sort()
         except:
-            rm.RibmosaicInfo("Invalid path or attributes for search in " + xmlpath)
+            rm.RibmosaicInfo("PipelineManager.list_elements: Invalid path or attributes for search in " + xmlpath)
         
         return elements
     
     def list_attributes(self, xmlpath, sort=True):
         """List attributes of element as strings at specified xmlpath"""
         
+        if DEBUG_PRINT:
+            print("PipelineManager.list_attributes()")
+            print("xmlpath: " + xmlpath)
+
         try:
             attributes = list(self._pipeline_tree.find(xmlpath).attrib)
             
@@ -1963,7 +2054,9 @@ class PipelineManager():
     
     def list_pipelines(self, sort=True):
         """List all pipelines currently loaded as strings"""
-        
+        if DEBUG_PRINT:
+            print("PipelineManager.list_pipelines()");
+
         return self.list_elements('', sort)
     
     def list_help(self, pipeline):
@@ -1971,6 +2064,9 @@ class PipelineManager():
         
         info = []
         
+        if DEBUG_PRINT:
+            print("PipelineManager.list_help()")
+
         try:
             ec = {'context_pipeline':pipeline}
             message = self.get_text(ec, pipeline)
@@ -2009,15 +2105,18 @@ class PipelineManager():
         window = Only list panels registered as window or any if null
         """
         
+        if DEBUG_PRINT:
+            print("PipelineManager.list_panels()")
+
         commands = []
-        cat = "/" + category + "/"
+        cat = "/" + category
         
         if not pipelines:
             pipelines = self.list_pipelines()
-        
+
         for rmp in pipelines:
             for pan in self.list_elements(rmp + cat):
-                xmlpath = rmp + cat + pan
+                xmlpath = rmp + cat + "/" + pan
                 windows = self.get_attr(None, xmlpath, "windows", False)
                 t = self.get_attr(None, xmlpath, "type", False)
                 
@@ -2040,18 +2139,23 @@ class PipelineManager():
         default = Value to return if attribute doesn't exist
         """
         
+        if DEBUG_PRINT:
+            print("PipelineManager.get_attr()")
+            print("xmlpath: " + xmlpath)
+            print("attr: " + attr)
+
         segs = xmlpath.split("/")
         
         try:
             element = self._pipeline_tree.find(xmlpath)
         except:
-            raise rm_error.RibmosaicError("Invalid path syntax for " + xmlpath)
+            raise rm_error.RibmosaicError("PipelineManager.get_attr: Invalid path syntax for " + xmlpath)
         
         if element == None:
             if segs[0] in self.list_pipelines():
-                raise rm_error.RibmosaicError("Could not find element at \"" + xmlpath + "\"")
+                raise rm_error.RibmosaicError("PipelineManager.get_attr: Could not find element at \"" + xmlpath + "\"")
             else:
-                raise rm_error.RibmosaicError("Could not find pipeline \"" + segs[0] + "\"")
+                raise rm_error.RibmosaicError("PipelineManager.get_attr: Could not find pipeline \"" + segs[0] + "\"")
         
         try:
             attrib = element.attrib
@@ -2061,7 +2165,7 @@ class PipelineManager():
             else:
                 data = default
         except:
-            raise rm_error.RibmosaicError("Could not get attribute " + xmlpath + "." + attr)
+            raise rm_error.RibmosaicError("PipelineManager.get_attr: Could not get attribute " + xmlpath + "." + attr)
         
         if not data:
             data = default
@@ -2092,26 +2196,29 @@ class PipelineManager():
         attrs = dictionary containing element attributes and values to set
         """
         
+        if DEBUG_PRINT:
+            print("PipelineManager.set_attrs()")
+
         segs = xmlpath.split("/")
         
         try:
             element = self._pipeline_tree.find(xmlpath)
         except:
-            raise rm_error.RibmosaicError("Invalid path syntax for " + xmlpath)
+            raise rm_error.RibmosaicError("PipelineManager.set_attrs: Invalid path syntax for " + xmlpath)
         
         if element == None:
             if segs[0] in self.list_pipelines():
-                raise rm_error.RibmosaicError("Could not find element at \"" + \
+                raise rm_error.RibmosaicError("PipelineManager.set_attrs: Could not find element at \"" + \
                                               xmlpath + "\"")
             else:
-                raise rm_error.RibmosaicError("Could not find pipeline \"" + \
+                raise rm_error.RibmosaicError("PipelineManager.set_attrs: Could not find pipeline \"" + \
                       segs[0] + "\"\nCheck pipeline info for missing dependencies!")
         
         try:
             for a in attrs:
                 element.attrib[a] = attrs[a]
         except:
-            raise rm_error.RibmosaicError("Could not find attribute " + \
+            raise rm_error.RibmosaicError("PipelineManager.set_attrs: Could not find attribute " + \
                                           xmlpath + "." + attrs[a])
         
         if segs[0]:
@@ -2130,24 +2237,31 @@ class PipelineManager():
         xmlpath = pipeline XML path to element containing text
         """
         
+        if DEBUG_PRINT:
+            print("PipelineManager.get_text()")
+
         try:
             element = self._pipeline_tree.find(xmlpath)
         except:
-            raise rm_error.RibmosaicError("Invalid path syntax for " + xmlpath)
+            raise rm_error.RibmosaicError("PipelineManager.get_text: " + \
+                                          "Invalid path syntax for " + xmlpath)
         
         if element == None:
             segs = xmlpath.split("/")
             if segs[0] in self.list_pipelines():
-                raise rm_error.RibmosaicError("Could not find element at \"" + \
+                raise rm_error.RibmosaicError("PipelineManager.get_text: " + \
+                                              "Could not find element at \"" + \
                                               xmlpath + "\"")
             else:
-                raise rm_error.RibmosaicError("Could not find pipeline \"" + \
+                raise rm_error.RibmosaicError("PipelineManager.get_text: " + \
+                                              "Could not find pipeline \"" + \
                       segs[0] + "\"\nCheck pipeline info for missing dependencies!")
         
         try:
             text = element.text
         except:
-            raise rm_error.RibmosaicError("Could not get text for " + xmlpath)
+            raise rm_error.RibmosaicError("PipelineManager.get_text: " + \
+                                          "Could not get text for " + xmlpath)
         
         if text:
             # If using more then one line strip first and last line whitespace
@@ -2181,25 +2295,34 @@ class PipelineManager():
         write = write changes to pipeline text
         """
         
+
+        if DEBUG_PRINT:
+            print("PipelineManager.set_text()")
+            print("xmlpath: " + xmlpath)
+
         segs = xmlpath.split("/")[0]
         
         try:
             element = self._pipeline_tree.find(xmlpath)
         except:
-            raise rm_error.RibmosaicError("Invalid path syntax for " + xmlpath)
+            raise rm_error.RibmosaicError("PipelineManager.set_text: " + \
+                                          "Invalid path syntax for " + xmlpath)
         
         if element == None:
             if segs[0] in self.list_pipelines():
-                raise rm_error.RibmosaicError("Could not find element at \"" + \
+                raise rm_error.RibmosaicError("PipelineManager.set_text: " + \
+                                              "Could not find element at \"" + \
                                               xmlpath + "\"")
             else:
-                raise rm_error.RibmosaicError("Could not find pipeline \"" + \
+                raise rm_error.RibmosaicError("PipelineManager.set_text: " + \
+                                              "Could not find pipeline \"" + \
                       segs[0] + "\"\nCheck pipeline info for missing dependencies!")
         
         try:
             element.text = value
         except:
-            raise rm_error.RibmosaicError("Could not set text for " + xmlpath)
+            raise rm_error.RibmosaicError("PipelineManager.set_text: " + \
+                                          "Could not set text for " + xmlpath)
         
         if segs[0]:
             if write:
@@ -2223,6 +2346,9 @@ class PipelineManager():
         return = attribute, dictionary of {attr:"value",...} or None if error
         """
         
+        if DEBUG_PRINT:
+            print("PipelineManager.get_element_info()")
+
         def get_key(element, key):
             """Retrieve a key in an element or attribute of the _pipeline_element
             dictionary, interpreting how to retrieve the data according to the
@@ -2231,6 +2357,9 @@ class PipelineManager():
             element = pointer to a element or attribute key in _pipeline_element
             key = the name of the key to retrieve data from
             """
+
+            if DEBUG_PRINT:
+               print("PipelineManager.get_element_info().get_key()")
             
             if key == 'default':
                 value = element['options'][element[key]]
@@ -2305,8 +2434,11 @@ class PipelineManager():
         attribs = XML attributes to add to panel element
         """
         
+        if DEBUG_PRINT:
+            print("PipelineManager.slmeta_to_panel()")
+
         try:
-            rm.RibmosaicInfo("Generating panel from " + filepath + "...")
+            rm.RibmosaicInfo("PipelineManager.slmeta_to_panel: Generating panel from " + filepath + "...")
             
             # Resolve any links in filepath into a real path
             ec = rm_context.ExportContext()
@@ -2638,5 +2770,5 @@ class PipelineManager():
             del slmeta
             del ec
         except:
-            rm.RibmosaicInfo("Could not load slmeta " + filepath)
+            rm.RibmosaicInfo("PipelineManager.slmeta_to_panel: Could not load slmeta " + filepath)
 
