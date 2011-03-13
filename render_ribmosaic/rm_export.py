@@ -69,9 +69,64 @@ import bpy
 MODULE = os.path.dirname(__file__).split(os.sep)[-1]
 exec("from " + MODULE + " import rm_error")
 exec("from " + MODULE + " import rm_context")
+exec("from " + MODULE + " import rm_property")
 exec("import " + MODULE + " as rm")
 
+# if DEBUG_PRINT set true then each method with print its method name and important vars to console io
+DEBUG_PRINT = True;
 
+# The dummy pass class is used to provide default render pass settings if the scene does not provide one.
+# During menu/panel draw/ and rendering context, it is not possible to modify RNA properties so for now
+# we use the DummyPass as a hack to allow a default pass to be setup.
+class DummyPass():
+    name = "Beauty Pass"
+    pass_enabled = True
+    pass_type = 'BEAUTY'
+    # Pass output properties
+    pass_display_file = "Renders/@[EVAL:.current_frame:####]@@[EVAL:.pass_layer:]@.tif"
+    pass_multilayer = False    
+    pass_shadingrate = 1
+    pass_eyesplits = 6
+    pass_gridsize = 0
+    pass_texturemem = 0
+    # Pass camera properties
+    pass_camera = ""
+    pass_camera_group = False
+    pass_camera_persp ='CAMERA'
+    pass_camera_lensadj = 0.0
+    pass_camera_nearclip = 0.005
+    pass_camera_farclip = 500
+    # Pass samples properties
+    pass_samples_x = 0
+    pass_samples_y = 0
+    # Pass filter properties
+    pass_filter = ""
+    pass_width_x = 1
+    pass_width_y = 1
+    # Pass control properties
+    pass_subpasses = 0
+    pass_passid = 0
+    # Pass tile passes properties
+    pass_tile_x = 0
+    pass_tile_y = 0
+    pass_tile_index = 0
+    # Pass sequence passes properties
+    pass_seq_width = 0
+    pass_seq_index = 0
+    # Pass frame range properties
+    pass_range_start = 0
+    pass_range_end = 0
+    pass_range_step = 0
+    # Pass resolution properties
+    pass_res_x = 0
+    pass_res_y = 0
+    # Pass aspect ratio properties
+    pass_aspect_x = 0
+    pass_aspect_y = 0
+    # Pass scene filters properties
+    pass_layerfilter = ""
+    pass_panelfilter = ""
+    pass_rib_string = ""
 
 
 # #############################################################################
@@ -137,12 +192,16 @@ class ExporterManager():
         
         scene = The scene we are exporting and retrieving export directory from
         """
-        
+        if DEBUG_PRINT:
+            print("ExportManager._update_directory")
+
         # Get active scene if not specified
         if not scene:
             if self.export_scene:
                 scene = self.export_scene
             else:
+                ### FIXME ###
+                # can not modify context if scene data extracted from context
                 scene = bpy.context.scene
         
         # If no active scene try grabbing the first one
@@ -151,21 +210,33 @@ class ExporterManager():
         
         if scene:
             # Insure RIB Mosaic passes are set
+            ### FIXME ###
+            # can not modify context if scene data extracted from context
             rp = scene.ribmosaic_passes
             pl = len(rp.collection)
             ai = rp.active_index
+
+            if DEBUG_PRINT:
+                print("scene.name: " + scene.name)
+                print("number of passes: ", pl)
+                print("active pass index: ", ai)
             
-            if not pl:
-                rp.collection.add().name = "Beauty Pass"
-                pl = 1
+            #if not pl:
+            #    rp.collection.add().name = "Beauty Pass"
+            #    pl = 1
             
-            if ai > pl - 1:
-                rp.active_index = pl - 1
-                ai = pl - 1
+            #if ai > pl - 1:
+            #    rp.active_index = pl - 1
+            #    ai = pl - 1
             
             self._pass_ranges = []
             self.export_passes = rp.collection
-            self.active_pass = rp.collection[ai]
+            if rp.collection and ai:
+                self.active_pass = rp.collection[ai]
+            else: 
+                # make a new dummy pass list
+                self.export_passes = [DummyPass()]
+                self.active_pass = self.export_passes[0] 
             
             # Store frame ranges for each pass for quick look up later
             for p in self.export_passes:
@@ -228,6 +299,9 @@ class ExporterManager():
         shader_library = Pipeline of shader library to prepare
         """
         
+        if DEBUG_PRINT:
+            print("ExportManager.prepare_directory")
+
         if not bpy.data.is_dirty:
             self._update_directory(active_scene)
             
@@ -319,6 +393,8 @@ class ExporterManager():
         render_object = The RenderEngine object currently exporting from
         shader_library = Pipeline of shader library to process exclusively
         """
+        if DEBUG_PRINT:
+            print("ExportManager.export_shaders")
         
         # Gather available command panels
         purge = self.export_scene.ribmosaic_purgeshd
@@ -512,6 +588,8 @@ class ExporterManager():
         
         render_object = The RenderEngine object currently exporting from
         """
+        if DEBUG_PRINT:
+            print("ExportManager.export_textures")
         
         purge = self.export_scene.ribmosaic_purgetex
         optimize = self.export_scene.ribmosaic_optimizetex
@@ -534,6 +612,8 @@ class ExporterManager():
         
         render_object = The RenderEngine object currently exporting from
         """
+        if DEBUG_PRINT:
+            print("ExportManager.export_rib")
         
         # Setup global information
         self._exporting_scene = True
@@ -659,6 +739,8 @@ class ExporterManager():
         if each command type should be executed and clears the commands from
         command_scripts once executed.
         """
+        if DEBUG_PRINT:
+            print("ExportManager.execute_commands")
         
         c = self.export_scene.ribmosaic_compileshd
         o = self.export_scene.ribmosaic_optimizetex
@@ -790,6 +872,8 @@ class ExporterArchive(rm_context.ExportContext):
         execute = Create archive with executable permissions (True/False)
         mode = File 'r', 'a', 'w' open mode (gzipped is always binary mode)
         """
+        if DEBUG_PRINT:
+            print("ExporterArchive.open_archive()")
         
         if gzipped != None:
             self.is_gzip = gzipped
@@ -821,6 +905,9 @@ class ExporterArchive(rm_context.ExportContext):
     def close_archive(self):
         """Close archive object for writing and apply regex objects"""
         
+        if DEBUG_PRINT:
+            print("ExporterArchive.close_archive()")
+
         # Only allow root object to close file
         if self.is_root:
             # Close down any cache pointers
@@ -884,6 +971,8 @@ class ExporterArchive(rm_context.ExportContext):
         text = The text to write (can contain escape characters)
         close = If true closes script archive when complete
         """
+        if DEBUG_PRINT:
+            print("ExporterArchive.write_text()")
         
         if text:
             if self._pointer_file:
@@ -908,6 +997,9 @@ class ExporterArchive(rm_context.ExportContext):
         element = The code text element to build
         close = If true closes script archive when complete
         """
+
+        if DEBUG_PRINT:
+            print("ExporterArchive.write_code()")
         
         target = rm.pipeline_manager.get_attr(self, xmlpath, "target", False)
         
@@ -934,6 +1026,9 @@ class ExporterArchive(rm_context.ExportContext):
         target = path/file.ext of target to search or path/*.ext for wildcard
         returns = list of matching target (path, file) or "" if no matches
         """
+
+        if DEBUG_PRINT:
+            print("ExporterArchive.list_targets()")
         
         # Populate files list according to target
         if target:
@@ -973,6 +1068,9 @@ class ExporterArchive(rm_context.ExportContext):
         
         xmlpath = XML pipeline path to a panels regexes element
         """
+
+        if DEBUG_PRINT:
+            print("ExporterArchive.add_regexes()")
         
         if xmlpath:
             subelements = rm.pipeline_manager.list_elements(xmlpath)
@@ -990,6 +1088,9 @@ class ExporterArchive(rm_context.ExportContext):
         building a list of target files from each regexes target attribute and
         applying the regex to each.
         """
+
+        if DEBUG_PRINT:
+            print("ExporterArchive.apply_regextargets()")
         
         # Get each target regex xmlpath
         for xmlpath in self._target_regexes:
@@ -1061,6 +1162,9 @@ class ExporterCommand(ExporterArchive):
     
     def terminate_command(self):
         """Terminate the currently running process"""
+
+        if DEBUG_PRINT:
+            print("ExporterCommand.terminate_command()")
         
         try:
             try: # Try it unix style
@@ -1075,6 +1179,10 @@ class ExporterCommand(ExporterArchive):
         
         xmlpath = self.command_xmlpath
         
+        if DEBUG_PRINT:
+            print("ExporterCommand.execute_command()")
+            print("xmlpath: " + xmlpath)
+
         # Perform delayed building and close archive before executing
         if self._pointer_file:
             if self.delay_build:
@@ -1126,6 +1234,9 @@ class ExporterCommand(ExporterArchive):
         element = The panels code element to build
         close = If true closes archive when complete
         """
+
+        if DEBUG_PRINT:
+            print("ExporterCommand.build_code()")
         
         self.write_code(self.command_xmlpath + "/" + element, close)
 
@@ -1166,6 +1277,9 @@ class ExporterUtility(ExporterArchive):
         element = The panels code element to build
         close = If true closes archive when complete
         """
+
+        if DEBUG_PRINT:
+            print("ExporterUtility.build_code()")
         
         self.write_code(self.utility_xmlpath + "/" + element, close)
 
@@ -1207,6 +1321,9 @@ class ExporterShader(ExporterArchive):
         close = If true closes archive when complete
         """
         
+        if DEBUG_PRINT:
+            print("ExporterShader.build_code()")
+
         self.write_code(self.shader_xmlpath + "/" + element, close)
 
 
@@ -1261,6 +1378,8 @@ class ExportPass(ExporterArchive):
         #objects.export_rib()
         #del objects
         
+        if DEBUG_PRINT:
+            print("ExportPass.export_rib()")
         
         
         # #### Setup basic test RIB for now
