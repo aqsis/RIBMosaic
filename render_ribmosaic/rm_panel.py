@@ -252,12 +252,15 @@ class RibmosaicRender(bpy.types.RenderEngine):
         rmv = rm.ENGINE + " " + rm.VERSION
         
         try:
+            ### FIXME ###
+            # can't write to scene datablock during render so this has to be accomplished differently
             # Special setup for preview render
-            if scene.name == "preview":
-                scene.ribmosaic_purgeshd = self.preview_compile
-                scene.ribmosaic_compileshd = self.preview_compile
-                scene.ribmosaic_purgetex = self.preview_optimize
-                scene.ribmosaic_optimizetex = self.preview_optimize
+            # if scene.name == "preview":
+            #
+            #    scene.ribmosaic_purgeshd = self.preview_compile
+            #    scene.ribmosaic_compileshd = self.preview_compile
+            #    scene.ribmosaic_purgetex = self.preview_optimize
+            #    scene.ribmosaic_optimizetex = self.preview_optimize
             
             c = scene.frame_current
             i = scene.frame_step
@@ -277,7 +280,7 @@ class RibmosaicRender(bpy.types.RenderEngine):
                     rm.export_manager.export_textures(render_object=self)
             
             # Special setup for preview render
-            if scene.name == "preview":
+            if scene.name == "preview" and rm.export_manager.active_pass:
                 rm.export_manager.active_pass.pass_shadingrate = self.preview_shading
                 rm.export_manager.active_pass.pass_samples_x = self.preview_samples
                 rm.export_manager.active_pass.pass_samples_y = self.preview_samples
@@ -300,7 +303,8 @@ class RibmosaicRender(bpy.types.RenderEngine):
                 
                 for p in rm.export_manager.display_output['passes']:
                     if self.test_break():
-                        raise rm_error.RibmosaicError("Export canceled")
+                        raise rm_error.RibmosaicError("RibmosaicRender.render: " +\
+                                                      "Export canceled")
                     
                     try:
                         # If multilayer exr
@@ -313,7 +317,7 @@ class RibmosaicRender(bpy.types.RenderEngine):
                                 if not p['layer'] or p['layer'] == l.name:
                                     l.load_from_file(p['file'])
                     except:
-                        rm.RibmosaicInfo("Could not load " + p['file'] + \
+                        rm.RibmosaicInfo("RibmosaicRender.render: Could not load " + p['file'] + \
                                          " into layer")
                 
                 self.end_result(result)
@@ -348,9 +352,11 @@ class RibmosaicPropertiesPanel(rm_context.ExportContext):
     def poll(cls, context):
         scene = context.scene
         passes = scene.ribmosaic_passes
+
         rd = scene.render
         show_panel = True
-        
+        print("RibmosaicPropertiesPanel.poll()")
+
         if (rd.engine in cls.COMPAT_ENGINES):
             # Sync pipeline tree with current .rmp files
             rm.pipeline_manager.sync()
@@ -385,6 +391,7 @@ class RibmosaicPropertiesPanel(rm_context.ExportContext):
             if show_panel and cls.panel_context:
                 # Setup active pass for export context
                 passes = scene.ribmosaic_passes
+
                 if len(passes.collection):
                     cls.pointer_pass = passes.collection[passes.active_index]
                 
@@ -396,6 +403,7 @@ class RibmosaicPropertiesPanel(rm_context.ExportContext):
                 show_panel = cls._panel_enabled(cls)
         
 # TODO add hooks for realtime updating of scene content to exporter here
+
 #        # If using interactive rendering call render on panel update
 #        if show_panel and scene.ribmosaic_interactive:
 #            bpy.ops.render.render()
@@ -834,19 +842,13 @@ class RENDER_PT_ribmosaic_passes(RibmosaicPropertiesPanel, bpy.types.Panel):
         scene = self._context_data(context, self.bl_context)['data']
         wm = context.window_manager
         ribmosaic_passes = scene.ribmosaic_passes
-        passes_len = len(ribmosaic_passes.collection)
+        
         active_index = ribmosaic_passes.active_index
-        
-        if not passes_len:
-            ribmosaic_passes.collection.add().name = "Beauty Pass"
-            passes_len = 1
-        
-        if active_index > passes_len - 1:
-            ribmosaic_passes.active_index = passes_len - 1
-            active_index = passes_len - 1
-        
-        active_pass = ribmosaic_passes.collection[active_index]
-        
+        if len(ribmosaic_passes.collection) and (active_index >=0):
+            active_pass = ribmosaic_passes.collection[active_index]
+        else:
+            active_pass = None
+
         layout = self.layout
         row = layout.row()
         row.template_list(ribmosaic_passes, "collection", ribmosaic_passes,
@@ -864,86 +866,88 @@ class RENDER_PT_ribmosaic_passes(RibmosaicPropertiesPanel, bpy.types.Panel):
         
         row = layout.row()
         sub = row.split(percentage=0.8, align=True)
-        sub.prop(active_pass, "name", text="Name")
-        sub.prop(active_pass, "pass_type", text="")
-        # TODO This should be moved into template_list when possible
-        row.prop(active_pass, "pass_enabled", text="")
+
+        if active_pass:
+            sub.prop(active_pass, "name", text="Name")
+            sub.prop(active_pass, "pass_type", text="")
+            # TODO This should be moved into template_list when possible
+            row.prop(active_pass, "pass_enabled", text="")
         
-        grp = layout.column()
-        grp.active = active_pass.pass_enabled
+            grp = layout.column()
+            grp.active = active_pass.pass_enabled
         
-        split = grp.split()
-        sub = split.column()
-        sub.label(text="Output:")
-        row = sub.row(align=True)
-        row.prop(active_pass, "pass_display_file", text="")
-        row.prop(active_pass, "pass_multilayer", text="", icon='RENDERLAYERS')
-        sub.separator()
-        col = sub.column(align=True)
-        col.prop(active_pass, "pass_shadingrate")
-        col.prop(active_pass, "pass_eyesplits")
-        col.prop(active_pass, "pass_gridsize")
-        col.prop(active_pass, "pass_texturemem")
-        sub = split.column()
-        sub.label(text="Camera:")
-        row = sub.row(align=True)
-        if active_pass.pass_camera_group:
-            row.prop_search(active_pass, "pass_camera", bpy.data, "groups")
-        else:
-            row.prop_search(active_pass, "pass_camera", scene, "objects")
-        row.prop(active_pass, "pass_camera_group", toggle=True, icon='OOPS')
-        sub.separator()
-        col = sub.column(align=True)
-        col.prop(active_pass, "pass_camera_persp", text="")
-        col.prop(active_pass, "pass_camera_lensadj")
-        col.prop(active_pass, "pass_camera_nearclip")
-        col.prop(active_pass, "pass_camera_farclip")
+            split = grp.split()
+            sub = split.column()
+            sub.label(text="Output:")
+            row = sub.row(align=True)
+            row.prop(active_pass, "pass_display_file", text="")
+            row.prop(active_pass, "pass_multilayer", text="", icon='RENDERLAYERS')
+            sub.separator()
+            col = sub.column(align=True)
+            col.prop(active_pass, "pass_shadingrate")
+            col.prop(active_pass, "pass_eyesplits")
+            col.prop(active_pass, "pass_gridsize")
+            col.prop(active_pass, "pass_texturemem")
+            sub = split.column()
+            sub.label(text="Camera:")
+            row = sub.row(align=True)
+            if active_pass.pass_camera_group:
+                row.prop_search(active_pass, "pass_camera", bpy.data, "groups")
+            else:
+                row.prop_search(active_pass, "pass_camera", scene, "objects")
+            row.prop(active_pass, "pass_camera_group", toggle=True, icon='OOPS')
+            sub.separator()
+            col = sub.column(align=True)
+            col.prop(active_pass, "pass_camera_persp", text="")
+            col.prop(active_pass, "pass_camera_lensadj")
+            col.prop(active_pass, "pass_camera_nearclip")
+            col.prop(active_pass, "pass_camera_farclip")
         
-        grp.separator()
-        split = grp.split()
-        sub = split.column()
-        sub.label(text="Samples:")
-        col = sub.column(align=True)
-        col.prop(active_pass, "pass_samples_x")
-        col.prop(active_pass, "pass_samples_y")
-        sub.label(text="Pixel Filtering:")
-        col = sub.column(align=True)
-        col.prop(active_pass, "pass_filter", text="", icon='FILTER')
-        row = col.row(align=True)
-        row.prop(active_pass, "pass_width_x")
-        row.prop(active_pass, "pass_width_y")
-        sub.label(text="Tile Passes:")
-        col = sub.column(align=True)
-        col.prop(active_pass, "pass_tile_x")
-        col.prop(active_pass, "pass_tile_y")
-        col.prop(active_pass, "pass_tile_index")
-        sub.label(text="Sequence Passes:")
-        col = sub.column(align=True)
-        col.prop(active_pass, "pass_seq_width")
-        col.prop(active_pass, "pass_seq_index")
-        sub = split.column()
-        sub.label(text="Resolution:")
-        col = sub.column(align=True)
-        col.prop(active_pass, "pass_res_x")
-        col.prop(active_pass, "pass_res_y")
-        sub.label(text="Aspect Ratio:")
-        col = sub.column(align=True)
-        col.prop(active_pass, "pass_aspect_x")
-        col.prop(active_pass, "pass_aspect_y")
-        sub.label(text="Frame Range:")
-        col = sub.column(align=True)
-        col.prop(active_pass, "pass_range_start")
-        col.prop(active_pass, "pass_range_end")
-        col.prop(active_pass, "pass_range_step")
-        sub.label(text="Pass Control:")
-        col = sub.column(align=True)
-        col.prop(active_pass, "pass_subpasses")
-        col.prop(active_pass, "pass_passid")
+            grp.separator()
+            split = grp.split()
+            sub = split.column()
+            sub.label(text="Samples:")
+            col = sub.column(align=True)
+            col.prop(active_pass, "pass_samples_x")
+            col.prop(active_pass, "pass_samples_y")
+            sub.label(text="Pixel Filtering:")
+            col = sub.column(align=True)
+            col.prop(active_pass, "pass_filter", text="", icon='FILTER')
+            row = col.row(align=True)
+            row.prop(active_pass, "pass_width_x")
+            row.prop(active_pass, "pass_width_y")
+            sub.label(text="Tile Passes:")
+            col = sub.column(align=True)
+            col.prop(active_pass, "pass_tile_x")
+            col.prop(active_pass, "pass_tile_y")
+            col.prop(active_pass, "pass_tile_index")
+            sub.label(text="Sequence Passes:")
+            col = sub.column(align=True)
+            col.prop(active_pass, "pass_seq_width")
+            col.prop(active_pass, "pass_seq_index")
+            sub = split.column()
+            sub.label(text="Resolution:")
+            col = sub.column(align=True)
+            col.prop(active_pass, "pass_res_x")
+            col.prop(active_pass, "pass_res_y")
+            sub.label(text="Aspect Ratio:")
+            col = sub.column(align=True)
+            col.prop(active_pass, "pass_aspect_x")
+            col.prop(active_pass, "pass_aspect_y")
+            sub.label(text="Frame Range:")
+            col = sub.column(align=True)
+            col.prop(active_pass, "pass_range_start")
+            col.prop(active_pass, "pass_range_end")
+            col.prop(active_pass, "pass_range_step")
+            sub.label(text="Pass Control:")
+            col = sub.column(align=True)
+            col.prop(active_pass, "pass_subpasses")
+            col.prop(active_pass, "pass_passid")
         
-        grp.separator()
-        grp.prop_search(active_pass, "pass_layerfilter", scene.render, "layers")
-        grp.prop(active_pass, "pass_panelfilter", icon='FILTER')
-        grp.prop(active_pass, "pass_rib_string", icon='SCRIPT')
+            grp.separator()
+            grp.prop_search(active_pass, "pass_layerfilter", scene.render, "layers")
+            grp.prop(active_pass, "pass_panelfilter", icon='FILTER')
+            grp.prop(active_pass, "pass_rib_string", icon='SCRIPT')
 
 
 class RENDER_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
@@ -1497,8 +1501,10 @@ class MATERIAL_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
             row.active = mat.ribmosaic_ri_opacity
             row.prop(mat, "alpha", text="Opacity")
             
-            if not strand.use_blender_units:
-                strand.use_blender_units = True
+            ### FIXME ###
+            # can't modify material data block during draw call
+            #if not strand.use_blender_units:
+            #    strand.use_blender_units = True
             split = layout.split()
             sub = split.column(align=True)
             sub.label(text="Strand Options")
