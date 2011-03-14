@@ -1386,6 +1386,7 @@ class PipelineManager():
                     "\t\tdata = self._context_data(context, "
                     "self.bl_context)['data']"]
             tail = ["",
+                    "bpy.utils.register_class(" + name +")",
                     "panel = " + name]
             
             # Unfold nested layout elements into layout draw code
