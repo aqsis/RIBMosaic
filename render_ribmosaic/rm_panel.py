@@ -359,8 +359,8 @@ class RibmosaicPropertiesPanel(rm_context.ExportContext):
 
         if (rd.engine in cls.COMPAT_ENGINES):
             # Sync pipeline tree with current .rmp files
-            rm.pipeline_manager.sync()
-            
+            #rm.pipeline_manager.sync()
+
             # If filter_type check object type against filter
             if cls.filter_type and context.object:
                 show_panel = context.object.type in cls.filter_type
@@ -595,6 +595,8 @@ class RibmosaicPipelinePanels(RibmosaicPropertiesPanel):
         else:
             rows = 2
         
+        row = layout.row()
+        row.operator("wm.ribmosaic_modal_sync")
         row = layout.row()
         row.template_list(wm.ribmosaic_pipelines, "collection",
                           wm.ribmosaic_pipelines, "active_index", rows=rows)

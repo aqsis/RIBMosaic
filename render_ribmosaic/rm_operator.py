@@ -67,6 +67,23 @@ exec("from " + MODULE + " import rm_panel")
 exec("import " + MODULE + " as rm")
 
 
+class WM_OT_ribmosaic_modal_sync(bpy.types.Operator):
+    '''sync pipeline manager'''
+    bl_idname = "wm.ribmosaic_modal_sync"
+    bl_label = "sync pipelines"
+
+    def execute(self, context):
+        #scene = context.scene
+
+        #rd = scene.render
+        print("wm.ribmosaic_modal_sync()")
+
+        #if (rd.engine in cls.COMPAT_ENGINES):
+            # Sync pipeline tree with current .rmp files
+        rm.pipeline_manager.sync()
+
+        return {'FINISHED'}
+
 
 
 # #############################################################################
@@ -2363,4 +2380,6 @@ class SCENE_OT_ribmosaic_exportpath(rm_context.ExportContext,
         context.window_manager.fileselect_add(self)
         
         return {'RUNNING_MODAL'}
+
+
 

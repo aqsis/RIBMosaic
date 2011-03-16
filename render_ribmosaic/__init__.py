@@ -169,6 +169,7 @@ def register():
         RibmosaicInfo("ribify module not found, using script level exporter")
 
     bpy.utils.register_module(__name__)
+    bpy.ops.wm.ribmosaic_modal_sync()
 
 def unregister():
     """Unregister Blender classes"""
@@ -193,4 +194,5 @@ def unregister():
 
 if __name__ == "__main__":
     register()
+
 
