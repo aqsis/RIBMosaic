@@ -42,7 +42,7 @@ output = message
                 <test_float type='FLOAT' description="test float" default="0.1" min="0.001" max="100.0" softmin="" softmax="" maxlen="" step="1" precision="3" items="" size="" link="" />
                 <test_string type='STRING' description="test string" default="test" min="" max="" softmin="" softmax="" maxlen="255" step="" precision="" items="" size="" link="" />
                 <test_bool type='BOOL' description="test bool" default="False" min="" max="" softmin="" softmax="" maxlen="" step="" precision="" items="" size="" link="" />
-                <test_enum type='ENUM' description="test enumerator" default="one" min="" max="" softmin="" softmax="" maxlen="" step="" precision="" items="[('1', 'one', 'one desc'), ('2', 'two', 'two desc'), ('3', 'three', 'three desc')]" size="" link="" />
+                <test_enum type='ENUM' description="test enumerator" default="1" min="" max="" softmin="" softmax="" maxlen="" step="" precision="" items="[('1', 'one', 'one desc'), ('2', 'two', 'two desc'), ('3', 'three', 'three desc')]" size="" link="" />
                 <test_color type='COLOR' description="test color" default="(0, 0, 1)" min="" max="" softmin="" softmax="" maxlen="" step="" precision="" items="" size="3" link="" />
                 <test_vector type='VECTOR' description="test vector" default="(1, 0, 1)" min="" max="" softmin="" softmax="" maxlen="" step="" precision="" items="" size="3" link="" />
                 <test_point type='POINT' description="test point" default="(1, 1, 1)" min="" max="" softmin="" softmax="" maxlen="" step="" precision="" items="" size="3" link="" />
