@@ -1023,12 +1023,14 @@ class PipelineManager():
             print("xmlpath: " + xmlpath)
 
         try:
+            # Get elements
+            element = self._pipeline_tree.find(xmlpath)
+
             # Get XML path to parent element
             parentpath = "/".join(xmlpath.split("/")[:-1])
             
-            # Get elements
             parent = self._pipeline_tree.find(parentpath)
-            element = self._pipeline_tree.find(xmlpath)
+
             
             if DEBUG_PRINT:
                 print("parentpath: ", parentpath)
@@ -1036,13 +1038,13 @@ class PipelineManager():
                 print("element: ", element)
 
             # Retrieve filepath attribute for return if exists
-            if element and "filepath" in element.attrib:
+            if element is not None and "filepath" in element.attrib:
                 filename = element.attrib["filepath"]
             else:
                 filename = ""
             
             # Preform XML decoration cleanup if specified
-            if decoration and parentpath:
+            if decoration and parent is not None:
                 # Set tabs according to XML path depth
                 tabs = "\t".join(["" for i in range(xmlpath.count("/") + 1)])
                 
@@ -1050,14 +1052,17 @@ class PipelineManager():
                 childlen = len(children)
                 index = children.index(element)
                 
-                # If only one element then adjust parent text
-                if childlen == 1:
+                # If only one element then adjust parent text if it exists
+                if childlen == 1 and parent.text:
                     parent.text = parent.text.rstrip("\t") + tabs[:-1]
                 # If the last element then adjust previous element
                 elif index == childlen - 1:
                     p = children[index - 1]
                     p.tail = p.tail.rstrip("\t") + tabs[:-1]
             
+            # if no parent found but element was found then assume parent is the root
+            if parent == None and element is not None:
+                parent = self._pipeline_tree.getroot()
             # Get rid of it
             parent.remove(element)
         except:
@@ -1536,7 +1541,8 @@ class PipelineManager():
                 print("\n".join(prop + head + func + draw + tail))
 
             try:
-                exec("\n".join(prop + head + func + draw + tail), globals(), local)
+                exec("\n".join(prop), globals(), local)
+                exec("\n".join(head + func + draw + tail), globals(), local)
             except:
                 raise rm_error.RibmosaicError("PipelineManager._register_panel: Failed to generate panel " + path,
                                               sys.exc_info())
