@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<Pixie_Core build="False" compile="False" dependencies="" enabled="True" filepath="pixie_core.rmp" filter="PIXIE_CORE" library="" version="0.0">
+<Pixie_Core build="False" compile="False" dependencies="" enabled="False" filepath="pixie_core.rmp" filter="PIXIE_CORE" library="" version="0.0">
 
     <python_scripts>
     </python_scripts>
