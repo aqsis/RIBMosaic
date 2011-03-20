@@ -141,7 +141,7 @@ echo "Info complete"
             </end>
             <regexes target="*.slmeta">
                 <head_name matches="1" regex=" &quot;" replace="&quot; name=&quot;" />
-                <head_ext matches="1" regex=".slx" replace="" />
+                <head_ext matches="1" regex=".sdr" replace="" />
                 <head_close matches="1" regex="$" replace="&gt;" />
                 <xml_start matches="1" regex="\A" replace="&lt;?xml version=&quot;1.0&quot; ?&gt;\n&lt;k3dml&gt;\n\t&lt;shaders&gt;\n\t\t&lt;shader type=&quot;" />
                 <xml_close matches="1" regex="\Z" replace="\t\t&lt;/shader&gt;\n\t&lt;/shaders&gt;\n&lt;/k3dml&gt;\n" />
