@@ -66,7 +66,7 @@ Display "+@[EVAL:.pass_output:]@" "exr" "float _z" "string layername" "RenderLay
         <Optimize delete="False" description="" duplicate="False" enabled="True" execute="True" extension=".sh.bat" filter="" register="True" type="OPTIMIZE" windows="SCENE">
             <begin target="">
 echo "Starting optimization..."
-teqser "@[EVAL:.target_path:]@@[EVAL:.target_name:]@"
+texmake "@[EVAL:.target_path:]@@[EVAL:.target_name:]@"
 
             </begin>
             <middle target="">
