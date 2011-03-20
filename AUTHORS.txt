@@ -1,0 +1,36 @@
+RIBMOSAIC contributors:
+
+Head developer (dreamscapearts@users.sourceforge.net)
+Eric Back (WHiTeRaBBiT)
+
+Contributors:
+Matt Ebb - inderectly through his code from his Blender to 3Delight exporter
+Sascha Fricke - inderectly through his code from his BlenderToRenderman exporter
+Jeff Doyle (nfz)
+
+Special thanks in no particular order:
+
+The blendertorenderman team:
+Temujin Ayamikhan (Tenzin)
+Ted Gocek (animate1978)
+Who can be found at http://www.blendertorenderman.blogspot.com
+
+The Aqsis team:
+Paul Gregory (pgregory)
+Leon Tony Atkinson (renderguy)
+Chris Foster (c42f)
+Who can be found at http://www.aqsis.org
+
+The Pixie team:
+Okan Arikan (render_man)
+George Harker (geohar)
+Cedric Paille (cedricp)
+Who can be found at http://www.renderpixie.com
+
+The Blender (python) team:
+Campbell Barton (ideasman42)
+Cedric Paille (cedricp)
+Who can be found at http://www.blender.org
+
+And also a big thanks to all the great people in the Blender community
+especially everybody at http://blenderartists.org/forum :)
