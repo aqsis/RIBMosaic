@@ -1097,7 +1097,7 @@ class WM_OT_ribmosaic_library_addpanel(rm_context.ExportContext,
     matprops = bpy.props.BoolProperty(name="Material Properties",
                     description="Use shader in material properties window",
                     default=True)
-    register = bpy.props.BoolProperty(name="Panel Register",
+    panelregister = bpy.props.BoolProperty(name="Panel Register",
                     description="Is panel registered on load or manually?",
                     default=True)
     enabled = bpy.props.BoolProperty(name="Panel Enable",
@@ -1125,7 +1125,7 @@ class WM_OT_ribmosaic_library_addpanel(rm_context.ExportContext,
         layout.separator()
         layout.label(text="Panel state and permissions:")
         box = layout.box()
-        box.prop(self.properties, "register")
+        box.prop(self.properties, "panelregister")
         box.prop(self.properties, "enabled")
         box.prop(self.properties, "duplicate")
         box.prop(self.properties, "delete")
@@ -1204,7 +1204,7 @@ class WM_OT_ribmosaic_library_addpanel(rm_context.ExportContext,
                 rm.pipeline_manager.slmeta_to_panel(shader_path + filename.name,
                                         library_path, self.pipeline, "", False,
                                         windows=",".join(props),
-                                        register=str(self.register),
+                                        register=str(self.panelregister),
                                         enabled=str(self.enabled),
                                         duplicate=str(self.duplicate),
                                         delete=str(self.delete))
