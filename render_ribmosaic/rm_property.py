@@ -156,7 +156,7 @@ geometry_props = ["Mesh",
 # #############################################################################
 
 # Setup which Blender panels will be visible
-import properties_render
+from bl_ui import properties_render
 properties_render.RENDER_PT_render.COMPAT_ENGINES.add(rm.ENGINE)
 properties_render.RENDER_PT_dimensions.COMPAT_ENGINES.add(rm.ENGINE)
 properties_render.RENDER_PT_layers.COMPAT_ENGINES.add(rm.ENGINE)
@@ -165,22 +165,22 @@ properties_render.RENDER_PT_post_processing.COMPAT_ENGINES.add(rm.ENGINE)
 properties_render.RENDER_PT_stamp.COMPAT_ENGINES.add(rm.ENGINE)
 del properties_render
 
-import properties_world
+from bl_ui import properties_world
 properties_world.WORLD_PT_context_world.COMPAT_ENGINES.add(rm.ENGINE)
 properties_world.WORLD_PT_custom_props.COMPAT_ENGINES.add(rm.ENGINE)
 del properties_world
 
-import properties_material
+from bl_ui import properties_material
 properties_material.MATERIAL_PT_context_material.COMPAT_ENGINES.add(rm.ENGINE)
 properties_material.MATERIAL_PT_custom_props.COMPAT_ENGINES.add(rm.ENGINE)
 del properties_material
 
-import properties_texture
+from bl_ui import properties_texture
 properties_texture.TEXTURE_PT_context_texture.COMPAT_ENGINES.add(rm.ENGINE)
 properties_texture.TEXTURE_PT_image.COMPAT_ENGINES.add(rm.ENGINE)
 del properties_texture
 
-import properties_data_lamp
+from bl_ui import properties_data_lamp
 properties_data_lamp.DATA_PT_context_lamp.COMPAT_ENGINES.add(rm.ENGINE)
 properties_data_lamp.DATA_PT_custom_props_lamp.COMPAT_ENGINES.add(rm.ENGINE)
 del properties_data_lamp
@@ -200,7 +200,7 @@ modules = ["properties_data_armature",
            "properties_scene"]
 
 for module in modules:
-    exec("import " + module + " as m")
+    exec("from bl_ui import " + module + " as m")
     
     for member in dir(m):
         subclass = getattr(m, member)
