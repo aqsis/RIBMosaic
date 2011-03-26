@@ -62,7 +62,8 @@ import queue
 import tempfile
 import gzip
 import bpy
-
+import mathutils
+import math
 
 # #### Global variables
 
@@ -74,6 +75,53 @@ exec("import " + MODULE + " as rm")
 
 # if DEBUG_PRINT set true then each method with print its method name and important vars to console io
 DEBUG_PRINT = True;
+
+# ------------- RIB formatting Helpers -------------
+# taken from Matt Ebb's Blender to 3Delight exporter
+
+def rib_param_val(data_type, val):
+    if data_type in ('float', 'integer', 'color', 'point'):
+        vlen = 1
+        
+        if hasattr(val, '__len__'):
+            vlen = len(val)
+        
+        if vlen > 1:
+            return ' '.join([str(i) for i in val])
+        else:
+            return str(val)
+    elif data_type == 'string':
+        return '"%s"' % val
+
+def rib_list_str(list):
+    return "[ " + " ".join(str(i) for i in list) + " ]"
+    
+def rib_mat_str(m):
+    return '[ %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f ]' % \
+            (m[0][0], m[0][1], m[0][2], m[0][3], \
+            m[1][0], m[1][1], m[1][2], m[1][3], \
+            m[2][0], m[2][1], m[2][2], m[2][3], \
+            m[3][0], m[3][1], m[3][2], m[3][3])
+
+
+# ------------- Data Access Helpers -------------
+# taken from Matt Ebb's Blender to 3Delight exporter
+
+def is_visible_layer(scene, ob):
+
+    for i in range(len(scene.layers)):
+        if scene.layers[i] == True and ob.layers[i] == True:
+            return True
+    return False
+
+def is_renderable(scene, ob):
+    return (is_visible_layer(scene, ob) and not ob.hide_render)
+
+def renderable_objects(scene):
+    return [ob for ob in scene.objects if is_renderable(scene, ob)]
+
+
+
 
 # The dummy pass class is used to provide default render pass settings if the scene does not provide one.
 # During menu/panel draw/ and rendering context, it is not possible to modify RNA properties so for now
@@ -784,8 +832,8 @@ class ExporterManager():
 # #############################################################################
 
 # #### Super class for all exporter objects
-
-class ExporterArchive(rm_context.ExportContext):
+ 
+class ExporterArchive(rm_context.ExportContext): 
     """This base class provides common functionality for creating archives of
     various types, maintaining the archive and cache file objects and managing
     object registration for threading.
@@ -1473,7 +1521,19 @@ class ExportPass(ExporterArchive):
         for p in world_shaders:
             p.build_code("rib")
         
-        self.write_text("Disk 0 1 360\n")
+        # figure out what objects in the scene are renderable
+        # self.write_text("Sphere 1 -1 1 360\n")
+        # export the objects to RIB recursively
+        # objtarget_path = self.archive_path + "Objects" + os.sep
+        for ob in renderable_objects(self.pointer_datablock):
+            target_name = ob.name + ".rib"
+            try:
+                eo = ExportObject(self, ob)
+                eo.export_rib()
+            except:
+                eo.close_archive()
+                raise rm_error.RibmosaicError("Failed to build object RIB " + \
+                                              target_name, sys.exc_info())
         
         for p in world_utilities:
             p.build_code("end")
@@ -1512,6 +1572,30 @@ class ExportObject(ExporterArchive):
     automatically handles nesting of CSG through parenting.
     """
     
+    # #### Private methods
+    
+    def __init__(self, export_object=None, pointer_object=None):
+        """Initialize attributes using export_object and parameters.
+        Automatically create the RIB this object represents.
+        
+        export_object = Any object subclassed from ExportContext
+        archive_path = Path to save archive to (from export_object otherwise)
+        archive_name = Name to save archive as (from export_object otherwise)
+        """
+        
+        ExporterArchive.__init__(self, export_object)
+        self._set_pointer_datablock(pointer_object)
+        
+        # TODO open the archive if using ReadArchive mode
+        # for now default to using the parents file pointer
+
+        # Determine if compressed RIB is enabled in the parent
+        #if export_object:
+        #    compress = getattr(export_object, "is_gzip", False)
+        #else:
+        #    compress = False
+        
+        #self.open_archive(gzipped=compress)
     
     # #### Public methods
     
@@ -1535,6 +1619,30 @@ class ExportObject(ExporterArchive):
         particles = ExportParticles(self)
         particles.export_rib()
         del particles
+
+    def export_rib(self):
+        """ """
+
+        print("ExportObject.export_rib()")
+
+        ob = self.pointer_datablock
+
+        if ob.parent:
+            mat = ob.parent.matrix_world * ob.matrix_local
+        else:
+            mat = ob.matrix_world
+        print(mat)
+ 
+        # FIXME this is just test code
+        #self.write_text('##Renderman  \n')
+        self.write_text('    AttributeBegin\n')
+        self.write_text('        Attribute "identifier" "name" [ "%s" ]\n' % self.data_name)
+        self.write_text('        Transform %s\n' % rib_mat_str(mat))
+
+        # create ExportObjectData
+
+        self.write_text('    AttributeEnd\n')
+        self.close_archive();
 
 
 class ExportLight(ExporterArchive):
@@ -1565,6 +1673,25 @@ class ExportObjdata(ExporterArchive):
     """Represents geometry, lights and cameras using objectdata data-blocks.
     Can also handle export of multiple meshes setup in LOD list
     """
+    
+    def __init__(self, export_object=None, archive_path="", archive_name=""):
+        """Initialize attributes using export_object and parameters.
+        Automatically create the RIB this object represents.
+        
+        export_object = Any object subclassed from ExportContext
+        archive_path = Path to save archive to (from export_object otherwise)
+        archive_name = Name to save archive as (from export_object otherwise)
+        """
+        
+        ExporterArchive.__init__(self, export_object, archive_path, archive_name)
+        
+        # Determine if compressed RIB is enabled
+        if self.pointer_datablock:
+            compress = self.pointer_datablock.ribmosaic_compressrib
+        else:
+            compress = False
+        
+        self.open_archive(gzipped=compress)
     
     
     # #### Public methods
@@ -1606,4 +1733,5 @@ class ExportParticles(ExporterArchive):
         rm.ribify.particles_curves(None)
         rm.ribify.data_to_primvar(None, member="N", define="N",
                                      ptype="normal", pclass="varying")
+
 
