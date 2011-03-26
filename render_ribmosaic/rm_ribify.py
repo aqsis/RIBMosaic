@@ -52,7 +52,11 @@
 # END BLOCKS
 # #############################################################################
 
+import bpy
+import math
 import os
+import mathutils
+import string
 
 
 # #### Global variables
@@ -201,4 +205,6 @@ class Ribify():
         """ """
         
         print("Creating meta points...")
+
+
 
