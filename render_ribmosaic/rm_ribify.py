@@ -65,8 +65,53 @@ MODULE = os.path.dirname(__file__).split(os.sep)[-1]
 exec("import " + MODULE + " as rm")
 
 
+# local helper functions
+# Mesh data access
+def get_mesh(mesh):
+    nverts = []
+    verts = []
+    P = []
+    f_uvs = {}
+    uvs = []
+    N = []
+    
+    for v in mesh.vertices:
+        co = v.co
+        P += [co[0], co[1], co[2]]
+        N += [v.normal[0], v.normal[1], v.normal[2]]
+    
+    for f in mesh.faces:
+        if len(f.vertices) == 3: n = 3
+        else: n = 4
 
+        nverts += [n]
+        for a in range(0, n):
+            verts += [f.vertices[a]]
 
+    try:
+        uv_layer = mesh.uv_textures.active.data
+    except:
+        uv_layer = None
+
+    if uv_layer:
+        for fi, tf in enumerate(uv_layer):
+            # "1.0 -" because
+            # pixie expects UVs flipped 
+            # vertically from blender
+        
+            f_uvs[fi] = [tf.uv1[0], 1.0-tf.uv1[1]]
+            f_uvs[fi] += [tf.uv2[0], 1.0-tf.uv2[1]]
+            f_uvs[fi] += [tf.uv3[0], 1.0-tf.uv3[1]]
+            if len(mesh.faces[fi].vertices) == 4:
+                f_uvs[fi] += [tf.uv4[0], 1.0-tf.uv4[1]]
+        
+        for uv in f_uvs.values():
+            uvs.extend(uv)
+    else:
+        uvs = None
+    
+    return (nverts, verts, P, uvs, N)
+ 
 # #############################################################################
 # GEOMETRY EXPORT CLASS
 # #############################################################################
@@ -104,6 +149,34 @@ class Ribify():
                     self.pointer_file.write(text)
             else:
                 raise RibmosaicError("Archive already closed, cannot write text")
+
+
+    def write_rib_list(self, list, items_per_line = 3, space_indent = 1):
+        spaces = " ".rjust(space_indent)
+        itemcount = 0
+        firstline = True
+        self.write_text(spaces + '[') 
+ 
+        for i in list:
+            # if on the first item of the line then indent
+            if itemcount == 0 and not firstline:
+                self.write_text('\n  ' + spaces)
+            else:
+                # adding another item on the line so just put a space between items
+                self.write_text(' ')
+
+            self.write_text(str(i))
+            itemcount += 1
+
+            # only allow so many items per line
+            if itemcount == items_per_line:
+                itemcount = 0
+                firstline = False
+
+        # end of the RIB array list block
+        self.write_text(' ]\n')
+ 
+
     
     def data_to_primvar(self, datablock, **primvar):
         """Append to file_object specified data-block member from Blender
@@ -125,6 +198,26 @@ class Ribify():
         """ """
         
         print("Creating pointpolygons...")
+        samples = [get_mesh(datablock)]
+        
+        for sample in samples:
+            # extract data sets from sample
+            nverts, verts, P, uvs, N = sample
+
+            self.write_text('        PointsPolygons \n')
+            self.write_rib_list(nverts, 10, 12)
+            self.write_rib_list(verts, 3, 12)
+            self.write_text('\n            "P"\n')
+            self.write_rib_list(P, 3, 14)
+
+            if uvs:     
+                self.write_text('\n            "facevarying float[2] st"\n')
+                self.write_rib_list(uvs, 2, 14)
+
+            if N: # and ob.renderman.smooth_normals:
+                self.write_text('\n            "varying normal N"\n')
+                self.write_rib_list(N, 3, 14)
+            
     
     def mesh_subdivisionmesh(self, datablock):
         """ """
