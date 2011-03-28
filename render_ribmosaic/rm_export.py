@@ -93,9 +93,7 @@ def rib_param_val(data_type, val):
     elif data_type == 'string':
         return '"%s"' % val
 
-def rib_list_str(list):
-    return "[ " + " ".join(str(i) for i in list) + " ]"
-    
+   
 def rib_mat_str(m):
     return '[ %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f ]' % \
             (m[0][0], m[0][1], m[0][2], m[0][3], \
@@ -115,7 +113,8 @@ def is_visible_layer(scene, ob):
     return False
 
 def is_renderable(scene, ob):
-    return (is_visible_layer(scene, ob) and not ob.hide_render)
+    return (is_visible_layer(scene, ob) and not ob.hide_render \
+            and ob.type in ('MESH', 'EMPTY'))
 
 def renderable_objects(scene):
     return [ob for ob in scene.objects if is_renderable(scene, ob)]
@@ -160,6 +159,30 @@ def create_mesh(scene, ob, matrix=None):
         mesh.transform(matrix)
 
     return mesh
+
+def render_get_resolution(r):
+    xres= int(r.resolution_x*r.resolution_percentage*0.01)
+    yres= int(r.resolution_y*r.resolution_percentage*0.01)
+    return xres, yres
+
+
+def render_get_aspect(r):
+    xres, yres = render_get_resolution(r)
+    
+    xratio= xres*r.pixel_aspect_x/200.0
+    yratio= yres*r.pixel_aspect_y/200.0
+
+    if xratio > yratio:
+        aspectratio= xratio/yratio
+        xaspect= aspectratio
+        yaspect= 1.0
+    else:
+        aspectratio= yratio/xratio;
+        xaspect= 1.0;
+        yaspect= aspectratio;
+        
+    return xaspect, yaspect, aspectratio
+
 
 
 
@@ -758,6 +781,7 @@ class ExporterManager():
                         del pa
                     except:
                         pa.close_archive()
+                        del pa
                         raise rm_error.RibmosaicError("Failed to build RIB " + \
                                                       target_name, sys.exc_info())
                 
@@ -1543,10 +1567,27 @@ class ExportPass(ExporterArchive):
         "@[EVAL:.pointer_pass.pass_samples_y:]@\" if "
         "@[EVAL:.pointer_pass.pass_samples_x:]@ else \"\" :]@\n"
         "@[EVAL:\"ShadingRate @[EVAL:.pointer_pass.pass_shadingrate:]@\" "
-        "if @[EVAL:.pointer_pass.pass_shadingrate:]@ else \"\":]@\n"
-        "Translate 0 0 1\n"
+        "if @[EVAL:.pointer_pass.pass_shadingrate:]@ else \"\":]@\n"))
+
+        # export camera - for now default to the camera in the scene
+        # TODO the pass camera overrides the scene's camera
+        # make use of ExportObject to do the dirty work 
+        #"Translate 0 0 1\n"
+        try:
+           cam = ExportObject(self, self.get_scene().camera)
+           cam.export_rib()
+           del cam
+        except:
+           cam.close_archive()
+           del cam
+           raise rm_error.RibmosaicError("Failed to build camera " + \
+                                         sys.exc_info())
+
+           
+
+        self.write_text(self._resolve_links(
         "Sides 2\n"
-        "Rotate @[EVAL:.current_frame:]@ 1 0 0\n"
+        #"Rotate @[EVAL:.current_frame:]@ 1 0 0\n"
         "WorldBegin\n"
         "Attribute \"displacementbound\" \"float sphere\" [ 0.05 ] "
         "\"string coordinatesystem\" [ \"shader\" ]\n"
@@ -1635,6 +1676,61 @@ class ExportObject(ExporterArchive):
         #    compress = False
         
         #self.open_archive(gzipped=compress)
+
+    def _export_camera_rib(self):
+        if DEBUG_PRINT:
+            print('ExportObject._export_camera()')
+
+        ob = self.get_object()
+        scene = self.get_scene()
+        r = scene.render
+        camera = ob.data
+    
+        xaspect, yaspect, aspectratio = render_get_aspect(r)
+    
+        # TODO get depth of field option from ribmosaic user panel
+        #if rm.depth_of_field:
+        #    if camera.dof_object:
+        #        dof_distance = (ob.location - camera.dof_object.location).length
+        #    else:
+        #        dof_distance = camera.dof_distance
+        #    file.write('DepthOfField %f 1.0 %f\n' % (rm.fstop, dof_distance))
+        #if scene.renderman.motion_blur:
+        #    file.write('Shutter %f %f\n' % (rm.shutter_open, rm.shutter_close))
+        #    file.write('Option "shutter" "efficiency" [ %f %f ] \n' % 
+        #        (rm.shutter_efficiency_open, rm.shutter_efficiency_close))
+
+        self.write_text('Clipping %f %f\n' % (camera.clip_start, camera.clip_end))
+    
+        if camera.type == 'PERSP':
+            lens= camera.lens
+            fov= 360.0*math.atan(16.0/lens/aspectratio)/math.pi
+            self.write_text('Projection "perspective" "fov" %f\n' % fov)
+        else:
+            lens= camera.ortho_scale
+            xaspect= xaspect*lens/(aspectratio*2.0)
+            yaspect= yaspect*lens/(aspectratio*2.0)
+            self.write('Projection "orthographic"\n')
+
+        self.write_text('ScreenWindow %f %f %f %f\n' % (-xaspect, xaspect, -yaspect, yaspect))
+
+
+        # build a transform matrix that is looking at the scene
+        mat = ob.matrix_world
+        loc = mat.to_translation()
+        rot = mat.to_euler()
+
+        # setup the look vector which defaults to looking down the Z axis
+        s = mathutils.Matrix(([1,0,0,0],[0,1,0,0],[0,0,-1,0],[0,0,0,1]))
+        r = mathutils.Matrix.Rotation(-rot[0], 4, 'X')
+        r *= mathutils.Matrix.Rotation(-rot[1], 4, 'Y')
+        r *= mathutils.Matrix.Rotation(-rot[2], 4, 'Z')
+        l = mathutils.Matrix.Translation(-loc)
+    
+        m = s * r * l
+        
+        self.write_text('Transform %s\n' % rib_mat_str(m))
+
     
     # #### Public methods
     
@@ -1664,37 +1760,43 @@ class ExportObject(ExporterArchive):
 
         print("ExportObject.export_rib()")
 
-        ob = self.pointer_datablock
+        ob = self.get_object()
 
-        if ob.parent:
-            mat = ob.parent.matrix_world * ob.matrix_local
+        if ob.type == 'CAMERA':
+            self._export_camera_rib()
         else:
-            mat = ob.matrix_world
-        print(mat)
- 
-        # FIXME this is just test code
-        #self.write_text('##Renderman  \n')
-        self.write_text('    AttributeBegin\n')
-        self.write_text('        Attribute "identifier" "name" [ "%s" ]\n' % self.data_name)
-        self.write_text('        Transform %s\n' % rib_mat_str(mat))
-        # export object data
-        # let the ExportObjdata instance decide how to export the object data
-        try:
-            eod = ExportObjdata(self)
-            eod.export_rib()
-            del eod
-        except:
-            eod.close_archive()
-            raise rm_error.RibmosaicError("Failed to build object data RIB " + \
-                                         self.data_name, sys.exc_info())
+            if ob.parent:
+                mat = ob.parent.matrix_world * ob.matrix_local
+            else:
+                mat = ob.matrix_world
+            print(mat)
+            # if a camera object then do special camera output
+            #     FIXME this is just test code
+            #self.write_text('##Renderman  \n')
+            self.write_text('    AttributeBegin\n')
+            self.write_text('        Attribute "identifier" "name" [ "%s" ]\n' % self.data_name)
+            self.write_text('        Transform %s\n' % rib_mat_str(mat))
+            # export object data
+            # let the ExportObjdata instance decide how to export the object data
+            try:
+                eod = ExportObjdata(self)
+                eod.export_rib()
+                del eod
+            except:
+                eod.close_archive()
+                raise rm_error.RibmosaicError("Failed to build object data RIB " + \
+                                             self.data_name, sys.exc_info())
           
-        # create ExportObjectData
+            # create ExportObjectData
 
-        self.write_text('    AttributeEnd\n')
-        self.close_archive();
+            self.write_text('    AttributeEnd\n')
+            self.close_archive();
 
     def get_scene(self):
         return self.pointer_parent.get_scene()
+
+    def get_object(self):
+        return self.pointer_datablock
 
 
 class ExportLight(ExporterArchive):
