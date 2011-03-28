@@ -120,6 +120,46 @@ def is_renderable(scene, ob):
 def renderable_objects(scene):
     return [ob for ob in scene.objects if is_renderable(scene, ob)]
 
+def is_subd_last(ob):
+    return ob.modifiers and ob.modifiers[len(ob.modifiers)-1].type == 'SUBSURF'
+
+def is_subd_displace_last(ob):
+    if len(ob.modifiers) < 2: return False
+    
+    return (ob.modifiers[len(ob.modifiers)-2].type == 'SUBSURF' and
+        ob.modifiers[len(ob.modifiers)-1].type == 'DISPLACE')
+
+def is_subdmesh(ob):
+    return (is_subd_last(ob) or is_subd_displace_last(ob))
+
+def detect_primitive(ob):
+#    rm = ob.renderman
+    
+#    if rm.primitive == 'AUTO':
+    if ob.type == 'MESH':
+        if is_subdmesh(ob):
+            return 'SUBDIVISION_MESH'
+        else:
+            return 'POLYGON_MESH'
+#    else:
+#        return rm.primitive
+ 
+def create_mesh(scene, ob, matrix=None):
+    # 2 special cases to ignore:
+    # subsurf last or subsurf 2nd last +displace last
+    
+    if is_subd_last(ob):
+        ob.modifiers[len(ob.modifiers)-1].show_render = False
+    elif is_subd_displace_last(ob):
+        ob.modifiers[len(ob.modifiers)-2].show_render = False
+        ob.modifiers[len(ob.modifiers)-1].show_render = False
+    
+    mesh = ob.to_mesh(scene, True, 'RENDER')    
+    
+    if matrix != None:
+        mesh.transform(matrix)
+
+    return mesh
 
 
 
@@ -889,8 +929,6 @@ class ExporterArchive(rm_context.ExportContext):
                                         self._queque_priority)
             self._pointer_file = getattr(export_object, "_pointer_file",
                                         self._pointer_file)
-            self._pointer_file = getattr(export_object, "_pointer_file",
-                                        self._pointer_file)
             self._pointer_cache = getattr(export_object, "_pointer_cache",
                                         self._pointer_cache)
             self._archive_regexes = getattr(export_object, "_archive_regexes",
@@ -1550,6 +1588,9 @@ class ExportPass(ExporterArchive):
         
         self.close_archive()
 
+    def get_scene(self):
+        return self.pointer_datablock
+
 
 class ExportWorld(ExporterArchive):
     """Represents shaders on world data-blocks"""
@@ -1578,10 +1619,8 @@ class ExportObject(ExporterArchive):
         """Initialize attributes using export_object and parameters.
         Automatically create the RIB this object represents.
         
-        export_object = Any object subclassed from ExportContext
-        archive_path = Path to save archive to (from export_object otherwise)
-        archive_name = Name to save archive as (from export_object otherwise)
-        """
+        export_object = ExportObject subclassed from ExportContext
+       """
         
         ExporterArchive.__init__(self, export_object)
         self._set_pointer_datablock(pointer_object)
@@ -1638,11 +1677,24 @@ class ExportObject(ExporterArchive):
         self.write_text('    AttributeBegin\n')
         self.write_text('        Attribute "identifier" "name" [ "%s" ]\n' % self.data_name)
         self.write_text('        Transform %s\n' % rib_mat_str(mat))
-
+        # export object data
+        # let the ExportObjdata instance decide how to export the object data
+        try:
+            eod = ExportObjdata(self)
+            eod.export_rib()
+            del eod
+        except:
+            eod.close_archive()
+            raise rm_error.RibmosaicError("Failed to build object data RIB " + \
+                                         self.data_name, sys.exc_info())
+          
         # create ExportObjectData
 
         self.write_text('    AttributeEnd\n')
         self.close_archive();
+
+    def get_scene(self):
+        return self.pointer_parent.get_scene()
 
 
 class ExportLight(ExporterArchive):
@@ -1674,32 +1726,55 @@ class ExportObjdata(ExporterArchive):
     Can also handle export of multiple meshes setup in LOD list
     """
     
-    def __init__(self, export_object=None, archive_path="", archive_name=""):
+    def __init__(self, export_object=None):
         """Initialize attributes using export_object and parameters.
-        Automatically create the RIB this object represents.
+        Automatically create the RIB this object data represents.
         
         export_object = Any object subclassed from ExportContext
-        archive_path = Path to save archive to (from export_object otherwise)
-        archive_name = Name to save archive as (from export_object otherwise)
-        """
+       """
         
-        ExporterArchive.__init__(self, export_object, archive_path, archive_name)
+        ExporterArchive.__init__(self, export_object)
         
         # Determine if compressed RIB is enabled
-        if self.pointer_datablock:
-            compress = self.pointer_datablock.ribmosaic_compressrib
-        else:
-            compress = False
+        #if self.pointer_datablock:
+        #    compress = self.pointer_datablock.ribmosaic_compressrib
+        #else:
+        #    compress = False
         
-        self.open_archive(gzipped=compress)
-    
-    
+        #self.open_archive(gzipped=compress)
+
+
+    def _export_polygon_mesh(self):
+       # create a mesh that has all modifiers applied to mesh data
+        mesh = create_mesh(self.get_scene(), self.get_object())
+        # set the file pointer for ribify
+        rm.ribify.pointer_file = self._pointer_file
+        # ribify the mesh data
+        rm.ribify.mesh_pointspolygons(mesh)
+
+        # don't need the mesh data anymore so tell blender to
+        # get rid of it
+        bpy.data.meshes.remove(mesh)
+
+    def _export_geometry(self):
+        if DEBUG_PRINT:
+            print("ExportObjdata._export_geometry")
+
+        # determine whate type of geometry is to be exported
+        prim = detect_primitive(self.get_object())
+
+        if prim == 'POLYGON_MESH':
+          self._export_polygon_mesh()
+   
     # #### Public methods
     
+    # TODO just a test method
     def export(self):
         """ """
         
-        print("Exporting object data...")
+        if DEBUG_PRINT:
+             print("Exporting object data...")
+
         rm.ribify.mesh_pointspolygons(None)
         rm.ribify.mesh_subdivisionmesh(None)
         rm.ribify.mesh_points(None)
@@ -1718,7 +1793,23 @@ class ExportObjdata(ExporterArchive):
         rm.ribify.data_to_primvar(None, member="N", define="N",
                                      ptype="normal", pclass="varying")
 
+    # export the blender object data into RIB format
+    def export_rib(self):
+        if DEBUG_PRINT:
+            print('ExportObjData.export_rib()')
 
+        # determine what type of object data needs to be exported
+        if self.pointer_datablock.type in ('MESH', 'EMPTY'):
+           self. _export_geometry()
+
+    # helper method to get the blender scene the object is in
+    def get_scene(self):
+        return self.pointer_parent.get_scene()
+
+    # helper method to get the blender object that is currently being exported
+    def get_object(self):
+        return self.pointer_datablock
+ 
 class ExportParticles(ExporterArchive):
     """Represents particle systems connected to particle data-blocks"""
     
