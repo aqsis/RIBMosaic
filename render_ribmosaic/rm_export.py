@@ -155,7 +155,7 @@ def create_mesh(scene, ob, matrix=None):
     
     mesh = ob.to_mesh(scene, True, 'RENDER')    
     
-    if matrix != None:
+    if matrix is not None:
         mesh.transform(matrix)
 
     return mesh
@@ -985,10 +985,10 @@ class ExporterArchive(rm_context.ExportContext):
         if DEBUG_PRINT:
             print("ExporterArchive.open_archive()")
         
-        if gzipped != None:
+        if gzipped is not None:
             self.is_gzip = gzipped
         
-        if execute != None:
+        if execute is not None:
             self.is_exec = execute
         
         if self.archive_name:
@@ -1328,7 +1328,7 @@ class ExporterCommand(ExporterArchive):
             # Only poll and apply target regexes if not interactive
             if not self.pointer_datablock.ribmosaic_interactive:
                 # Wait for process to quit while checking for key presses
-                while self.command_process.poll() == None:
+                while self.command_process.poll() is None:
                     try:
                         self._test_break()
                     except:

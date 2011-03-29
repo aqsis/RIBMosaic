@@ -1061,7 +1061,7 @@ class PipelineManager():
                     p.tail = p.tail.rstrip("\t") + tabs[:-1]
             
             # if no parent found but element was found then assume parent is the root
-            if parent == None and element is not None:
+            if parent is None and element is not None:
                 parent = self._pipeline_tree.getroot()
             # Get rid of it
             parent.remove(element)
@@ -2012,7 +2012,7 @@ class PipelineManager():
             else:
                 found_element = self._pipeline_tree.find(xmlpath)
 
-            if found_element == None:
+            if found_element is None:
                 return elements;
 
             for e in found_element.iterfind('*'):
@@ -2158,7 +2158,7 @@ class PipelineManager():
         except:
             raise rm_error.RibmosaicError("PipelineManager.get_attr: Invalid path syntax for " + xmlpath)
         
-        if element == None:
+        if element is None:
             if segs[0] in self.list_pipelines():
                 raise rm_error.RibmosaicError("PipelineManager.get_attr: Could not find element at \"" + xmlpath + "\"")
             else:
@@ -2179,7 +2179,7 @@ class PipelineManager():
         
         # Check for links in data, if so resolve them
         if resolve and "@[" in data:
-            if export_object == None:
+            if export_object is None:
                 export_object = rm_context.ExportContext()
                 
             elif type(export_object) == dict:
@@ -2213,7 +2213,7 @@ class PipelineManager():
         except:
             raise rm_error.RibmosaicError("PipelineManager.set_attrs: Invalid path syntax for " + xmlpath)
         
-        if element == None:
+        if element is None:
             if segs[0] in self.list_pipelines():
                 raise rm_error.RibmosaicError("PipelineManager.set_attrs: Could not find element at \"" + \
                                               xmlpath + "\"")
@@ -2253,7 +2253,7 @@ class PipelineManager():
             raise rm_error.RibmosaicError("PipelineManager.get_text: " + \
                                           "Invalid path syntax for " + xmlpath)
         
-        if element == None:
+        if element is None:
             segs = xmlpath.split("/")
             if segs[0] in self.list_pipelines():
                 raise rm_error.RibmosaicError("PipelineManager.get_text: " + \
@@ -2279,7 +2279,7 @@ class PipelineManager():
         
         # Check for links in data, if so resolve them
         if resolve and "@[" in text:
-            if export_object == None:
+            if export_object is None:
                 export_object = rm_context.ExportContext()
             elif type(export_object) == dict:
                 attrs = dict(export_object)
@@ -2315,7 +2315,7 @@ class PipelineManager():
             raise rm_error.RibmosaicError("PipelineManager.set_text: " + \
                                           "Invalid path syntax for " + xmlpath)
         
-        if element == None:
+        if element is None:
             if segs[0] in self.list_pipelines():
                 raise rm_error.RibmosaicError("PipelineManager.set_text: " + \
                                               "Could not find element at \"" + \
@@ -2406,7 +2406,7 @@ class PipelineManager():
                         e = "widget"
             
             # Get attribute
-            if attr != None:
+            if attr is not None:
                 # Directly access attribute
                 if attr:
                     k = self._pipeline_elements[e]['attributes'][attr]
@@ -2496,7 +2496,7 @@ class PipelineManager():
             for a in [(slauth, 'authors'),
                       (slcopy, 'copyright'),
                       (sldesc, 'description')]:
-                if a[0] != None and a[0].text:
+                if a[0] is not None and a[0].text:
                     lines = [l.strip() for l in a[0].text.splitlines() if l.strip()]
                     message += a[1].capitalize() + ":\\n" + \
                                "\\n".join(lines) + "\\n\\n"
