@@ -113,11 +113,23 @@ def is_visible_layer(scene, ob):
     return False
 
 def is_renderable(scene, ob):
-    return (is_visible_layer(scene, ob) and not ob.hide_render \
-            and ob.type in ('MESH', 'EMPTY'))
+    return (is_visible_layer(scene, ob) and not ob.hide_render) 
+            
+def get_renderables(scene):
+    objects = []
+    lights = []
+    cameras = []
 
-def renderable_objects(scene):
-    return [ob for ob in scene.objects if is_renderable(scene, ob)]
+    for ob in scene.objects:
+         if is_renderable(scene, ob):
+             if ob.type in ['MESH', 'EMPTY']:
+                 objects += [ob]
+             elif ob.type in ['LIGHT']:
+                 lights += [ob]
+             elif ob.type in ['CAMERA']:
+                 cameras = [ob]
+  
+    return (objects, lights, cameras)
 
 def is_subd_last(ob):
     return ob.modifiers and ob.modifiers[len(ob.modifiers)-1].type == 'SUBSURF'
@@ -1468,6 +1480,38 @@ class ExportPass(ExporterArchive):
         
         self.open_archive(gzipped=compress)
     
+    def _export_lights(self, lights):
+        if DEBUG_PRINT:
+            print("ExportPass._export_lights()")
+
+        for idx, light in enumerate(lights):
+           target_name = ob.name + ".rib"
+           try:
+               el = ExportLight(self, light, idx)
+               el.export_rib()
+               del el
+           except:
+               el.close_archive()
+               del el
+               raise rm_error.RibmosaicError("Failed to build light RIB " + \
+                                             target_name, sys.exc_info())
+         
+    def _export_objects(self, objects):
+        if DEBUG_PRINT:
+            print("ExportPass._export_lights()")
+
+        for ob in objects:
+            target_name = ob.name + ".rib"
+            try:
+                eo = ExportObject(self, ob)
+                eo.export_rib()
+                del eo
+            except:
+                eo.close_archive()
+                del eo
+                raise rm_error.RibmosaicError("Failed to build object RIB " + \
+                                              target_name, sys.exc_info())
+ 
     
     # #### Public methods
     
@@ -1601,19 +1645,16 @@ class ExportPass(ExporterArchive):
             p.build_code("rib")
         
         # figure out what objects in the scene are renderable
-        # self.write_text("Sphere 1 -1 1 360\n")
-        # export the objects to RIB recursively
-        # objtarget_path = self.archive_path + "Objects" + os.sep
-        for ob in renderable_objects(self.pointer_datablock):
-            target_name = ob.name + ".rib"
-            try:
-                eo = ExportObject(self, ob)
-                eo.export_rib()
-            except:
-                eo.close_archive()
-                raise rm_error.RibmosaicError("Failed to build object RIB " + \
-                                              target_name, sys.exc_info())
-        
+        # build a collection of all renderable objects which includes:
+        # light, camera, mesh, empty
+        objects, lights, cameras = get_renderables(self.get_scene())
+
+        # first export lights to rib
+        self._export_lights(lights)
+
+        # export all the objects to RIB
+        self._export_objects(objects)
+       
         for p in world_utilities:
             p.build_code("end")
         
@@ -1801,14 +1842,30 @@ class ExportObject(ExporterArchive):
 
 class ExportLight(ExporterArchive):
     """Represents shaders on lamp data-blocks"""
+    lightidx = 0
     
-    
+    def __init__(self, export_object=None, pointer_object=None, idx=0):
+        """Initialize attributes using export_object and parameters.
+        Automatically create the RIB this object represents.
+        
+        export_object = ExportObject subclassed from ExportContext
+       """
+        
+        ExporterArchive.__init__(self, export_object)
+        self._set_pointer_datablock(pointer_object)
+        lightidx = idx
+     
     # #### Public methods
     
     def export(self):
         """ """
         
         print("Exporting lamp...")
+
+    def export_rib(self):
+        if DEBUG_PRINT:
+            print("ExportLight.export_rib()")
+
 
 
 class ExportMaterial(ExporterArchive):
