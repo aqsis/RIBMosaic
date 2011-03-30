@@ -124,7 +124,7 @@ def get_renderables(scene):
          if is_renderable(scene, ob):
              if ob.type in ['MESH', 'EMPTY']:
                  objects += [ob]
-             elif ob.type in ['LIGHT']:
+             elif ob.type in ['LAMP']:
                  lights += [ob]
              elif ob.type in ['CAMERA']:
                  cameras = [ob]
@@ -1232,6 +1232,15 @@ class ExporterArchive(rm_context.ExportContext):
                 archive.open_archive(mode='r')
                 archive.close_archive()
 
+    def riAttributeBegin(self):
+        self.write_text('AttributeBegin\n')
+
+    def riAttributeEnd(self):
+        self.write_text('AttributeEnd\n')
+        
+    def riIlluminate(self, idx, state=1):
+        self.write_text('Illuminate "%s" %s\n' % (idx, state));
+
 
 # #### Pipeline panel sub classes (all derived from ExporterArchive)
 
@@ -1485,9 +1494,10 @@ class ExportPass(ExporterArchive):
             print("ExportPass._export_lights()")
 
         for idx, light in enumerate(lights):
-           target_name = ob.name + ".rib"
+           target_name = light.name + ".rib"
+           self.current_lightid = idx
            try:
-               el = ExportLight(self, light, idx)
+               el = ExportLight(self, light)
                el.export_rib()
                del el
            except:
@@ -1634,9 +1644,7 @@ class ExportPass(ExporterArchive):
         #"Rotate @[EVAL:.current_frame:]@ 1 0 0\n"
         "WorldBegin\n"
         "Attribute \"displacementbound\" \"float sphere\" [ 0.05 ] "
-        "\"string coordinatesystem\" [ \"shader\" ]\n"
-        "LightSource \"pointlight\" 0 \"uniform point from\" [ 0 0 -1 ]\n"))
-        #"LightSource \"ambientlight\" 0\n"))
+        "\"string coordinatesystem\" [ \"shader\" ]\n"))
         
         for p in world_utilities:
             p.build_code("begin")
@@ -1814,7 +1822,7 @@ class ExportObject(ExporterArchive):
             # if a camera object then do special camera output
             #     FIXME this is just test code
             #self.write_text('##Renderman  \n')
-            self.write_text('    AttributeBegin\n')
+            self.riAttributeBegin()
             self.write_text('        Attribute "identifier" "name" [ "%s" ]\n' % self.data_name)
             self.write_text('        Transform %s\n' % rib_mat_str(mat))
             # export object data
@@ -1830,7 +1838,7 @@ class ExportObject(ExporterArchive):
           
             # create ExportObjectData
 
-            self.write_text('    AttributeEnd\n')
+            self.riAttributeEnd()
             self.close_archive();
 
     def get_scene(self):
@@ -1842,9 +1850,8 @@ class ExportObject(ExporterArchive):
 
 class ExportLight(ExporterArchive):
     """Represents shaders on lamp data-blocks"""
-    lightidx = 0
-    
-    def __init__(self, export_object=None, pointer_object=None, idx=0):
+        
+    def __init__(self, export_object=None, pointer_object=None):
         """Initialize attributes using export_object and parameters.
         Automatically create the RIB this object represents.
         
@@ -1853,7 +1860,6 @@ class ExportLight(ExporterArchive):
         
         ExporterArchive.__init__(self, export_object)
         self._set_pointer_datablock(pointer_object)
-        lightidx = idx
      
     # #### Public methods
     
@@ -1865,7 +1871,28 @@ class ExportLight(ExporterArchive):
     def export_rib(self):
         if DEBUG_PRINT:
             print("ExportLight.export_rib()")
+            
+        ob = self.pointer_datablock
+        lamp = ob.data
 
+        if ob.parent:
+            m = ob.parent.matrix_world * ob.matrix_local
+        else:
+            m = ob.matrix_world
+            loc = m.to_translation()
+    
+        loc = m.to_translation()
+        lvec = [loc[0]-m[2][0], loc[1]-m[2][1], loc[2]-m[2][2]]
+        params = []
+    
+        self.riAttributeBegin()
+        # TODO default to a pointlight for now
+        self.write_text("LightSource \"pointlight\" %s \"uniform point from\" "
+                        "[ %s ]\n" % (self.current_lightid, rib_param_val('float', loc)))
+        
+        self.riAttributeEnd()
+        self.riIlluminate(self.current_lightid);
+        
 
 
 class ExportMaterial(ExporterArchive):
