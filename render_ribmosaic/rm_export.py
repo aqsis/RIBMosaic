@@ -1097,6 +1097,9 @@ class ExporterArchive(rm_context.ExportContext):
             print("ExporterArchive.write_text()")
         
         if text:
+            if self.current_indent > 0:
+                text = " ".rjust(self.current_indent * 4) + text    
+            
             if self._pointer_file:
                 if self.is_gzip:
                     self._pointer_file.write(text.encode())
@@ -1232,10 +1235,20 @@ class ExporterArchive(rm_context.ExportContext):
                 archive.open_archive(mode='r')
                 archive.close_archive()
 
+    def riWorldBegin(self):
+        self.write_text('WorldBegin\n')
+        self.inc_indent()
+        
+    def riWorldEnd(self):
+        self.dec_indent()
+        self.write_text('WorldEnd\n')
+
     def riAttributeBegin(self):
         self.write_text('AttributeBegin\n')
+        self.inc_indent()
 
     def riAttributeEnd(self):
+        self.dec_indent()
         self.write_text('AttributeEnd\n')
         
     def riIlluminate(self, idx, state=1):
@@ -1639,12 +1652,10 @@ class ExportPass(ExporterArchive):
 
            
 
-        self.write_text(self._resolve_links(
-        "Sides 2\n"
-        #"Rotate @[EVAL:.current_frame:]@ 1 0 0\n"
-        "WorldBegin\n"
-        "Attribute \"displacementbound\" \"float sphere\" [ 0.05 ] "
-        "\"string coordinatesystem\" [ \"shader\" ]\n"))
+        self.write_text("Sides 2\n")
+        self.riWorldBegin()
+        self.write_text("Attribute \"displacementbound\" \"float sphere\" [ 0.05 ] "
+        "\"string coordinatesystem\" [ \"shader\" ]\n")
         
         for p in world_utilities:
             p.build_code("begin")
@@ -1666,7 +1677,7 @@ class ExportPass(ExporterArchive):
         for p in world_utilities:
             p.build_code("end")
         
-        self.write_text("WorldEnd\n")
+        self.riWorldEnd()
         
         for p in render_utilities:
             p.build_code("end")
@@ -1823,8 +1834,8 @@ class ExportObject(ExporterArchive):
             #     FIXME this is just test code
             #self.write_text('##Renderman  \n')
             self.riAttributeBegin()
-            self.write_text('        Attribute "identifier" "name" [ "%s" ]\n' % self.data_name)
-            self.write_text('        Transform %s\n' % rib_mat_str(mat))
+            self.write_text('Attribute "identifier" "name" [ "%s" ]\n' % self.data_name)
+            self.write_text('Transform %s\n' % rib_mat_str(mat))
             # export object data
             # let the ExportObjdata instance decide how to export the object data
             try:
