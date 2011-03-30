@@ -128,6 +128,7 @@ class ExportContext():
     current_command = 0 # Current command (shell script) index
     current_library = 0 # Current shader library index
     current_lightid = 0 # Current RenderMan light ID
+    current_indent = 0 # Current indentation level for RIB text ouput
     
     # Output dimensions
     dims_resx = 0 # X output resolution
@@ -191,6 +192,7 @@ class ExportContext():
             self.current_command = export_object.current_command
             self.current_library = export_object.current_library
             self.current_lightid = export_object.current_lightid
+            self.current_indent = export_object.current_indent
             
             self.dims_resx = export_object.dims_resx
             self.dims_resy = export_object.dims_resy
@@ -460,6 +462,17 @@ class ExportContext():
     
     # #### Public methods
     
+    def inc_indent(self):
+        """ Increment the current indent by one. """
+        self.current_indent += 1
+        
+    def dec_indent(self):
+        """ Decrement the current indent by one.  Does not allow the indent to 
+            go below zero.
+        """
+        self.current_indent -= 1
+        if self.current_indent < 0: self.current_indent = 0
+            
     # TODO begin writing handy public export methods for links here!
     # TODO methods and docstrings to show in pipeline editor link builder
     # TODO the following are just pseudo examples of handy methods
