@@ -1669,9 +1669,11 @@ class ExportPass(ExporterArchive):
         "\"string coordinatesystem\" [ \"shader\" ]\n")
         
         for p in world_utilities:
+            p.current_indent = self.current_indent
             p.build_code("begin")
         
         for p in world_shaders:
+            p.current_indent = self.current_indent
             p.build_code("rib")
         
         # figure out what objects in the scene are renderable
@@ -1686,16 +1688,19 @@ class ExportPass(ExporterArchive):
         self._export_objects(objects)
        
         for p in world_utilities:
+            p.current_indent = self.current_indent
             p.build_code("end")
         
         self.riWorldEnd()
         
         for p in render_utilities:
+            p.current_indent = self.current_indent
             p.build_code("end")
         
         self.riFrameEnd()
         
         for p in scene_utilities:
+            p.current_indent = self.current_indent
             p.build_code("end")
         
         self.close_archive()
@@ -1959,6 +1964,8 @@ class ExportObjdata(ExporterArchive):
         mesh = create_mesh(self.get_scene(), self.get_object())
         # set the file pointer for ribify
         rm.ribify.pointer_file = self._pointer_file
+        # set the indent level of the rib output
+        rm.ribify.indent = self.current_indent
         # ribify the mesh data
         rm.ribify.mesh_pointspolygons(mesh)
 

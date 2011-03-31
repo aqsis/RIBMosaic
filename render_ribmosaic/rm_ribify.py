@@ -128,11 +128,12 @@ class Ribify():
     
     pointer_file = None # File object to write RIB to
     is_gzip = False # If file gzipped
+    indent = 0 # how many tabs to indent from the left
     
     
     # ### Public methods
     
-    def write_text(self, text=""):
+    def write_text(self, text="", use_indent = True):
         """Writes text to open file handle. Also properly writes text as either
         encoded binary or text mode according to is_gzip bool. This method also
         exists in the  ExporterArchive class but is duplicated here to simplify
@@ -143,29 +144,39 @@ class Ribify():
         
         if text:
             if self.pointer_file:
+                if use_indent and self.indent > 0: text = " ".rjust(self.indent * 4) + text
                 if self.is_gzip:
                     self.pointer_file.write(text.encode())
                 else:
                     self.pointer_file.write(text)
             else:
                 raise RibmosaicError("Archive already closed, cannot write text")
+                
+    def inc_indent(self):
+        self.indent += 1
+        
+    def dec_indent(self):
+        self.indent -= 1
+        if self.indent < 0:
+            self.indent = 0
 
 
     def write_rib_list(self, list, items_per_line = 3, space_indent = 1):
-        spaces = " ".rjust(space_indent)
         itemcount = 0
         firstline = True
-        self.write_text(spaces + '[') 
+        self.write_text('[') 
  
         for i in list:
             # if on the first item of the line then indent
             if itemcount == 0 and not firstline:
-                self.write_text('\n  ' + spaces)
+                self.write_text('\n', False)
+                self.write_text('  ')
             else:
                 # adding another item on the line so just put a space between items
-                self.write_text(' ')
-
-            self.write_text(str(i))
+                # don't use indentation
+                self.write_text(' ', False)
+            # output the item in the list but with no indentation
+            self.write_text(str(i), False)
             itemcount += 1
 
             # only allow so many items per line
@@ -174,7 +185,7 @@ class Ribify():
                 firstline = False
 
         # end of the RIB array list block
-        self.write_text(' ]\n')
+        self.write_text(' ]\n', False)
  
 
     
@@ -204,18 +215,22 @@ class Ribify():
             # extract data sets from sample
             nverts, verts, P, uvs, N = sample
 
-            self.write_text('        PointsPolygons \n')
+            self.write_text('PointsPolygons \n')
+            self.inc_indent()
             self.write_rib_list(nverts, 10, 12)
             self.write_rib_list(verts, 3, 12)
-            self.write_text('\n            "P"\n')
+            self.write_text('\n')
+            self.write_text('"P"\n')
             self.write_rib_list(P, 3, 14)
 
             if uvs:     
-                self.write_text('\n            "facevarying float[2] st"\n')
+                self.write_text('\n')
+                self.write_text('"facevarying float[2] st"\n')
                 self.write_rib_list(uvs, 2, 14)
 
             if N: # and ob.renderman.smooth_normals:
-                self.write_text('\n            "varying normal N"\n')
+                self.write_text('\n')
+                self.write_text('"varying normal N"\n')
                 self.write_rib_list(N, 3, 14)
             
     
