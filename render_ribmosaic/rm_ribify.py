@@ -205,7 +205,7 @@ class Ribify():
         print("Creating", primvar['define'], "as", primvar['ptype'], "sorted as",
               primvar['pclass'], "for", primvar['member'], "in", datablock, "...")
     
-    def mesh_pointspolygons(self, datablock):
+    def mesh_pointspolygons(self, datablock, smooth_normals=False):
         """ """
         
         print("Creating pointpolygons...")
@@ -228,7 +228,7 @@ class Ribify():
                 self.write_text('"facevarying float[2] st"\n')
                 self.write_rib_list(uvs, 2, 14)
 
-            if N: # and ob.renderman.smooth_normals:
+            if N and smooth_normals:
                 self.write_text('\n')
                 self.write_text('"varying normal N"\n')
                 self.write_rib_list(N, 3, 14)
