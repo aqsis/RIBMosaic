@@ -1235,6 +1235,14 @@ class ExporterArchive(rm_context.ExportContext):
                 archive.open_archive(mode='r')
                 archive.close_archive()
 
+    def riFrameBegin(self):
+        self.write_text('FrameBegin %s\n' % self.current_rmframe)
+        self.inc_indent()
+        
+    def riFrameEnd(self):
+        self.dec_indent()
+        self.write_text('FrameEnd\n')
+
     def riWorldBegin(self):
         self.write_text('WorldBegin\n')
         self.inc_indent()
@@ -1623,7 +1631,7 @@ class ExportPass(ExporterArchive):
         for p in scene_utilities:
             p.build_code("begin")
         
-        self.write_text("FrameBegin 1\n")
+        self.riFrameBegin()
         
         for p in render_utilities:
             p.build_code("begin")
@@ -1682,7 +1690,7 @@ class ExportPass(ExporterArchive):
         for p in render_utilities:
             p.build_code("end")
         
-        self.write_text("FrameEnd\n")
+        self.riFrameEnd()
         
         for p in scene_utilities:
             p.build_code("end")
@@ -1850,6 +1858,7 @@ class ExportObject(ExporterArchive):
             # create ExportObjectData
 
             self.riAttributeEnd()
+            self.write_text('\n')
             self.close_archive();
 
     def get_scene(self):
@@ -1903,6 +1912,7 @@ class ExportLight(ExporterArchive):
         
         self.riAttributeEnd()
         self.riIlluminate(self.current_lightid);
+        self.write_text('\n')
         
 
 
