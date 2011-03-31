@@ -1634,15 +1634,18 @@ class ExportPass(ExporterArchive):
         self.riFrameBegin()
         
         for p in render_utilities:
+            p.current_indent = self.current_indent
             p.build_code("begin")
         
         self.write_text(self._resolve_links(
-        "Format @[EVAL:.dims_resx:]@ @[EVAL:.dims_resy:]@ 1\n"
-        "@[EVAL:\"PixelSamples @[EVAL:.pointer_pass.pass_samples_x:]@ "
-        "@[EVAL:.pointer_pass.pass_samples_y:]@\" if "
-        "@[EVAL:.pointer_pass.pass_samples_x:]@ else \"\" :]@\n"
-        "@[EVAL:\"ShadingRate @[EVAL:.pointer_pass.pass_shadingrate:]@\" "
-        "if @[EVAL:.pointer_pass.pass_shadingrate:]@ else \"\":]@\n"))
+            "Format @[EVAL:.dims_resx:]@ @[EVAL:.dims_resy:]@ 1\n"))
+        self.write_text(self._resolve_links(
+            "@[EVAL:\"PixelSamples @[EVAL:.pointer_pass.pass_samples_x:]@ "
+            "@[EVAL:.pointer_pass.pass_samples_y:]@\" if "
+            "@[EVAL:.pointer_pass.pass_samples_x:]@ else \"\" :]@\n"))
+        self.write_text(self._resolve_links(
+            "@[EVAL:\"ShadingRate @[EVAL:.pointer_pass.pass_shadingrate:]@\" "
+            "if @[EVAL:.pointer_pass.pass_shadingrate:]@ else \"\":]@\n"))
 
         # export camera - for now default to the camera in the scene
         # TODO the pass camera overrides the scene's camera
