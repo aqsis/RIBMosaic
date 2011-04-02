@@ -66,7 +66,7 @@ exec("from " + MODULE + " import rm_context")
 exec("import " + MODULE + " as rm")
 
 # if DEBUG_PRINT set true then each method with print its method name and important vars to console io
-DEBUG_PRINT = True;
+DEBUG_PRINT = False;
 
 # #############################################################################
 # PIPELINE MANAGER CLASS
@@ -1087,7 +1087,7 @@ class PipelineManager():
             if text in bpy.data.texts:
                 text_data = bpy.data.texts[text]
             else:
-                text_data = bpy.context.blend_data.texts.new_pipeline(text)
+                text_data = bpy.context.blend_data.texts.new(text)
             
             xml = ET.tostring(element, encoding="UTF-8").decode("UTF-8")
             text_data.from_string(xml)
