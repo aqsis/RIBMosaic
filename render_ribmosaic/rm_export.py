@@ -1919,13 +1919,28 @@ class ExportLight(ExporterArchive):
         ExporterArchive.__init__(self, export_object)
         self._set_pointer_datablock(pointer_object)
      
+    def _export_lightcolor(self, color=(1, 1, 1)):
+        self.write_text('"color lightcolor" [ %s ]\n'
+                        % rib_param_val('float', color))
+        
+    def _export_intensity(self, energy=1):
+        self.write_text('"float intensity" %s\n' % (energy * 50))
+            
+    def _export_from(self, loc=(0, 0, 0)):
+        self.write_text('"uniform point from" [ %s ]\n'
+                        % rib_param_val('float', loc))
+
+    def _export_to(self, loc=(0, 0, 0)):
+        self.write_text('"uniform point to" [ %s ]\n'
+                        % rib_param_val('float', loc))
+        
     # #### Public methods
     
     def export(self):
         """ """
         
         print("Exporting lamp...")
-
+        
     def export_rib(self):
         if DEBUG_PRINT:
             print("ExportLight.export_rib()")
@@ -1944,14 +1959,44 @@ class ExportLight(ExporterArchive):
         params = []
     
         self.riAttributeBegin()
-        # TODO default to a pointlight for now
-        self.write_text('LightSource "pointlight" %s\n' % self.current_lightid)
-        self.inc_indent()
-        self.write_text('"float intensity" %s\n' % (lamp.energy * 50))
-        self.write_text('"color lightcolor" [ %s ]\n' % rib_param_val('float', lamp.color))
-        self.write_text('"uniform point from" [ %s ]\n' % rib_param_val('float', loc))
-        self.dec_indent()
+        # TODO add support for all light types
         
+        # these are automatic shaders based on blender lamp type
+        if lamp.type == 'HEMI':
+            self.write_text('LightSource "ambient" %s\n' % self.current_lightid)
+            self.inc_indent()
+            self._export_intensity(lamp.energy)
+            self._export_lightcolor(lamp.color)
+
+        elif lamp.type == 'SUN':
+            self.write_text('LightSource "distantlight" %s\n' % self.current_lightid)
+            self.inc_indent()
+            self._export_intensity(lamp.energy)
+            self._export_lightcolor(lamp.color)
+            self._export_from(loc)
+            self._export_to(lvec)
+
+        elif lamp.type == 'SPOT':
+            self.write_text('LightSource "spotlight" %s\n' % self.current_lightid)
+            self.inc_indent()
+            self._export_intensity(lamp.energy)
+            self._export_lightcolor(lamp.color)
+            self._export_from(loc)
+            self._export_to(lvec)
+            if hasattr(lamp, "spot_size"):
+                coneangle = lamp.spot_size / 2.0
+                self.write_text('"float coneangle" %s\n'
+                    % (rib_param_val('float', coneangle)))
+            
+        else:
+            # default to a pointlight if no lamp type match
+            self.write_text('LightSource "pointlight" %s\n' % self.current_lightid)
+            self.inc_indent()
+            self._export_intensity(lamp.energy)
+            self._export_lightcolor(lamp.color)
+            self._export_from(loc)
+
+        self.dec_indent()
         self.riAttributeEnd()
         self.riIlluminate(self.current_lightid);
         self.write_text('\n', False)
