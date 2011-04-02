@@ -64,6 +64,7 @@ import string
 MODULE = os.path.dirname(__file__).split(os.sep)[-1]
 exec("import " + MODULE + " as rm")
 
+DEBUG_PRINT = False
 
 # local helper functions
 # Mesh data access
@@ -201,14 +202,16 @@ class Ribify():
         ptype = primitive data type
         pclass = primitive class to order quantities by
         """
-        
-        print("Creating", primvar['define'], "as", primvar['ptype'], "sorted as",
-              primvar['pclass'], "for", primvar['member'], "in", datablock, "...")
+        if DEBUG_PRINT:
+            print("Creating", primvar['define'], "as", primvar['ptype'], "sorted as",
+                primvar['pclass'], "for", primvar['member'], "in", datablock, "...")
     
     def mesh_pointspolygons(self, datablock, smooth_normals=False):
         """ """
         
-        print("Creating pointpolygons...")
+        if DEBUG_PRINT:
+            print("Creating pointpolygons...")
+            
         samples = [get_mesh(datablock)]
         
         for sample in samples:
@@ -236,8 +239,8 @@ class Ribify():
     
     def mesh_subdivisionmesh(self, datablock):
         """ """
-        
-        print("Creating subdivisionmesh...")
+        if DEBUG_PRINT:
+            print("Creating subdivisionmesh...")
     
     def mesh_points(self, datablock):
         """ """
