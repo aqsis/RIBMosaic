@@ -11,7 +11,7 @@
     </shader_panels>
 
     <utility_panels filter="UTILITY">
-        <Framebuffer_Display delete="False" description="" duplicate="False" enabled="True" filter="" register="True" type="DISPLAY" windows="RENDER">
+        <Framebuffer_Display delete="False" description="" duplicate="False" enabled="False" filter="" register="True" type="DISPLAY" windows="RENDER">
             <read target="">
             </read>
             <begin target="">
