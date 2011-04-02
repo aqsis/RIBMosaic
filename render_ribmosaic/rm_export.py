@@ -1261,6 +1261,12 @@ class ExporterArchive(rm_context.ExportContext):
         
     def riIlluminate(self, idx, state=1):
         self.write_text('Illuminate "%s" %s\n' % (idx, state));
+        
+    def riColor(self, color=(0, 0, 0)):
+        self.write_text('Color [%s %s %s]' % (color[0], color[1], color[2]))
+
+    def riOpacity(self, color=(0, 0, 0)):
+        self.write_text('Opacity [%s %s %s]' % (color[0], color[1], color[2]))
 
 
 # #### Pipeline panel sub classes (all derived from ExporterArchive)
@@ -1842,6 +1848,23 @@ class ExportObject(ExporterArchive):
         if ob.type == 'CAMERA':
             self._export_camera_rib()
         else:
+            
+            # need to group mesh data with associated material
+            # if the mesh uses more than one material then mesh has to be split up
+            # for now we just spit out the first material only for testing purposes
+            
+            if len(ob.material_slots) > 0:
+                try:
+                    em = ExportMaterial(self, ob.material_slots[0].material)
+                    em.export_rib()
+                    del em
+                except:
+                    em.close_archive()
+                    raise rm_error.RibmosaicError("Failed to build object material RIB " + \
+                                                  self.data_name, sys.exc_info())
+                    
+                
+
             if ob.parent:
                 mat = ob.parent.matrix_world * ob.matrix_local
             else:
@@ -1950,6 +1973,16 @@ class ExportMaterial(ExporterArchive):
     def export_rib(self):
         if DEBUG_PRINT:
             print("ExportMaterial.export_rib()")
+            
+        material = self.pointer_datablock
+        
+        # export riColor if enabled
+        if material.ribmosaic_ri_color:
+            self.riColor(material.diffuse_color)
+            
+        # export riOpacity if enabled
+        if material.ribmosaic_ri_opacity:
+            self.riOpacity((material.alpha, material.alpha, material.alpha))
             
 
 
