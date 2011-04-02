@@ -1086,27 +1086,31 @@ class ExporterArchive(rm_context.ExportContext):
                         rm_error.RibmosaicError("Cannot apply regex to archive",
                                                 sys.exc_info())
     
-    def write_text(self, text="", close=False):
+    def write_text(self, text="", use_indent=True, close=False):
         """Writes text to this archive's open file handle. Also properly writes
         text as either encoded binary or text mode according to is_gzip attribute.
         
         text = The text to write (can contain escape characters)
+        use_indent = if true then indent the text
         close = If true closes script archive when complete
         """
         if DEBUG_PRINT:
             print("ExporterArchive.write_text()")
         
         if text:
-            if self.current_indent > 0:
-                text = " ".rjust(self.current_indent * 4) + text    
+            # split the text up into lines 
+            lines = text.splitlines(True)
+            for ln in lines:
+                if use_indent and self.current_indent > 0:
+                    ln = " ".rjust(self.current_indent * 4) + ln    
             
-            if self._pointer_file:
-                if self.is_gzip:
-                    self._pointer_file.write(text.encode())
+                if self._pointer_file:
+                    if self.is_gzip:
+                        self._pointer_file.write(ln.encode())
+                    else:
+                        self._pointer_file.write(ln)
                 else:
-                    self._pointer_file.write(text)
-            else:
-                raise rm_error.RibmosaicError("Archive already closed, cannot write text")
+                    raise rm_error.RibmosaicError("Archive already closed, cannot write text")
         
         if close:
             self.close_archive()
@@ -1941,12 +1945,16 @@ class ExportLight(ExporterArchive):
     
         self.riAttributeBegin()
         # TODO default to a pointlight for now
-        self.write_text("LightSource \"pointlight\" %s \"uniform point from\" "
-                        "[ %s ]\n" % (self.current_lightid, rib_param_val('float', loc)))
+        self.write_text('LightSource "pointlight" %s\n' % self.current_lightid)
+        self.inc_indent()
+        self.write_text('"float intensity" %s\n' % (lamp.energy * 50))
+        self.write_text('"color lightcolor" [ %s ]\n' % rib_param_val('float', lamp.color))
+        self.write_text('"uniform point from" [ %s ]\n' % rib_param_val('float', loc))
+        self.dec_indent()
         
         self.riAttributeEnd()
         self.riIlluminate(self.current_lightid);
-        self.write_text('\n')
+        self.write_text('\n', False)
         
 
 
@@ -1990,7 +1998,6 @@ class ExportMaterial(ExporterArchive):
         pipeline = self.context_pipeline
         category = self.context_category
         panel = self.context_panel
-        datablock = self.pointer_datablock
         
         # Panel material lists
         material_shaders = []
@@ -2009,7 +2016,6 @@ class ExportMaterial(ExporterArchive):
         self.context_pipeline = pipeline
         self.context_category = category
         self.context_panel = panel
-        self.pointer_datablock = datablock
 
         # output rib code for the shaders
         for p in material_shaders:
