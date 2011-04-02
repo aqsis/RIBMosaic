@@ -64,7 +64,7 @@ exec("from " + MODULE + " import rm_context")
 exec("import " + MODULE + " as rm")
 
 
-
+DEBUG_PRINT = False
 
 # #############################################################################
 # MENU CLASSES AND FUNCTIONS
@@ -355,7 +355,8 @@ class RibmosaicPropertiesPanel(rm_context.ExportContext):
 
         rd = scene.render
         show_panel = True
-        print("RibmosaicPropertiesPanel.poll()")
+        if DEBUG_PRINT:
+            print("RibmosaicPropertiesPanel.poll()")
 
         if (rd.engine in cls.COMPAT_ENGINES):
             # Sync pipeline tree with current .rmp files
