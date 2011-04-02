@@ -1235,6 +1235,7 @@ class ExporterArchive(rm_context.ExportContext):
                 archive.open_archive(mode='r')
                 archive.close_archive()
 
+    # helper methods for outputting RIB code
     def riFrameBegin(self):
         self.write_text('FrameBegin %s\n' % self.current_rmframe)
         self.inc_indent()
@@ -1983,6 +1984,38 @@ class ExportMaterial(ExporterArchive):
         # export riOpacity if enabled
         if material.ribmosaic_ri_opacity:
             self.riOpacity((material.alpha, material.alpha, material.alpha))
+        
+        # Build a list of material shaders
+        # Push objects attributes that will get changed
+        pipeline = self.context_pipeline
+        category = self.context_category
+        panel = self.context_panel
+        datablock = self.pointer_datablock
+        
+        # Panel material lists
+        material_shaders = []
+
+        # export all enabled shader panels for this material
+        for p in rm.pipeline_manager.list_panels("shader_panels", window='MATERIAL'):
+            segs = p.split("/")
+            self.context_pipeline = segs[0]
+            self.context_category = segs[1]
+            self.context_panel = segs[2]
+            
+            if self._panel_enabled():
+                material_shaders.append(ExporterShader(self, p))
+
+        # Pop objects attributes
+        self.context_pipeline = pipeline
+        self.context_category = category
+        self.context_panel = panel
+        self.pointer_datablock = datablock
+
+        # output rib code for the shaders
+        for p in material_shaders:
+            p.current_indent = self.current_indent
+            p.build_code("rib")
+
             
 
 
