@@ -74,7 +74,7 @@ exec("from " + MODULE + " import rm_property")
 exec("import " + MODULE + " as rm")
 
 # if DEBUG_PRINT set true then each method with print its method name and important vars to console io
-DEBUG_PRINT = True;
+DEBUG_PRINT = False;
 
 # ------------- RIB formatting Helpers -------------
 # taken from Matt Ebb's Blender to 3Delight exporter
@@ -1833,11 +1833,12 @@ class ExportObject(ExporterArchive):
 
     def export_rib(self):
         """ """
-
-        print("ExportObject.export_rib()")
+        if DEBUG_PRINT:
+            print("ExportObject.export_rib()")
 
         ob = self.get_object()
 
+        # if a camera object then do special camera output
         if ob.type == 'CAMERA':
             self._export_camera_rib()
         else:
@@ -1845,13 +1846,14 @@ class ExportObject(ExporterArchive):
                 mat = ob.parent.matrix_world * ob.matrix_local
             else:
                 mat = ob.matrix_world
-            print(mat)
-            # if a camera object then do special camera output
+            #print(mat)
+
             #     FIXME this is just test code
             #self.write_text('##Renderman  \n')
             self.riAttributeBegin()
             self.write_text('Attribute "identifier" "name" [ "%s" ]\n' % self.data_name)
             self.write_text('Transform %s\n' % rib_mat_str(mat))
+
             # export object data
             # let the ExportObjdata instance decide how to export the object data
             try:
@@ -1926,7 +1928,17 @@ class ExportLight(ExporterArchive):
 
 class ExportMaterial(ExporterArchive):
     """Represents shaders on materials related to material data-blocks"""
-    
+
+    def __init__(self, export_object=None, pointer_object=None):
+        """Initialize attributes using export_object and parameters.
+        Automatically create the RIB this object represents.
+        
+        export_object = ExportObject subclassed from ExportContext
+       """
+        
+        ExporterArchive.__init__(self, export_object)
+        self._set_pointer_datablock(pointer_object)
+   
     
     # #### Public methods
     
@@ -1934,6 +1946,11 @@ class ExportMaterial(ExporterArchive):
         """ """
         
         print("Exporting materials...")
+        
+    def export_rib(self):
+        if DEBUG_PRINT:
+            print("ExportMaterial.export_rib()")
+            
 
 
 class ExportObjdata(ExporterArchive):
