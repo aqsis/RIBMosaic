@@ -1263,10 +1263,10 @@ class ExporterArchive(rm_context.ExportContext):
         self.write_text('Illuminate "%s" %s\n' % (idx, state));
         
     def riColor(self, color=(0, 0, 0)):
-        self.write_text('Color [%s %s %s]' % (color[0], color[1], color[2]))
+        self.write_text('Color [%s %s %s]\n' % (color[0], color[1], color[2]))
 
     def riOpacity(self, color=(0, 0, 0)):
-        self.write_text('Opacity [%s %s %s]' % (color[0], color[1], color[2]))
+        self.write_text('Opacity [%s %s %s]\n' % (color[0], color[1], color[2]))
 
 
 # #### Pipeline panel sub classes (all derived from ExporterArchive)
