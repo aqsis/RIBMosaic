@@ -997,7 +997,7 @@ class PipelineManager():
         
         # Don't load this pipeline if one already has the same element name
         if self._pipeline_tree.findall(element.tag):
-            raise rm_error.RibmosaicError("PipelineManager._load_xml: Pipeline already loaded")
+            raise rm_error.RibmosaicError("PipelineManager._load_xml: %s Pipeline already loaded" % element.tag)
         
         self._pipeline_tree.getroot().append(element)
         
