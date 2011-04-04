@@ -64,6 +64,7 @@ import gzip
 import bpy
 import mathutils
 import math
+import time
 
 # #### Global variables
 
@@ -1240,6 +1241,17 @@ class ExporterArchive(rm_context.ExportContext):
                 archive.close_archive()
 
     # helper methods for outputting RIB code
+    def ribHeader(self):
+        self.write_text("##RenderMan RIB-Structure 1.1\n")
+        self.write_text("##Scene: %s\n" % rm.export_manager.export_scene.name)
+        self.write_text("##Creator: RIBMOSAIC %s for Blender\n" % rm.VERSION)
+        self.write_text("##CreationDate: "+time.strftime("%I:%M%p %m/%d/%Y", time.localtime()).lower()+"\n")
+        self.write_text("##For: %s\n" % self.blend_name)
+        #self.write_text("##Frames: "+str(fraEnd-fraStart+1)+"\n")
+        self.write_text("version 3.03\n")
+        
+        
+        
     def riFrameBegin(self):
         self.write_text('FrameBegin %s\n' % self.current_rmframe)
         self.inc_indent()
@@ -1637,6 +1649,9 @@ class ExportPass(ExporterArchive):
         self.context_category = category
         self.context_panel = panel
         self.pointer_datablock = datablock
+        
+        # output rib header
+        self.ribHeader()
         
         # Write everything to archive
         for p in scene_utilities:
