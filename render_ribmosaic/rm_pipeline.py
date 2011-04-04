@@ -924,11 +924,7 @@ class PipelineManager():
             print("ename: " + ename)
             
         try:
-             # if no path given then assume top level of pipelines
-            if xmlpath =='':
-                element = self._pipeline_tree.getroot()
-            else:
-                element = self._pipeline_tree.find(xmlpath)
+            element = self.get_element(xmlpath)
 
             children = element.getchildren()
             childlen = len(children)
@@ -1032,12 +1028,12 @@ class PipelineManager():
 
         try:
             # Get elements
-            element = self._pipeline_tree.find(xmlpath)
+            element = self.get_element(xmlpath)
 
             # Get XML path to parent element
             parentpath = "/".join(xmlpath.split("/")[:-1])
             
-            parent = self._pipeline_tree.find(parentpath)
+            parent = self.get_element(parentpath)
 
             
             if DEBUG_PRINT:
@@ -1089,7 +1085,7 @@ class PipelineManager():
         if DEBUG_PRINT:
             print("PipelineManager._write_xml()")
         try:
-            element = self._pipeline_tree.find(pipeline)
+            element = self.get_element(pipeline)
             text = element.attrib["filepath"]
             
             if text in bpy.data.texts:
@@ -1915,8 +1911,8 @@ class PipelineManager():
             segs.pop()
             
             # Get elements
-            element = self._pipeline_tree.find(xmlpath)
-            parent = self._pipeline_tree.find("/".join(segs))
+            element = self.get_element(xmlpath)
+            parent = self.get_element("/".join(segs))
             
             # Duplicate and setup panel
             xml = ET.tostring(element)
@@ -2011,14 +2007,10 @@ class PipelineManager():
         if DEBUG_PRINT:
             print("PipelineManager.list_elements()")
             print("xmlpath: " + xmlpath)
-            print(self._pipeline_tree.find(xmlpath))
+            print("element: " + self.get_element(xmlpath))
 
         try:
-            # if no path given then assume top level of pipelines
-            if xmlpath =='':
-                found_element = self._pipeline_tree.getroot()
-            else:
-                found_element = self._pipeline_tree.find(xmlpath)
+            found_element = self.get_element(xmlpath)
 
             if found_element is None:
                 return elements;
@@ -2058,7 +2050,7 @@ class PipelineManager():
             print("xmlpath: " + xmlpath)
 
         try:
-            attributes = list(self._pipeline_tree.find(xmlpath).attrib)
+            attributes = list(self.get_element(xmlpath).attrib)
             
             if sort:
                 attributes.sort()
@@ -2162,7 +2154,7 @@ class PipelineManager():
         segs = xmlpath.split("/")
         
         try:
-            element = self._pipeline_tree.find(xmlpath)
+            element = self.get_element(xmlpath)
         except:
             raise rm_error.RibmosaicError("PipelineManager.get_attr: Invalid path syntax for " + xmlpath)
         
@@ -2217,7 +2209,7 @@ class PipelineManager():
         segs = xmlpath.split("/")
         
         try:
-            element = self._pipeline_tree.find(xmlpath)
+            element = self.get_element(xmlpath)
         except:
             raise rm_error.RibmosaicError("PipelineManager.set_attrs: Invalid path syntax for " + xmlpath)
         
@@ -2256,7 +2248,7 @@ class PipelineManager():
             print("PipelineManager.get_text()")
 
         try:
-            element = self._pipeline_tree.find(xmlpath)
+            element = self.get_element(xmlpath)
         except:
             raise rm_error.RibmosaicError("PipelineManager.get_text: " + \
                                           "Invalid path syntax for " + xmlpath)
@@ -2318,7 +2310,7 @@ class PipelineManager():
         segs = xmlpath.split("/")[0]
         
         try:
-            element = self._pipeline_tree.find(xmlpath)
+            element = self.get_element(xmlpath)
         except:
             raise rm_error.RibmosaicError("PipelineManager.set_text: " + \
                                           "Invalid path syntax for " + xmlpath)
@@ -2347,6 +2339,25 @@ class PipelineManager():
                 self._unregister_panel(segs[0], segs[1], segs[2])
                 self._register_panel(segs[0], segs[1], segs[2])
     
+    def get_element(self, xmlpath=""):
+        """Get a XML element at specified XML path
+        
+        xmlpath = the full XML path to the tree to add element
+        If no xmlpath is given then the root element of the pipeline
+        tree is returned.
+        """
+        if DEBUG_PRINT:
+            print("PipelineManager.get_element()")
+            print("xmlpath: " + xmlpath)
+            
+        # if no path given then assume top level of pipelines
+        if xmlpath =='':
+            element = self._pipeline_tree.getroot()
+        else:
+            element = self._pipeline_tree.find(xmlpath)
+            
+        return element
+        
     def get_element_info(self, element="", attr=None, key=""):
         """Retrieves element and/or element attribute information from the
         _pipeline_elements dictionary. The element can be specified directly or
@@ -2406,7 +2417,7 @@ class PipelineManager():
                     e = "property"
                 else: # Otherwise must be a layout
                     # If has text a container
-                    t = self._pipeline_tree.find(element).text
+                    t = self.get_element(element).text
                     
                     if t:
                         e = "container"
@@ -2480,15 +2491,15 @@ class PipelineManager():
             xmlpath = xmlcat + "/" + panel
             
             # If panel already exists copy user settings otherwise initialize
-            shader = self._pipeline_tree.find(xmlpath)
+            shader = self.get_element(xmlpath)
             
             if shader:
-                for p in self._pipeline_tree.find(xmlpath + "/properties"):
+                for p in self.get_element(xmlpath + "/properties"):
                     if 'link' in p.attrib and p.attrib['link']:
                         links[p.tag] = p.attrib['link']
                 
                 attrib = dict(shader.attrib)
-                self._pipeline_tree.find(xmlcat).remove(shader)
+                self.get_element(xmlcat).remove(shader)
             else:
                 attrib['slmeta'] = filepath
                 attrib['library'] = library
@@ -2548,7 +2559,7 @@ class PipelineManager():
             
             # Lets build shader element structure
             shader.attrib = attrib
-            rib = self._pipeline_tree.find(xmlpath + "/rib")
+            rib = self.get_element(xmlpath + "/rib")
             rib_decoration = rib.text[1:]
             
             # Build fixed properties
