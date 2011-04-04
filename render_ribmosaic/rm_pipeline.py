@@ -920,8 +920,16 @@ class PipelineManager():
         
         if DEBUG_PRINT:
             print("PipelineManager._new_element()")
+            print("xmlpath: " + xmlpath)
+            print("ename: " + ename)
+            
         try:
-            element = self._pipeline_tree.find(xmlpath)
+             # if no path given then assume top level of pipelines
+            if xmlpath =='':
+                element = self._pipeline_tree.getroot()
+            else:
+                element = self._pipeline_tree.find(xmlpath)
+
             children = element.getchildren()
             childlen = len(children)
             attribs = dict(attribs)
@@ -2008,7 +2016,7 @@ class PipelineManager():
         try:
             # if no path given then assume top level of pipelines
             if xmlpath =='':
-                found_element = self._pipeline_tree
+                found_element = self._pipeline_tree.getroot()
             else:
                 found_element = self._pipeline_tree.find(xmlpath)
 
