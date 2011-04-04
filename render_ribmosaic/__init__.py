@@ -53,14 +53,14 @@
 
 bl_info = {
     "name": "RIB Mosaic",
-    "author": "Eric Back (WHiTeRaBBiT), Jeff Doyle (nfz)",
+    "author": "Eric Back (WHiTeRaBBiT)",
     "version": (0, 1, 1),
     "blender": (2, 5, 7),
     "api": 35669,
     "location": "Info Header (engine dropdown)",
     "description": "RenderMan production environment for Blender",
     "warning": "GIT Alpha",
-    "wiki_url": "http://sourceforge.net/apps/mediawiki/ribmosaic",
+    "wiki_url": "http://wiki.aqsis.org/guide/ribmosaic_install",
     "tracker_url": "http://sourceforge.net/projects/ribmosaic/develop",
     "category": "Render"}
 
