@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
-<Test_Panel build="False" compile="False" dependencies="" enabled="True" filepath="test_panel.rmp" filter="PANEL" library="" version="0.0">
+<Test_Panel build="False" compile="False" dependencies="" enabled="False" filepath="test_panel.rmp" filter="PANEL" library="" version="0.0">
 
     <python_scripts>
         <test_exec description="" filepath="">

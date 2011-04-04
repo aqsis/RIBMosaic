@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<Embedded_Shader build="False" compile="False" dependencies="" enabled="True" filepath="embedded_shader.rmp" filter="EMBEDDED_SHADER" library="" version="0.0">
+<Embedded_Shader build="False" compile="False" dependencies="" enabled="False" filepath="embedded_shader.rmp" filter="EMBEDDED_SHADER" library="" version="0.0">
 
 	<python_scripts>
 	</python_scripts>
