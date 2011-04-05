@@ -1720,10 +1720,7 @@ class ExportPass(ExporterArchive):
         
         if scene.ribmosaic_use_world:
             self.riWorldBegin()
-            
-        self.write_text("Attribute \"displacementbound\" \"float sphere\" [ 0.05 ] "
-        "\"string coordinatesystem\" [ \"shader\" ]\n")
-        
+
         for p in world_utilities:
             p.current_indent = self.current_indent
             p.build_code("begin")
@@ -2087,7 +2084,13 @@ class ExportMaterial(ExporterArchive):
         # export riOpacity if enabled
         if material.ribmosaic_ri_opacity:
             self.riOpacity((material.alpha, material.alpha, material.alpha))
-        
+            
+        # export displacementbound if enabled: > 0
+        if material.ribmosaic_disp_pad > 0.0:
+            self.write_text('Attribute "displacementbound" "float sphere" [%s]'
+                ' "string coordinatesystem" ["%s"]\n'
+                % (material.ribmosaic_disp_pad, material.ribmosaic_disp_coor))
+                
         # Build a list of material shaders
         # Push objects attributes that will get changed
         pipeline = self.context_pipeline
