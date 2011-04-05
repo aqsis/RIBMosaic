@@ -1650,6 +1650,8 @@ class ExportPass(ExporterArchive):
         self.context_panel = panel
         self.pointer_datablock = datablock
         
+        scene = self.get_scene()
+        
         # output rib header
         self.ribHeader()
         
@@ -1657,7 +1659,8 @@ class ExportPass(ExporterArchive):
         for p in scene_utilities:
             p.build_code("begin")
         
-        self.riFrameBegin()
+        if scene.ribmosaic_use_frame:
+            self.riFrameBegin()
         
         for p in render_utilities:
             p.current_indent = self.current_indent
@@ -1678,7 +1681,7 @@ class ExportPass(ExporterArchive):
         # make use of ExportObject to do the dirty work 
         #"Translate 0 0 1\n"
         try:
-           cam = ExportObject(self, self.get_scene().camera)
+           cam = ExportObject(self, scene.camera)
            cam.export_rib()
            del cam
         except:
@@ -1690,7 +1693,10 @@ class ExportPass(ExporterArchive):
            
 
         self.write_text("Sides 2\n")
-        self.riWorldBegin()
+        
+        if scene.ribmosaic_use_world:
+            self.riWorldBegin()
+            
         self.write_text("Attribute \"displacementbound\" \"float sphere\" [ 0.05 ] "
         "\"string coordinatesystem\" [ \"shader\" ]\n")
         
@@ -1705,7 +1711,7 @@ class ExportPass(ExporterArchive):
         # figure out what objects in the scene are renderable
         # build a collection of all renderable objects which includes:
         # light, camera, mesh, empty
-        objects, lights, cameras = get_renderables(self.get_scene())
+        objects, lights, cameras = get_renderables(scene)
 
         # first export lights to rib
         self._export_lights(lights)
@@ -1717,13 +1723,15 @@ class ExportPass(ExporterArchive):
             p.current_indent = self.current_indent
             p.build_code("end")
         
-        self.riWorldEnd()
+        if scene.ribmosaic_use_world:
+            self.riWorldEnd()
         
         for p in render_utilities:
             p.current_indent = self.current_indent
             p.build_code("end")
         
-        self.riFrameEnd()
+        if scene.ribmosaic_use_frame:
+            self.riFrameEnd()
         
         for p in scene_utilities:
             p.current_indent = self.current_indent
@@ -1802,19 +1810,22 @@ class ExportObject(ExporterArchive):
         #    file.write('Option "shutter" "efficiency" [ %f %f ] \n' % 
         #        (rm.shutter_efficiency_open, rm.shutter_efficiency_close))
 
-        self.write_text('Clipping %f %f\n' % (camera.clip_start, camera.clip_end))
+        if scene.ribmosaic_use_clipping:
+            self.write_text('Clipping %f %f\n' % (camera.clip_start, camera.clip_end))
     
-        if camera.type == 'PERSP':
-            lens= camera.lens
-            fov= 360.0*math.atan(16.0/lens/aspectratio)/math.pi
-            self.write_text('Projection "perspective" "fov" %f\n' % fov)
-        else:
-            lens= camera.ortho_scale
-            xaspect= xaspect*lens/(aspectratio*2.0)
-            yaspect= yaspect*lens/(aspectratio*2.0)
-            self.write('Projection "orthographic"\n')
+        if scene.ribmosaic_use_projection:
+            if camera.type == 'PERSP':
+                lens= camera.lens
+                fov= 360.0*math.atan(16.0/lens/aspectratio)/math.pi
+                self.write_text('Projection "perspective" "fov" %f\n' % fov)
+            else:
+                lens= camera.ortho_scale
+                xaspect= xaspect*lens/(aspectratio*2.0)
+                yaspect= yaspect*lens/(aspectratio*2.0)
+                self.write('Projection "orthographic"\n')
 
-        self.write_text('ScreenWindow %f %f %f %f\n' % (-xaspect, xaspect, -yaspect, yaspect))
+        if scene.ribmosaic_use_screenwindow:
+            self.write_text('ScreenWindow %f %f %f %f\n' % (-xaspect, xaspect, -yaspect, yaspect))
 
 
         # build a transform matrix that is looking at the scene
