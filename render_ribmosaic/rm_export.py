@@ -1565,7 +1565,29 @@ class ExportPass(ExporterArchive):
                 del eo
                 raise rm_error.RibmosaicError("Failed to build object RIB " + \
                                               target_name, sys.exc_info())
- 
+                                              
+    def _export_searchpaths(self):
+        """ Export the user defined search paths for archive, shader, texture
+            display, procedural, resource.
+        """
+        scene = self.get_scene()
+        
+        # TODO add archive searchpath
+        
+        if scene.ribmosaic_shader_searchpath != '':
+            self.write_text('Option "searchpath" "string shader" [ "@:.:%s" ]\n' % scene.ribmosaic_shader_searchpath)
+            
+        if scene.ribmosaic_texture_searchpath != '':
+            self.write_text('Option "searchpath" "string texture" [ "@:.:%s" ]\n' % scene.ribmosaic_texture_searchpath)
+            
+        if scene.ribmosaic_display_searchpath != '':
+            self.write_text('Option "searchpath" "string display" [ "@:.:%s" ]\n' % scene.ribmosaic_display_searchpath)
+            
+        if scene.ribmosaic_procedural_searchpath != '':
+            self.write_text('Option "searchpath" "string procedural" [ "@:.:%s" ]\n' % scene.ribmosaic_procedural_searchpath)
+            
+        if scene.ribmosaic_resource_searchpath != '':
+            self.write_text('Option "searchpath" "string resource" [ "@:.:%s" ]\n' % scene.ribmosaic_resource_searchpath)
     
     # #### Public methods
     
@@ -1654,6 +1676,8 @@ class ExportPass(ExporterArchive):
         
         # output rib header
         self.ribHeader()
+        
+        self._export_searchpaths()
         
         # Write everything to archive
         for p in scene_utilities:
