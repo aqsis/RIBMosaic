@@ -345,17 +345,10 @@ class ExporterManager():
                 print("number of passes: ", pl)
                 print("active pass index: ", ai)
             
-            #if not pl:
-            #    rp.collection.add().name = "Beauty Pass"
-            #    pl = 1
-            
-            #if ai > pl - 1:
-            #    rp.active_index = pl - 1
-            #    ai = pl - 1
             
             self._pass_ranges = []
             self.export_passes = rp.collection
-            if rp.collection and ai:
+            if rp.collection and ai >= 0:
                 self.active_pass = rp.collection[ai]
             else: 
                 # make a new dummy pass list
@@ -1565,7 +1558,33 @@ class ExportPass(ExporterArchive):
                 del eo
                 raise rm_error.RibmosaicError("Failed to build object RIB " + \
                                               target_name, sys.exc_info())
-                                              
+
+    def _export_pass_properties(self):
+        if DEBUG_PRINT:
+            print("ExportPass._export_pass_properties()")
+            
+        self.write_text(self._resolve_links(
+            "Format @[EVAL:.dims_resx:]@ @[EVAL:.dims_resy:]@ 1\n"))
+        self.write_text(self._resolve_links(
+            "@[EVAL:\"PixelSamples @[EVAL:.pointer_pass.pass_samples_x:]@ "
+            "@[EVAL:.pointer_pass.pass_samples_y:]@\" if "
+            "@[EVAL:.pointer_pass.pass_samples_x:]@ else \"\" :]@\n"))
+        self.write_text(self._resolve_links(
+            "@[EVAL:\"ShadingRate @[EVAL:.pointer_pass.pass_shadingrate:]@\" "
+            "if @[EVAL:.pointer_pass.pass_shadingrate:]@ else \"\":]@\n"))
+            
+        renderpass = self.pointer_pass
+        if renderpass.pass_eyesplits > 0:
+            self.write_text('Option "limits" "int eyesplits" [%i]\n'
+                % renderpass.pass_eyesplits)
+        if renderpass.pass_gridsize > 0:
+            self.write_text('Option "limits" "int gridsize" [%i]\n'
+                % renderpass.pass_gridsize)
+        if renderpass.pass_texturemem > 0:
+             self.write_text('Option "limits" "int texturememory" [%i]\n'
+                % renderpass.pass_texturemem)
+        
+        
     def _export_searchpaths(self):
         """ Export the user defined search paths for archive, shader, texture
             display, procedural, resource.
@@ -1689,21 +1708,13 @@ class ExportPass(ExporterArchive):
         for p in render_utilities:
             p.current_indent = self.current_indent
             p.build_code("begin")
-        
-        self.write_text(self._resolve_links(
-            "Format @[EVAL:.dims_resx:]@ @[EVAL:.dims_resy:]@ 1\n"))
-        self.write_text(self._resolve_links(
-            "@[EVAL:\"PixelSamples @[EVAL:.pointer_pass.pass_samples_x:]@ "
-            "@[EVAL:.pointer_pass.pass_samples_y:]@\" if "
-            "@[EVAL:.pointer_pass.pass_samples_x:]@ else \"\" :]@\n"))
-        self.write_text(self._resolve_links(
-            "@[EVAL:\"ShadingRate @[EVAL:.pointer_pass.pass_shadingrate:]@\" "
-            "if @[EVAL:.pointer_pass.pass_shadingrate:]@ else \"\":]@\n"))
+
+        # export the passes properties
+        self._export_pass_properties()
 
         # export camera - for now default to the camera in the scene
         # TODO the pass camera overrides the scene's camera
         # make use of ExportObject to do the dirty work 
-        #"Translate 0 0 1\n"
         try:
            cam = ExportObject(self, scene.camera)
            cam.export_rib()
