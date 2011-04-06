@@ -75,7 +75,7 @@ exec("from " + MODULE + " import rm_property")
 exec("import " + MODULE + " as rm")
 
 # if DEBUG_PRINT set true then each method with print its method name and important vars to console io
-DEBUG_PRINT = False;
+DEBUG_PRINT = False
 
 # ------------- RIB formatting Helpers -------------
 # taken from Matt Ebb's Blender to 3Delight exporter
@@ -1819,20 +1819,25 @@ class ExportObject(ExporterArchive):
     
         xaspect, yaspect, aspectratio = render_get_aspect(r)
     
-        # TODO get depth of field option from ribmosaic user panel
-        #if rm.depth_of_field:
-        #    if camera.dof_object:
-        #        dof_distance = (ob.location - camera.dof_object.location).length
-        #    else:
-        #        dof_distance = camera.dof_distance
-        #    file.write('DepthOfField %f 1.0 %f\n' % (rm.fstop, dof_distance))
+        if camera.ribmosaic_dof:
+            # allow an object to be used for dof distance
+            if camera.dof_object:
+                dof_distance = (ob.location - camera.dof_object.location).length
+            else:
+                dof_distance = camera.dof_distance
+                
+            self.write_text('DepthOfField %f %f %f\n' % (camera.ribmosaic_f_stop,
+                camera.ribmosaic_focal_length, dof_distance))
+                
+        # TODO setup motion blur parameters
         #if scene.renderman.motion_blur:
         #    file.write('Shutter %f %f\n' % (rm.shutter_open, rm.shutter_close))
         #    file.write('Option "shutter" "efficiency" [ %f %f ] \n' % 
         #        (rm.shutter_efficiency_open, rm.shutter_efficiency_close))
 
         if scene.ribmosaic_use_clipping:
-            self.write_text('Clipping %f %f\n' % (camera.clip_start, camera.clip_end))
+            self.write_text('Clipping %f %f\n'
+                % (camera.clip_start, camera.clip_end))
     
         if scene.ribmosaic_use_projection:
             if camera.type == 'PERSP':
