@@ -66,7 +66,7 @@ exec("from " + MODULE + " import rm_context")
 exec("import " + MODULE + " as rm")
 
 # if DEBUG_PRINT set true then each method with print its method name and important vars to console io
-DEBUG_PRINT = False;
+DEBUG_PRINT = False
 
 # #############################################################################
 # PIPELINE MANAGER CLASS
@@ -2007,7 +2007,7 @@ class PipelineManager():
         if DEBUG_PRINT:
             print("PipelineManager.list_elements()")
             print("xmlpath: " + xmlpath)
-            print("element: " + self.get_element(xmlpath))
+            print("element: " + self.get_element(xmlpath).tag)
 
         try:
             found_element = self.get_element(xmlpath)
