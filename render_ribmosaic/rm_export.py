@@ -74,19 +74,21 @@ exec("from " + MODULE + " import rm_context")
 exec("from " + MODULE + " import rm_property")
 exec("import " + MODULE + " as rm")
 
-# if DEBUG_PRINT set true then each method with print its method name and important vars to console io
+# if DEBUG_PRINT set true then each method with print its method name
+# and important vars to console io
 DEBUG_PRINT = False
 
 # ------------- RIB formatting Helpers -------------
 # taken from Matt Ebb's Blender to 3Delight exporter
 
+
 def rib_param_val(data_type, val):
     if data_type in ('float', 'integer', 'color', 'point'):
         vlen = 1
-        
+
         if hasattr(val, '__len__'):
             vlen = len(val)
-        
+
         if vlen > 1:
             return ' '.join([str(i) for i in val])
         else:
@@ -94,12 +96,12 @@ def rib_param_val(data_type, val):
     elif data_type == 'string':
         return '"%s"' % val
 
-   
+
 def rib_mat_str(m):
     return '[ %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f ]' % \
-            (m[0][0], m[0][1], m[0][2], m[0][3], \
-            m[1][0], m[1][1], m[1][2], m[1][3], \
-            m[2][0], m[2][1], m[2][2], m[2][3], \
+            (m[0][0], m[0][1], m[0][2], m[0][3],
+            m[1][0], m[1][1], m[1][2], m[1][3],
+            m[2][0], m[2][1], m[2][2], m[2][3],
             m[3][0], m[3][1], m[3][2], m[3][3])
 
 
@@ -113,40 +115,48 @@ def is_visible_layer(scene, ob):
             return True
     return False
 
+
 def is_renderable(scene, ob):
-    return (is_visible_layer(scene, ob) and not ob.hide_render) 
-            
+    return (is_visible_layer(scene, ob) and not ob.hide_render)
+
+
 def get_renderables(scene):
     objects = []
     lights = []
     cameras = []
 
     for ob in scene.objects:
-         if is_renderable(scene, ob):
-             if ob.type in ['MESH', 'EMPTY']:
-                 objects += [ob]
-             elif ob.type in ['LAMP']:
-                 lights += [ob]
-             elif ob.type in ['CAMERA']:
-                 cameras = [ob]
-  
+        if is_renderable(scene, ob):
+            if ob.type in ['MESH', 'EMPTY']:
+                objects += [ob]
+            elif ob.type in ['LAMP']:
+                lights += [ob]
+            elif ob.type in ['CAMERA']:
+                cameras = [ob]
+
     return (objects, lights, cameras)
 
+
 def is_subd_last(ob):
-    return ob.modifiers and ob.modifiers[len(ob.modifiers)-1].type == 'SUBSURF'
+    return (ob.modifiers and
+            ob.modifiers[len(ob.modifiers) - 1].type == 'SUBSURF')
+
 
 def is_subd_displace_last(ob):
-    if len(ob.modifiers) < 2: return False
-    
-    return (ob.modifiers[len(ob.modifiers)-2].type == 'SUBSURF' and
-        ob.modifiers[len(ob.modifiers)-1].type == 'DISPLACE')
+    if len(ob.modifiers) < 2:
+        return False
+
+    return (ob.modifiers[len(ob.modifiers) - 2].type == 'SUBSURF' and
+        ob.modifiers[len(ob.modifiers) - 1].type == 'DISPLACE')
+
 
 def is_subdmesh(ob):
     return (is_subd_last(ob) or is_subd_displace_last(ob))
 
+
 def detect_primitive(ob):
 #    rm = ob.renderman
-    
+
 #    if rm.primitive == 'AUTO':
     if ob.type == 'MESH':
         if is_subdmesh(ob):
@@ -155,60 +165,63 @@ def detect_primitive(ob):
             return 'POLYGON_MESH'
 #    else:
 #        return rm.primitive
- 
+
+
 def create_mesh(scene, ob, matrix=None):
     # 2 special cases to ignore:
     # subsurf last or subsurf 2nd last +displace last
-    
+
     if is_subd_last(ob):
-        ob.modifiers[len(ob.modifiers)-1].show_render = False
+        ob.modifiers[len(ob.modifiers) - 1].show_render = False
     elif is_subd_displace_last(ob):
-        ob.modifiers[len(ob.modifiers)-2].show_render = False
-        ob.modifiers[len(ob.modifiers)-1].show_render = False
-    
-    mesh = ob.to_mesh(scene, True, 'RENDER')    
-    
+        ob.modifiers[len(ob.modifiers) - 2].show_render = False
+        ob.modifiers[len(ob.modifiers) - 1].show_render = False
+
+    mesh = ob.to_mesh(scene, True, 'RENDER')
+
     if matrix is not None:
         mesh.transform(matrix)
 
     return mesh
 
+
 def render_get_resolution(r):
-    xres= int(r.resolution_x*r.resolution_percentage*0.01)
-    yres= int(r.resolution_y*r.resolution_percentage*0.01)
+    xres = int(r.resolution_x * r.resolution_percentage * 0.01)
+    yres = int(r.resolution_y * r.resolution_percentage * 0.01)
     return xres, yres
 
 
 def render_get_aspect(r):
     xres, yres = render_get_resolution(r)
-    
-    xratio= xres*r.pixel_aspect_x/200.0
-    yratio= yres*r.pixel_aspect_y/200.0
+
+    xratio = xres * r.pixel_aspect_x / 200.0
+    yratio = yres * r.pixel_aspect_y / 200.0
 
     if xratio > yratio:
-        aspectratio= xratio/yratio
-        xaspect= aspectratio
-        yaspect= 1.0
+        aspectratio = xratio / yratio
+        xaspect = aspectratio
+        yaspect = 1.0
     else:
-        aspectratio= yratio/xratio;
-        xaspect= 1.0;
-        yaspect= aspectratio;
-        
+        aspectratio = yratio / xratio
+        xaspect = 1.0
+        yaspect = aspectratio
+
     return xaspect, yaspect, aspectratio
 
 
-
-
-# The dummy pass class is used to provide default render pass settings if the scene does not provide one.
-# During menu/panel draw/ and rendering context, it is not possible to modify RNA properties so for now
-# we use the DummyPass as a hack to allow a default pass to be setup.
+# The dummy pass class is used to provide default render pass settings
+# if the scene does not provide one.
+# During menu/panel draw/ and rendering context, it is not possible to
+# modify RNA properties so for now we use the DummyPass as a hack to
+# allow a default pass to be setup.
 class DummyPass():
     name = "Beauty Pass"
     pass_enabled = True
     pass_type = 'BEAUTY'
     # Pass output properties
-    pass_display_file = "Renders/@[EVAL:.current_frame:####]@@[EVAL:.pass_layer:]@.tif"
-    pass_multilayer = False    
+    pass_display_file = 'Renders/@[EVAL:.current_frame:####]@' \
+                        '@[EVAL:.pass_layer:]@.tif'
+    pass_multilayer = False
     pass_shadingrate = 1
     pass_eyesplits = 6
     pass_gridsize = 0
@@ -216,7 +229,7 @@ class DummyPass():
     # Pass camera properties
     pass_camera = ""
     pass_camera_group = False
-    pass_camera_persp ='CAMERA'
+    pass_camera_persp = 'CAMERA'
     pass_camera_lensadj = 0.0
     pass_camera_nearclip = 0.005
     pass_camera_farclip = 500
@@ -265,55 +278,51 @@ class ExporterManager():
     export process for archives, shaders, ect and managing commands to be
     executed.
     """
-    
-    
+
     # #### Public attributes
-    
-    export_frame = 0 # Frame being exported
-    export_scene = None # Scene being exported
-    active_pass = None # The active pass
-    export_directory = "" # Directory being exported to
-    export_passes = [] # Pass collection being exported
-    
+
+    export_frame = 0  # Frame being exported
+    export_scene = None  # Scene being exported
+    active_pass = None  # The active pass
+    export_directory = ""  # Directory being exported to
+    export_passes = []  # Pass collection being exported
+
     # Dictionary containing beauty pass display output info
     # passes = {'file':"", 'layer':"", 'multilayer':False}
-    display_output = {'x':0, 'y':0, 'passes':[]}
+    display_output = {'x': 0, 'y': 0, 'passes': []}
     # Dictionary of all export path combinations
-    export_paths = {'DIR':[],
-                    'FRA':["Archives"],
-                    'WLD':["Archives", "Worlds"],
-                    'LAM':["Archives", "Lights"],
-                    'OBJ':["Archives", "Objects"],
-                    'GEO':["Archives", "Objects", "Geometry"],
-                    'MAT':["Archives", "Objects", "Materials"],
-                    'MAP':["Maps"],
-                    'SHD':["Shaders"],
-                    'TEX':["Textures"],
-                    'RND':["Renders"],
-                    'TMP':["Cache"]}
+    export_paths = {'DIR': [],
+                    'FRA': ["Archives"],
+                    'WLD': ["Archives", "Worlds"],
+                    'LAM': ["Archives", "Lights"],
+                    'OBJ': ["Archives", "Objects"],
+                    'GEO': ["Archives", "Objects", "Geometry"],
+                    'MAT': ["Archives", "Objects", "Materials"],
+                    'MAP': ["Maps"],
+                    'SHD': ["Shaders"],
+                    'TEX': ["Textures"],
+                    'RND': ["Renders"],
+                    'TMP': ["Cache"]}
     # Dictionary of generated command objects
-    command_scripts = {'OPTIMIZE':[],
-                       'COMPILE':[],
-                       'INFO':[],
-                       'RENDER':[],
-                       'POSTRENDER':[]}
-    
-    
+    command_scripts = {'OPTIMIZE': [],
+                       'COMPILE': [],
+                       'INFO': [],
+                       'RENDER': [],
+                       'POSTRENDER': []}
+
     # #### Private attributes
-    
-    _exporting_scene = False # The target scene we are exporting
-    _pass_ranges = [] # Store pass frame ranges for quick lookup
-    
-    
+    _exporting_scene = False  # The target scene we are exporting
+    _pass_ranges = []  # Store pass frame ranges for quick lookup
+
     # #### Private methods
-    
+
     def _update_directory(self, scene=None):
         """Determines the export directory by resolving possible tokens and
         Blender relative paths from the scene property ribmosaic_export_path.
         Sets the public attributes export_directory and export_scene. Also
         initializes attributes that may be necessary for link resolution in
         export path.
-        
+
         scene = The scene we are exporting and retrieving export directory from
         """
         if DEBUG_PRINT:
@@ -327,11 +336,11 @@ class ExporterManager():
                 ### FIXME ###
                 # can not modify context if scene data extracted from context
                 scene = bpy.context.scene
-        
+
         # If no active scene try grabbing the first one
         if not scene:
             scene = bpy.data.scenes[0]
-        
+
         if scene:
             # Insure RIB Mosaic passes are set
             ### FIXME ###
@@ -344,17 +353,16 @@ class ExporterManager():
                 print("scene.name: " + scene.name)
                 print("number of passes: ", pl)
                 print("active pass index: ", ai)
-            
-            
+
             self._pass_ranges = []
             self.export_passes = rp.collection
             if rp.collection and ai >= 0:
                 self.active_pass = rp.collection[ai]
-            else: 
+            else:
                 # make a new dummy pass list
                 self.export_passes = [DummyPass()]
-                self.active_pass = self.export_passes[0] 
-            
+                self.active_pass = self.export_passes[0]
+
             # Store frame ranges for each pass for quick look up later
             for p in self.export_passes:
                 # Determine frame range of pass
@@ -362,66 +370,64 @@ class ExporterManager():
                     start = p.pass_range_start
                 else:
                     start = scene.frame_start
-                
+
                 if p.pass_range_end:
                     end = p.pass_range_end
                 else:
                     end = scene.frame_end
-                
+
                 if p.pass_range_step:
                     step = p.pass_range_step
                 else:
                     step = scene.frame_step
-                
+
                 self._pass_ranges.append(range(start, end + 1, step))
-            
+
             # Resolve export directory
             ec = rm_context.ExportContext(pointer_datablock=scene)
             path = scene.ribmosaic_export_path
-            
+
             if path:
                 path = ec._resolve_links(path, "Export Directory Property")
                 path = os.path.realpath(bpy.path.abspath(path)) + os.sep
                 del ec
             else:
                 raise rm_error.RibmosaicError("No export directory specified, "
-                                     "see \"Scene->Export Options->Export Path\"")
+                                "see \"Scene->Export Options->Export Path\"")
         else:
             raise rm_error.RibmosaicError("Cannot determine active scene "
                                           "for export directory")
-        
+
         # Make sure working directory points to export directory
         try:
             os.chdir(path)
         except:
             pass
-        
+
         self.export_scene = scene
         self.export_directory = path
-                
-    
-    
+
     # #### Public methods
-    
+
     def prepare_export(self, active_scene=None,
                        clean_paths=['DIR'],
                        purge_paths=['TMP'],
                        shader_library=""):
         """Prepares the export attributes and folders for a new export process.
         Should be called before any other public export_manager methods.
-        
+
         active_scene = The scene we are exporting and retrieving properties from
         clean_paths = Remove all files in specified self.export_paths dict keys
         purge_paths = Remove everything in specified self.export_paths dict keys
         shader_library = Pipeline of shader library to prepare
         """
-        
+
         if DEBUG_PRINT:
             print("ExportManager.prepare_directory")
 
         if not bpy.data.is_dirty:
             self._update_directory(active_scene)
-            
+
             try:
                 # If active scene assume we are preparing for export
                 if active_scene and not shader_library:
@@ -440,54 +446,54 @@ class ExporterManager():
                         purgetex = active_scene.ribmosaic_purgetex
                         clean_paths = list(clean_paths)
                         purge_paths = list(purge_paths)
-                    
+
                     # Add archive paths to clean if purging RIBs
                     if purgerib and not activepass:
                         for p in ['FRA', 'WLD', 'LAM', 'OBJ', 'GEO', 'MAT']:
                             if not p in clean_paths:
                                 clean_paths.append(p)
-                    
+
                     # Add shader path to purge if purging shaders
                     if purgeshd:
                         if not 'SHD' in purge_paths:
                             purge_paths.append('SHD')
-                    
+
                     # Add texture path to purge if purging textures
                     if purgetex:
                         if not 'TEX' in purge_paths:
                             purge_paths.append('TEX')
-                
+
                 # Check that export folders exist and clean or purge them
                 for p in self.export_paths:
                     path = self.export_directory + os.sep.join(self.export_paths[p])
-                    
+
                     if not os.path.exists(path):
                         os.makedirs(path)
                     else:
                         purge = p in purge_paths
                         clean = p in clean_paths
-                        
+
                         if purge or clean:
                             for f in os.listdir(path):
                                 p = path + os.sep + f
-                                
+
                                 if os.path.isfile(p):
                                     os.remove(p)
                                 elif purge and os.path.isdir(p):
                                     shutil.rmtree(p)
-                
+
                 # Reset exporter attributes
                 self.export_frame = 0
-                self.display_output = {'x':0, 'y':0, 'passes':[]}
-                
+                self.display_output = {'x': 0, 'y': 0, 'passes': []}
+
                 # Be sure previous commands are closed and cleared
                 for k in self.command_scripts:
                     for c in self.command_scripts[k]:
                         c.close_archive()
                         c.terminate_command()
-                    
+
                     self.command_scripts[k] = []
-                
+
                 # Make sure working directory points to export directory
                 try:
                     os.chdir(self.export_directory)
@@ -500,79 +506,79 @@ class ExporterManager():
         else:
             raise rm_error.RibmosaicError("Blend must be saved before "
                                           "it can be exported")
-    
+
     def export_shaders(self, render_object=None, shader_library=""):
         """Exports shaders for all pipelines (including Blender's text editor
         shaders as a virtual pipeline). Also generates both compile and info
         command objects and loads them in the command_scripts attribute.
         Shader libraries are only processed individually if specified.
-        
+
         render_object = The RenderEngine object currently exporting from
         shader_library = Pipeline of shader library to process exclusively
         """
         if DEBUG_PRINT:
             print("ExportManager.export_shaders")
-        
+
         # Gather available command panels
         purge = self.export_scene.ribmosaic_purgeshd
         compile_commands = rm.pipeline_manager.list_panels("command_panels",
                                                            type='COMPILE')
         info_commands = rm.pipeline_manager.list_panels("command_panels",
                                                         type='INFO')
-        
+
         # Setup generic export context object
         ec = rm_context.ExportContext(None, self.export_scene, self.active_pass)
         ec.root_path = self.export_directory
         ec.context_window = 'SCENE'
         ec.pointer_render = render_object
-        
+
         # Build pipelines list to process
         if shader_library:
             pipelines = [shader_library]
         else:
             pipelines = rm.pipeline_manager.list_pipelines()
             pipelines.append("Text_Editor")
-        
+
         # If in interactive mode DO NOT export shaders
         if self.export_scene.ribmosaic_interactive:
             pipelines = []
-        
+
         # Create folders, export sources and generate command scripts
         for p in pipelines:
             libraries = []
-            
+
             # Virtual Text_Editor pipeline is always enabled otherwise check
             if p == "Text_Editor":
                 libraries.append("xml")
             elif p == shader_library:
                 lib = rm.pipeline_manager.get_attr(ec, p, "library", False, "")
-                
+
                 if lib:
                     libraries.append(lib)
             elif eval(rm.pipeline_manager.get_attr(ec, p, "enabled", False, "True")):
                 libraries.append("xml")
-            
+
             # Only export shaders if pipeline contains shader libraries
             for library in libraries:
                 is_shaders = False
-                
+
                 # Export shader sources
                 if library == "xml":
                     compile = True
                     info = self.export_scene.ribmosaic_compileshd
-                    
+
                     # Setup shader paths to be relative from export directory
                     path = "." + os.sep + \
                            os.sep.join(self.export_paths['SHD']) + \
                            os.sep + p + os.sep
                     ec.target_path = path
                     ec.target_name = ""
-                    
+
                     try:
                         os.makedirs(path)
                     except:
                         pass
-                    
+
                     # Export sources in Blender's text editor
                     if p == "Text_Editor":
                         for t in bpy.data.texts:
@@ -580,18 +586,18 @@ class ExporterManager():
                                 name = os.path.basename(t.filepath)
                             else:
                                 name = t.name
-                            
+
                             ext = os.path.splitext(name)[1]
-                            
+
                             # Only export source code
                             if ext == ".sl" or ext == ".h":
                                 if purge:
                                     f = open(path + name, 'w')
                                     f.write(t.as_string())
                                     f.close()
-                                
+
                                 is_shaders = True
-                    # Export sources in XML data   
+                    # Export sources in XML data
                     else:
                         for e in rm.pipeline_manager.list_elements(p + \
                                  "/shader_sources"):
@@ -599,19 +605,19 @@ class ExporterManager():
                             name = rm.pipeline_manager.get_attr(ec, xmlp,
                                                              "filepath", False)
                             name = os.path.basename(name)
-                            
+
                             if name:
                                 if purge:
                                     source = rm.pipeline_manager.get_text(ec, xmlp)
                                     f = open(path + name, 'w')
                                     f.write(source)
                                     f.close()
-                                
+
                                 is_shaders = True
                             else:
                                 raise rm_error.RibmosaicError("Attribute error in " + \
                                                 xmlp + ", must specify filepath")
-                    
+
                     # If no shaders exported remove empty directory
                     if not is_shaders:
                         try:
@@ -623,28 +629,28 @@ class ExporterManager():
                     # Always setup library path to be absolute
                     path = os.path.realpath(bpy.path.abspath(library)) + os.sep
                     is_shaders = True
-                    
+
                     if path:
                         compile = eval(rm.pipeline_manager.get_attr(ec, p, "compile",
                                                                 False, "False"))
-                        
+
                         # Only check for building info if export option is set
                         if self.export_scene.ribmosaic_compileshd:
                             info = eval(rm.pipeline_manager.get_attr(ec, p, "build",
                                                                 False, "False"))
                         else:
                             info = False
-                        
+
                         ec.target_path = path
                         ec.target_name = ""
                     else:
                         raise rm_error.RibmosaicError("Pipeline library incorrect for " + p)
-                
+
                 # generate command scripts for pipelines with shaders
                 if is_shaders:
-                    ec.current_library += 1 # Increment shader library index
-                    ec.current_command = 0 # Reset command index
-                    
+                    ec.current_library += 1  # Increment shader library index
+                    ec.current_command = 0  # Reset command index
+
                     for c in compile_commands:
                         # Setup command panel context from xmlpath
                         segs = c.split("/")
@@ -667,54 +673,54 @@ class ExporterManager():
                                 s.build_code("end", True)
                             except:
                                 s.close_archive()
-                                raise rm_error.RibmosaicError("Failed to build command " + \
+                                raise rm_error.RibmosaicError("Failed to build command " +
                                                               name, sys.exc_info())
-                            
+
                             self.command_scripts['COMPILE'].append(s)
-                    
-                    ec.current_command = 0 # Reset command index
-                    
+
+                    ec.current_command = 0  # Reset command index
+
                     for c in info_commands:
                         # Setup command panel context from xmlpath
                         segs = c.split("/")
                         ec.context_pipeline = segs[0]
                         ec.context_category = segs[1]
                         ec.context_panel = segs[2]
-                        
+
                         # Only export enabled command panels
                         if info and ec._panel_enabled():
                             ec.current_command += 1
-                            name = ec._resolve_links( \
+                            name = ec._resolve_links(
                                    "INFO_S@[EVAL:.current_library:#####]@"
                                    "_C@[EVAL:.current_command:#####]@")
                             path = "." + os.sep
-                            
+
                             try:
                                 s = ExporterCommand(ec, c, True, path, name)
                             except:
                                 s.close_archive()
-                                raise rm_error.RibmosaicError("Failed to build command " + \
+                                raise rm_error.RibmosaicError("Failed to build command " +
                                                               name, sys.exc_info())
-                            
+
                             self.command_scripts['INFO'].append(s)
-        
+
         del ec
-    
+
     def export_textures(self, render_object=None):
         """...
-        
+
         render_object = The RenderEngine object currently exporting from
         """
         if DEBUG_PRINT:
             print("ExportManager.export_textures")
-        
+
         purge = self.export_scene.ribmosaic_purgetex
         optimize = self.export_scene.ribmosaic_optimizetex
         interactive = self.export_scene.ribmosaic_interactive
-        
+
         if optimize and not interactive:
             pass
-    
+
     def export_rib(self, render_object=None):
         """Entry point to RIB exporting process for all passes under current
         frame. This creates a root export context object and populates it with
@@ -731,14 +737,14 @@ class ExporterManager():
         """
         if DEBUG_PRINT:
             print("ExportManager.export_rib")
-        
+
         # Setup global information
         self._exporting_scene = True
         command_path = "." + os.sep
         target_path = "." + os.sep + "Archives" + os.sep
-        render_commands = rm.pipeline_manager.list_panels("command_panels", \
+        render_commands = rm.pipeline_manager.list_panels("command_panels",
                                                        type='RENDER')
-        postrender_commands = rm.pipeline_manager.list_panels("command_panels", \
+        postrender_commands = rm.pipeline_manager.list_panels("command_panels",
                                                            type='POSTRENDER')
         
         # Setup scene information
@@ -750,13 +756,13 @@ class ExporterManager():
         only_active = self.export_scene.ribmosaic_activepass
         
         self.export_frame = f
-        self.display_output = {'x':x, 'y':y, 'passes':[]}
-        
+        self.display_output = {'x': x, 'y': y, 'passes': []}
+
         # If in interactive mode ALWAYS export archives
         if self.export_scene.ribmosaic_interactive:
             export_rib = True
             only_active = True
-        
+
         # Process current scene's RenderMan passes
         for i, p in enumerate(self.export_passes):
             # Make sure pass is enabled and within frame ranges
@@ -771,14 +777,14 @@ class ExporterManager():
                 ec.dims_resy = y
                 target_name = ec._resolve_links("P@[EVAL:.current_pass:#####]@"
                                           "_F@[EVAL:.current_frame:#####]@.rib")
-                
+
                 # Add to display list if a beauty pass
                 if ec.pass_type == 'BEAUTY':
                     display_output = ec._resolve_links(ec.pass_output)
-                    self.display_output['passes'].append({'file':display_output,
-                                                'layer':ec.pass_layer,
-                                                'multilayer':ec.pass_multilayer})
-                
+                    self.display_output['passes'].append({'file': display_output,
+                                                'layer': ec.pass_layer,
+                                                'multilayer': ec.pass_multilayer})
+
                 # Do not build RIB if disabled in export options
                 if export_rib and (not only_active or p == self.active_pass):
                     try:
@@ -788,9 +794,9 @@ class ExporterManager():
                     except:
                         pa.close_archive()
                         del pa
-                        raise rm_error.RibmosaicError("Failed to build RIB " + \
+                        raise rm_error.RibmosaicError("Failed to build RIB " +
                                                       target_name, sys.exc_info())
-                
+
                 # Build RENDER command scripts
                 for c in render_commands:
                     segs = c.split("/")
@@ -799,14 +805,14 @@ class ExporterManager():
                     ec.context_panel = segs[2]
                     ec.target_path = target_path
                     ec.target_name = target_name
-                    
+
                     # Only export enabled command panels
                     if ec._panel_enabled():
                         ec.current_command += 1
                         name = ec._resolve_links("RENDER_P@[EVAL:.current_pass:#####]@"
                                                  "_F@[EVAL:.current_frame:#####]@"
                                                  "_C@[EVAL:.current_command:#####]@")
-                        
+
                         try:
                             s = ExporterCommand(ec, c, False, command_path, name)
                             s.build_code("begin")
@@ -814,11 +820,11 @@ class ExporterManager():
                             s.build_code("end", True)
                         except:
                             s.close_archive()
-                            raise rm_error.RibmosaicError("Failed to build command " + \
+                            raise rm_error.RibmosaicError("Failed to build command " +
                                                           name, sys.exc_info())
-                        
+
                         self.command_scripts['RENDER'].append(s)
-                
+
                 # Build POSTRENDER command scripts
                 for c in postrender_commands:
                     segs = c.split("/")
@@ -842,7 +848,7 @@ class ExporterManager():
                             s.build_code("end", True)
                         except:
                             s.close_archive()
-                            raise rm_error.RibmosaicError("Failed to build command " + \
+                            raise rm_error.RibmosaicError("Failed to build command " +
                                                           name, sys.exc_info())
                         
                         self.command_scripts['POSTRENDER'].append(s)
@@ -876,9 +882,9 @@ class ExporterManager():
             for t in ['OPTIMIZE', 'COMPILE', 'INFO', 'RENDER', 'POSTRENDER']:
                 for s in self.command_scripts[t]:
                     # Be sure command is enabled in scene export options
-                    if ((t == 'RENDER' or t == 'POSTRENDER') and r) or \
-                            ((t == 'COMPILE' or t == 'INFO') and c) or \
-                            (t == 'OPTIMIZE' and o):
+                    if (((t == 'RENDER' or t == 'POSTRENDER') and r) or
+                            ((t == 'COMPILE' or t == 'INFO') and c) or
+                            (t == 'OPTIMIZE' and o)):
                         s.execute_command()
                     
                     if t != 'INFO':
@@ -894,57 +900,51 @@ class ExporterManager():
         # Clean up
         root.close_archive()
 
-
-
-
 # #############################################################################
 # EXPORTER OBJECT CLASSES
 # #############################################################################
 
+
 # #### Super class for all exporter objects
- 
-class ExporterArchive(rm_context.ExportContext): 
+class ExporterArchive(rm_context.ExportContext):
     """This base class provides common functionality for creating archives of
     various types, maintaining the archive and cache file objects and managing
     object registration for threading.
     """
-    
-    
+
     # #### Public attributes
-    
-    is_file = True # To distinguish a file object from a export object
-    is_root = True # To determine if this is the root archive
-    is_gzip = False # Set to handle file as gzipped
-    is_exec = False # Set to handle file as executable
-    
-    
+
+    is_file = True  # To distinguish a file object from a export object
+    is_root = True  # To determine if this is the root archive
+    is_gzip = False  # Set to handle file as gzipped
+    is_exec = False  # Set to handle file as executable
+
     # #### Private attributes
-    
+
     _queque_mode = 0
     _queque_priority = 0
-    
+
     _pointer_file = None
     _pointer_cache = None
     _archive_regexes = []
     _target_regexes = []
-    
-    
+
     # #### Private methods
-    
+
     def __init__(self, export_object=None, archive_path="", archive_name=""):
         """Initialize attributes using export_object and parameters.
-        
+
         export_object = Any object subclassed from ExportContext
         archive_path = Path to save archive to (from export_object otherwise)
         archive_name = Name to save archive as (from export_object otherwise)
         """
-        
+
         rm_context.ExportContext.__init__(self, export_object)
-        
+
         # If export object is already a file object pass its attributes
         if getattr(export_object, "is_file", False):
-            self.is_root = False # If inherited then not root file
-            
+            self.is_root = False  # If inherited then not root file
+
             self.is_gzip = getattr(export_object, "is_gzip",
                                         self.is_gzip)
             self.is_exec = getattr(export_object, "is_exec",
@@ -969,7 +969,7 @@ class ExporterArchive(rm_context.ExportContext):
             # Insure each object has a unique list
             self._archive_regexes = list(self._archive_regexes)
             self._target_regexes = list(self._target_regexes)
-        
+
         # If archive path specified use it
         if archive_path:
             self.archive_path = archive_path
@@ -977,7 +977,6 @@ class ExporterArchive(rm_context.ExportContext):
         # If archive name specified use it
         if archive_name:
             self.archive_name = archive_name
-    
     
     # #### Public methods
     
@@ -1007,13 +1006,13 @@ class ExporterArchive(rm_context.ExportContext):
                     self._pointer_file = open(filepath, mode)
                 
                 if self.is_exec:
-                    os.chmod(filepath, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR | \
-                                       stat.S_IRGRP | stat.S_IXGRP | \
+                    os.chmod(filepath, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR |
+                                       stat.S_IRGRP | stat.S_IXGRP |
                                        stat.S_IROTH | stat.S_IXOTH)
                 
-                self.is_root = True # If creating a new archive this object is root
+                self.is_root = True  # If creating a new archive this object is root
             except:
-                raise rm_error.RibmosaicError("Could not open archive \"" + filepath + \
+                raise rm_error.RibmosaicError("Could not open archive \"" + filepath +
                                               "\" for '" + mode + "'", sys.exc_info())
         else:
             raise rm_error.RibmosaicError("Archive's path and name must be specified")
@@ -1092,11 +1091,11 @@ class ExporterArchive(rm_context.ExportContext):
             print("ExporterArchive.write_text()")
         
         if text:
-            # split the text up into lines 
+            # split the text up into lines
             lines = text.splitlines(True)
             for ln in lines:
                 if use_indent and self.current_indent > 0:
-                    ln = " ".rjust(self.current_indent * 4) + ln    
+                    ln = " ".rjust(self.current_indent * 4) + ln
             
                 if self._pointer_file:
                     if self.is_gzip:
@@ -1238,17 +1237,15 @@ class ExporterArchive(rm_context.ExportContext):
         self.write_text("##RenderMan RIB-Structure 1.1\n")
         self.write_text("##Scene: %s\n" % rm.export_manager.export_scene.name)
         self.write_text("##Creator: RIBMOSAIC %s for Blender\n" % rm.VERSION)
-        self.write_text("##CreationDate: "+time.strftime("%I:%M%p %m/%d/%Y", time.localtime()).lower()+"\n")
+        self.write_text("##CreationDate: " + time.strftime("%I:%M%p %m/%d/%Y", time.localtime()).lower() + "\n")
         self.write_text("##For: %s\n" % self.blend_name)
         #self.write_text("##Frames: "+str(fraEnd-fraStart+1)+"\n")
         self.write_text("version 3.03\n")
-        
-        
-        
+
     def riFrameBegin(self):
         self.write_text('FrameBegin %s\n' % self.current_rmframe)
         self.inc_indent()
-        
+
     def riFrameEnd(self):
         self.dec_indent()
         self.write_text('FrameEnd\n')
@@ -1270,7 +1267,7 @@ class ExporterArchive(rm_context.ExportContext):
         self.write_text('AttributeEnd\n')
         
     def riIlluminate(self, idx, state=1):
-        self.write_text('Illuminate "%s" %s\n' % (idx, state));
+        self.write_text('Illuminate "%s" %s\n' % (idx, state))
         
     def riColor(self, color=(0, 0, 0)):
         self.write_text('Color [%s %s %s]\n' % (color[0], color[1], color[2]))
@@ -1286,17 +1283,15 @@ class ExporterCommand(ExporterArchive):
     of a pipeline command panel. It provides all necessary public methods and
     attributes for creating, building and executing a shell script from XML source.
     """
-    
-    
+
     # #### Public attributes
     
-    command_xmlpath = "" # XML path to command panel this object represents
-    command_process = None # Pointer to Popen process
-    delay_build = False # Delay building command until execution
-    
-    
+    command_xmlpath = ""  # XML path to command panel this object represents
+    command_process = None  # Pointer to Popen process
+    delay_build = False  # Delay building command until execution
+
     # #### Private methods
-    
+
     def __init__(self, export_object=None, command_xmlpath="", delay_build=False,
                        archive_path="", archive_name="", archive_mode="w"):
         """Initialize attributes using export_object and command_xmlpath as well
@@ -1322,12 +1317,11 @@ class ExporterCommand(ExporterArchive):
         # Automatically add regexes and create archive
         if command_xmlpath:
             self.add_regexes(command_xmlpath + "/regexes")
-        
+
         self.open_archive(execute=True, mode=archive_mode)
-    
-    
+
     # #### Public methods
-    
+
     def terminate_command(self):
         """Terminate the currently running process"""
 
@@ -1335,9 +1329,9 @@ class ExporterCommand(ExporterArchive):
             print("ExporterCommand.terminate_command()")
         
         try:
-            try: # Try it unix style
+            try:  # Try it unix style
                 os.killpg(self.command_process.pid, signal.SIGTERM)
-            except: # Try it windows style
+            except:  # Try it windows style
                 self.command_process.terminate()
         except:
             pass
@@ -1365,7 +1359,7 @@ class ExporterCommand(ExporterArchive):
             execute = eval(rm.pipeline_manager.get_attr(self, xmlpath, "execute",
                                                            True, "True"))
         except:
-            raise rm_error.RibmosaicError("Invalid result for \"execute\" attribute in " + \
+            raise rm_error.RibmosaicError("Invalid result for \"execute\" attribute in " +
                                           xmlpath + ", expected True/False")
         
         if execute:
@@ -1375,10 +1369,10 @@ class ExporterCommand(ExporterArchive):
                 # Run command as sub process and save pointer
                 command = self.archive_path + self.archive_name
                 
-                try: # Try it unix style
+                try:  # Try it unix style
                     self.command_process = subprocess.Popen(command, shell=True,
                                                             preexec_fn=os.setsid)
-                except: # Try it windows style
+                except:  # Try it windows style
                     self.command_process = subprocess.Popen(command, shell=True)
             except:
                 raise rm_error.RibmosaicError("Could not execute command " + command)
@@ -1418,7 +1412,7 @@ class ExporterUtility(ExporterArchive):
     
     # #### Public attributes
     
-    utility_xmlpath = "" # XML path to utility panel this object represents
+    utility_xmlpath = ""  # XML path to utility panel this object represents
     
     
     # #### Private methods
@@ -1457,12 +1451,12 @@ class ExporterShader(ExporterArchive):
     of a pipeline shader panel. It provides all necessary public methods and
     attributes for building shader RIB from XML source.
     """
-    
-    
+
+
     # #### Public attributes
     
-    shader_xmlpath = "" # XML path to shader panel this object represents
-    
+    shader_xmlpath = ""  # XML path to shader panel this object represents
+
     
     # #### Private methods
     
@@ -1525,24 +1519,24 @@ class ExportPass(ExporterArchive):
             compress = False
         
         self.open_archive(gzipped=compress)
-    
+
     def _export_lights(self, lights):
         if DEBUG_PRINT:
             print("ExportPass._export_lights()")
 
         for idx, light in enumerate(lights):
-           target_name = light.name + ".rib"
-           self.current_lightid = idx
-           try:
-               el = ExportLight(self, light)
-               el.export_rib()
-               del el
-           except:
-               el.close_archive()
-               del el
-               raise rm_error.RibmosaicError("Failed to build light RIB " + \
+            target_name = light.name + ".rib"
+            self.current_lightid = idx
+            try:
+                el = ExportLight(self, light)
+                el.export_rib()
+                del el
+            except:
+                el.close_archive()
+                del el
+                raise rm_error.RibmosaicError("Failed to build light RIB " +
                                              target_name, sys.exc_info())
-         
+
     def _export_objects(self, objects):
         if DEBUG_PRINT:
             print("ExportPass._export_lights()")
@@ -1556,7 +1550,7 @@ class ExportPass(ExporterArchive):
             except:
                 eo.close_archive()
                 del eo
-                raise rm_error.RibmosaicError("Failed to build object RIB " + \
+                raise rm_error.RibmosaicError("Failed to build object RIB " +
                                               target_name, sys.exc_info())
 
     def _export_pass_properties(self):
@@ -1576,13 +1570,13 @@ class ExportPass(ExporterArchive):
         renderpass = self.pointer_pass
         if renderpass.pass_eyesplits > 0:
             self.write_text('Option "limits" "int eyesplits" [%i]\n'
-                % renderpass.pass_eyesplits)
+                            % renderpass.pass_eyesplits)
         if renderpass.pass_gridsize > 0:
             self.write_text('Option "limits" "int gridsize" [%i]\n'
-                % renderpass.pass_gridsize)
+                            % renderpass.pass_gridsize)
         if renderpass.pass_texturemem > 0:
-             self.write_text('Option "limits" "int texturememory" [%i]\n'
-                % renderpass.pass_texturemem)
+            self.write_text('Option "limits" "int texturememory" [%i]\n'
+                            % renderpass.pass_texturemem)
         
         
     def _export_searchpaths(self):
@@ -1594,19 +1588,29 @@ class ExportPass(ExporterArchive):
         # TODO add archive searchpath
         
         if scene.ribmosaic_shader_searchpath != '':
-            self.write_text('Option "searchpath" "string shader" [ "@:.:%s" ]\n' % scene.ribmosaic_shader_searchpath)
+            self.write_text('Option "searchpath" "string shader"'
+                            '[ "@:.:%s" ]\n' %
+                            scene.ribmosaic_shader_searchpath)
             
         if scene.ribmosaic_texture_searchpath != '':
-            self.write_text('Option "searchpath" "string texture" [ "@:.:%s" ]\n' % scene.ribmosaic_texture_searchpath)
+            self.write_text('Option "searchpath" "string texture"'
+                            '[ "@:.:%s" ]\n' %
+                            scene.ribmosaic_texture_searchpath)
             
         if scene.ribmosaic_display_searchpath != '':
-            self.write_text('Option "searchpath" "string display" [ "@:.:%s" ]\n' % scene.ribmosaic_display_searchpath)
+            self.write_text('Option "searchpath" "string display"'
+                            '[ "@:.:%s" ]\n' %
+                            scene.ribmosaic_display_searchpath)
             
         if scene.ribmosaic_procedural_searchpath != '':
-            self.write_text('Option "searchpath" "string procedural" [ "@:.:%s" ]\n' % scene.ribmosaic_procedural_searchpath)
+            self.write_text('Option "searchpath" "string procedural"'
+                            '[ "@:.:%s" ]\n' %
+                            scene.ribmosaic_procedural_searchpath)
             
         if scene.ribmosaic_resource_searchpath != '':
-            self.write_text('Option "searchpath" "string resource" [ "@:.:%s" ]\n' % scene.ribmosaic_resource_searchpath)
+            self.write_text('Option "searchpath" "string resource"'
+                            '[ "@:.:%s" ]\n' %
+                            scene.ribmosaic_resource_searchpath)
     
     # #### Public methods
     
@@ -1714,21 +1718,21 @@ class ExportPass(ExporterArchive):
 
         # export camera - for now default to the camera in the scene
         # TODO the pass camera overrides the scene's camera
-        # make use of ExportObject to do the dirty work 
+        # make use of ExportObject to do the dirty work
         try:
-           cam = ExportObject(self, scene.camera)
-           cam.export_rib()
-           del cam
+            cam = ExportObject(self, scene.camera)
+            cam.export_rib()
+            del cam
         except:
-           cam.close_archive()
-           del cam
-           raise rm_error.RibmosaicError("Failed to build camera " + \
+            cam.close_archive()
+            del cam
+            raise rm_error.RibmosaicError("Failed to build camera " +
                                          sys.exc_info())
 
-           
+
 
         self.write_text("Sides 2\n")
-        
+
         if scene.ribmosaic_use_world:
             self.riWorldBegin()
 
@@ -1843,7 +1847,7 @@ class ExportObject(ExporterArchive):
         # TODO setup motion blur parameters
         #if scene.renderman.motion_blur:
         #    file.write('Shutter %f %f\n' % (rm.shutter_open, rm.shutter_close))
-        #    file.write('Option "shutter" "efficiency" [ %f %f ] \n' % 
+        #    file.write('Option "shutter" "efficiency" [ %f %f ] \n' %
         #        (rm.shutter_efficiency_open, rm.shutter_efficiency_close))
 
         if scene.ribmosaic_use_clipping:
@@ -1852,17 +1856,18 @@ class ExportObject(ExporterArchive):
     
         if scene.ribmosaic_use_projection:
             if camera.type == 'PERSP':
-                lens= camera.lens
-                fov= 360.0*math.atan(16.0/lens/aspectratio)/math.pi
+                lens = camera.lens
+                fov = 360.0 * math.atan(16.0 / lens / aspectratio) / math.pi
                 self.write_text('Projection "perspective" "fov" %f\n' % fov)
             else:
-                lens= camera.ortho_scale
-                xaspect= xaspect*lens/(aspectratio*2.0)
-                yaspect= yaspect*lens/(aspectratio*2.0)
+                lens = camera.ortho_scale
+                xaspect = xaspect * lens / (aspectratio * 2.0)
+                yaspect = yaspect * lens / (aspectratio * 2.0)
                 self.write('Projection "orthographic"\n')
 
         if scene.ribmosaic_use_screenwindow:
-            self.write_text('ScreenWindow %f %f %f %f\n' % (-xaspect, xaspect, -yaspect, yaspect))
+            self.write_text('ScreenWindow %f %f %f %f\n' %
+                (-xaspect, xaspect, -yaspect, yaspect))
 
 
         # build a transform matrix that is looking at the scene
@@ -1871,7 +1876,8 @@ class ExportObject(ExporterArchive):
         rot = mat.to_euler()
 
         # setup the look vector which defaults to looking down the Z axis
-        s = mathutils.Matrix(([1,0,0,0],[0,1,0,0],[0,0,-1,0],[0,0,0,1]))
+        s = mathutils.Matrix(([1, 0, 0, 0], [0, 1, 0, 0],
+                            [0, 0, -1, 0], [0, 0, 0, 1]))
         r = mathutils.Matrix.Rotation(-rot[0], 4, 'X')
         r *= mathutils.Matrix.Rotation(-rot[1], 4, 'Y')
         r *= mathutils.Matrix.Rotation(-rot[2], 4, 'Z')
@@ -1928,7 +1934,7 @@ class ExportObject(ExporterArchive):
                     del em
                 except:
                     em.close_archive()
-                    raise rm_error.RibmosaicError("Failed to build object material RIB " + \
+                    raise rm_error.RibmosaicError("Failed to build object material RIB " +
                                                   self.data_name, sys.exc_info())
                     
                 
@@ -1953,14 +1959,14 @@ class ExportObject(ExporterArchive):
                 del eod
             except:
                 eod.close_archive()
-                raise rm_error.RibmosaicError("Failed to build object data RIB " + \
+                raise rm_error.RibmosaicError("Failed to build object data RIB " +
                                              self.data_name, sys.exc_info())
           
             # create ExportObjectData
 
             self.riAttributeEnd()
             self.write_text('\n')
-            self.close_archive();
+            self.close_archive()
 
     def get_scene(self):
         return self.pointer_parent.get_scene()
@@ -2018,7 +2024,7 @@ class ExportLight(ExporterArchive):
             loc = m.to_translation()
     
         loc = m.to_translation()
-        lvec = [loc[0]-m[2][0], loc[1]-m[2][1], loc[2]-m[2][2]]
+        lvec = [loc[0] - m[2][0], loc[1] - m[2][1], loc[2] - m[2][2]]
         params = []
     
         self.riAttributeBegin()
@@ -2061,7 +2067,7 @@ class ExportLight(ExporterArchive):
 
         self.dec_indent()
         self.riAttributeEnd()
-        self.riIlluminate(self.current_lightid);
+        self.riIlluminate(self.current_lightid)
         self.write_text('\n', False)
         
 
@@ -2084,35 +2090,35 @@ class ExportMaterial(ExporterArchive):
     
     def export(self):
         """ """
-        
+
         print("Exporting materials...")
-        
+
     def export_rib(self):
         if DEBUG_PRINT:
             print("ExportMaterial.export_rib()")
-            
+
         material = self.pointer_datablock
-        
+
         # export riColor if enabled
         if material.ribmosaic_ri_color:
             self.riColor(material.diffuse_color)
-            
+
         # export riOpacity if enabled
         if material.ribmosaic_ri_opacity:
             self.riOpacity((material.alpha, material.alpha, material.alpha))
-            
+
         # export displacementbound if enabled: > 0
         if material.ribmosaic_disp_pad > 0.0:
             self.write_text('Attribute "displacementbound" "float sphere" [%s]'
                 ' "string coordinatesystem" ["%s"]\n'
                 % (material.ribmosaic_disp_pad, material.ribmosaic_disp_coor))
-                
+
         # Build a list of material shaders
         # Push objects attributes that will get changed
         pipeline = self.context_pipeline
         category = self.context_category
         panel = self.context_panel
-        
+
         # Panel material lists
         material_shaders = []
 
@@ -2136,29 +2142,29 @@ class ExportMaterial(ExporterArchive):
             p.current_indent = self.current_indent
             p.build_code("rib")
 
-            
+
 
 
 class ExportObjdata(ExporterArchive):
     """Represents geometry, lights and cameras using objectdata data-blocks.
     Can also handle export of multiple meshes setup in LOD list
     """
-    
+
     def __init__(self, export_object=None):
         """Initialize attributes using export_object and parameters.
         Automatically create the RIB this object data represents.
         
         export_object = Any object subclassed from ExportContext
        """
-        
+
         ExporterArchive.__init__(self, export_object)
-        
+
         # Determine if compressed RIB is enabled
         #if self.pointer_datablock:
         #    compress = self.pointer_datablock.ribmosaic_compressrib
         #else:
         #    compress = False
-        
+
         #self.open_archive(gzipped=compress)
 
 
@@ -2184,16 +2190,16 @@ class ExportObjdata(ExporterArchive):
         prim = detect_primitive(self.get_object())
 
         if prim == 'POLYGON_MESH':
-          self._export_polygon_mesh()
-   
+            self._export_polygon_mesh()
+
     # #### Public methods
-    
+
     # TODO just a test method
     def export(self):
         """ """
-        
+
         if DEBUG_PRINT:
-             print("Exporting object data...")
+            print("Exporting object data...")
 
         rm.ribify.mesh_pointspolygons(None)
         rm.ribify.mesh_subdivisionmesh(None)
@@ -2220,7 +2226,7 @@ class ExportObjdata(ExporterArchive):
 
         # determine what type of object data needs to be exported
         if self.pointer_datablock.type in ('MESH', 'EMPTY'):
-           self. _export_geometry()
+            self. _export_geometry()
 
     # helper method to get the blender scene the object is in
     def get_scene(self):
@@ -2229,20 +2235,19 @@ class ExportObjdata(ExporterArchive):
     # helper method to get the blender object that is currently being exported
     def get_object(self):
         return self.pointer_datablock
- 
+
+
 class ExportParticles(ExporterArchive):
     """Represents particle systems connected to particle data-blocks"""
-    
-    
+
+
     # #### Public methods
-    
+
     def export(self):
         """ """
-        
+
         print("Exporting particles...")
         rm.ribify.particles_points(None)
         rm.ribify.particles_curves(None)
         rm.ribify.data_to_primvar(None, member="N", define="N",
                                      ptype="normal", pclass="varying")
-
-
