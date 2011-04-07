@@ -92,7 +92,8 @@ if "bpy" in locals():
     imp.reload(rm_operator)
 else:
     import bpy
-    from bpy.props import StringProperty, BoolProperty, IntProperty, FloatProperty, FloatVectorProperty, EnumProperty
+    from bpy.props import StringProperty, BoolProperty, IntProperty, \
+        FloatProperty, FloatVectorProperty, EnumProperty
     exec("from " + MODULE + " import rm_pipeline")
     exec("from " + MODULE + " import rm_export")
     exec("from " + MODULE + " import rm_ribify")
@@ -105,27 +106,23 @@ else:
 
 def RibmosaicInfo(message, operator=None):
     """UI and console info messages"""
-    
+
     if operator:
         operator.report({'INFO'}, message)
-    
+
     print(ENGINE + " Info: " + message)
 
 
 def PropertyHash(name):
     """Converts long property names into a 30 character or less hash"""
-    
+
     return "P" + str(hash(name))[:30].replace("-", "N")
 
 
 def RibPath(path):
     """Makes path RIB safe for search and archive paths"""
-    
+
     return path.strip().replace(os.sep, "/")
-
-
-
-
 
 
 # #############################################################################
@@ -134,11 +131,12 @@ def RibPath(path):
 
 from bl_ui import space_text
 
+
 def register():
     """Register Blender classes and setup class properties"""
-    
+
     global pipeline_manager, export_manager, ribify
-    
+
     # Ensure that only one RIB Mosaic addon is currently enabled
     for module in [a.module for a in bpy.context.user_preferences.addons]:
         if module != MODULE:
@@ -149,17 +147,17 @@ def register():
                  "\tbpy.utils.addon_disable('" + module + "')\n"
                  "except:\n"
                  "\tpass\n")
-    
+
     # Create our properties
     rm_property.create_props()
-    
+
     # Add draw functions
     space_text.TEXT_MT_toolbox.append(rm_panel.ribmosaic_text_menu)
-    
+
     # Create our manager objects
     pipeline_manager = rm_pipeline.PipelineManager()
     export_manager = rm_export.ExporterManager()
-    
+
     # Try loading ribify module, otherwise initiate ribify class object
     try:
         import ribify
@@ -171,28 +169,28 @@ def register():
     bpy.utils.register_module(__name__)
     bpy.ops.wm.ribmosaic_modal_sync()
 
+
 def unregister():
     """Unregister Blender classes"""
-    
+
     global pipeline_manager, export_manager, ribify
-    
+
     # Make sure default blender engine is selected
     bpy.context.scene.render.engine = 'BLENDER_RENDER'
-    
+
     # Destroy our manager objects
     pipeline_manager = None
     export_manager = None
     ribify = None
-    
+
     # Remove draw functions
     space_text.TEXT_MT_toolbox.remove(rm_panel.ribmosaic_text_menu)
-    
+
     # Destroy our properties
     rm_property.destroy_props()
 
     bpy.utils.unregister_module(__name__)
 
+
 if __name__ == "__main__":
     register()
-
-

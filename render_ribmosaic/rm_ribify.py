@@ -39,8 +39,8 @@
 # COMMENT BLOCK:
 # #############################################################################
 #
-# RIB export module to translate and write Blender geometry data to RIB archives,
-# can also be compiled into Python C module using Cython.
+# RIB export module to translate and write Blender geometry data to
+# RIB archives, can also be compiled into Python C module using Cython.
 #
 # This script is PEP 8 compliant
 #
@@ -66,6 +66,7 @@ exec("import " + MODULE + " as rm")
 
 DEBUG_PRINT = False
 
+
 # local helper functions
 # Mesh data access
 def get_mesh(mesh):
@@ -75,15 +76,17 @@ def get_mesh(mesh):
     f_uvs = {}
     uvs = []
     N = []
-    
+
     for v in mesh.vertices:
         co = v.co
         P += [co[0], co[1], co[2]]
         N += [v.normal[0], v.normal[1], v.normal[2]]
-    
+
     for f in mesh.faces:
-        if len(f.vertices) == 3: n = 3
-        else: n = 4
+        if len(f.vertices) == 3:
+            n = 3
+        else:
+            n = 4
 
         nverts += [n]
         for a in range(0, n):
@@ -97,84 +100,83 @@ def get_mesh(mesh):
     if uv_layer:
         for fi, tf in enumerate(uv_layer):
             # "1.0 -" because
-            # pixie expects UVs flipped 
+            # pixie expects UVs flipped
             # vertically from blender
-        
-            f_uvs[fi] = [tf.uv1[0], 1.0-tf.uv1[1]]
-            f_uvs[fi] += [tf.uv2[0], 1.0-tf.uv2[1]]
-            f_uvs[fi] += [tf.uv3[0], 1.0-tf.uv3[1]]
+
+            f_uvs[fi] = [tf.uv1[0], 1.0 - tf.uv1[1]]
+            f_uvs[fi] += [tf.uv2[0], 1.0 - tf.uv2[1]]
+            f_uvs[fi] += [tf.uv3[0], 1.0 - tf.uv3[1]]
             if len(mesh.faces[fi].vertices) == 4:
-                f_uvs[fi] += [tf.uv4[0], 1.0-tf.uv4[1]]
-        
+                f_uvs[fi] += [tf.uv4[0], 1.0 - tf.uv4[1]]
+
         for uv in f_uvs.values():
             uvs.extend(uv)
     else:
         uvs = None
-    
+
     return (nverts, verts, P, uvs, N)
- 
+
+
 # #############################################################################
 # GEOMETRY EXPORT CLASS
 # #############################################################################
 
 # ##### Define the ribify class for script export of RIB primitives
-
 class Ribify():
     """The ribify class provides all methods required to export geometry data
     of all types from Blender to RenderMan.
     """
-    
-    
+
     # ### Public attributes
-    
-    pointer_file = None # File object to write RIB to
-    is_gzip = False # If file gzipped
-    indent = 0 # how many tabs to indent from the left
-    
-    
+
+    pointer_file = None  # File object to write RIB to
+    is_gzip = False  # If file gzipped
+    indent = 0  # how many tabs to indent from the left
+
     # ### Public methods
-    
-    def write_text(self, text="", use_indent = True):
+
+    def write_text(self, text="", use_indent=True):
         """Writes text to open file handle. Also properly writes text as either
         encoded binary or text mode according to is_gzip bool. This method also
         exists in the  ExporterArchive class but is duplicated here to simplify
         file management in the Ribify C++ module.
-        
+
         text = The text to write (can contain escape characters)
         """
-        
+
         if text:
             if self.pointer_file:
-                if use_indent and self.indent > 0: text = " ".rjust(self.indent * 4) + text
+                if use_indent and self.indent > 0:
+                    text = " ".rjust(self.indent * 4) + text
                 if self.is_gzip:
                     self.pointer_file.write(text.encode())
                 else:
                     self.pointer_file.write(text)
             else:
-                raise RibmosaicError("Archive already closed, cannot write text")
-                
+                raise RibmosaicError("Archive already closed,"
+                                     "cannot write text")
+
     def inc_indent(self):
         self.indent += 1
-        
+
     def dec_indent(self):
         self.indent -= 1
         if self.indent < 0:
             self.indent = 0
 
-
-    def write_rib_list(self, list, items_per_line = 3, space_indent = 1):
+    def write_rib_list(self, list, items_per_line=3, space_indent=1):
         itemcount = 0
         firstline = True
-        self.write_text('[') 
- 
+        self.write_text('[')
+
         for i in list:
             # if on the first item of the line then indent
             if itemcount == 0 and not firstline:
                 self.write_text('\n', False)
                 self.write_text('  ')
             else:
-                # adding another item on the line so just put a space between items
-                # don't use indentation
+                # adding another item on the line so just put a space
+                #  between items don't use indentation
                 self.write_text(' ', False)
             # output the item in the list but with no indentation
             self.write_text(str(i), False)
@@ -187,14 +189,12 @@ class Ribify():
 
         # end of the RIB array list block
         self.write_text(' ]\n', False)
- 
 
-    
     def data_to_primvar(self, datablock, **primvar):
         """Append to file_object specified data-block member from Blender
         data-block into RenderMan primitive variable as class type using
         specified define name.
-        
+
         datablock = Blender mesh data-block
         **primvar = dictionary containing following members:
         member = data-block member to build primvar from (such as Normal, ect)
@@ -203,17 +203,18 @@ class Ribify():
         pclass = primitive class to order quantities by
         """
         if DEBUG_PRINT:
-            print("Creating", primvar['define'], "as", primvar['ptype'], "sorted as",
-                primvar['pclass'], "for", primvar['member'], "in", datablock, "...")
-    
+            print("Creating", primvar['define'], "as", primvar['ptype'],
+                  "sorted as", primvar['pclass'], "for", primvar['member'],
+                  "in", datablock, "...")
+
     def mesh_pointspolygons(self, datablock, smooth_normals=False):
         """ """
-        
+
         if DEBUG_PRINT:
             print("Creating pointpolygons...")
-            
+
         samples = [get_mesh(datablock)]
-        
+
         for sample in samples:
             # extract data sets from sample
             nverts, verts, P, uvs, N = sample
@@ -226,7 +227,7 @@ class Ribify():
             self.write_text('"P"\n')
             self.write_rib_list(P, 3, 14)
 
-            if uvs:     
+            if uvs:
                 self.write_text('\n')
                 self.write_text('"facevarying float[2] st"\n')
                 self.write_rib_list(uvs, 2, 14)
@@ -235,87 +236,83 @@ class Ribify():
                 self.write_text('\n')
                 self.write_text('"varying normal N"\n')
                 self.write_rib_list(N, 3, 14)
-            
-    
+
     def mesh_subdivisionmesh(self, datablock):
         """ """
         if DEBUG_PRINT:
             print("Creating subdivisionmesh...")
-    
+
     def mesh_points(self, datablock):
         """ """
-        
+
         print("Creating mesh points...")
-    
+
     def mesh_curves(self, datablock):
         """ """
-        
+
         print("Creating mesh curves...")
-    
+
     def particles_points(self, datablock):
         """ """
-        
+
         print("Creating particle points...")
-    
+
     def particles_curves(self, datablock):
         """ """
-        
+
         print("Creating particle curves...")
-    
+
     def curve_cyclic_poly(self, datablock):
         """ """
-        
+
         print("Creating cyclic poly curves...")
-    
+
     def curve_cyclic_bezier(self, datablock):
         """ """
-        
+
         print("Creating cyclic bezier curves...")
-    
+
     def curve_cyclic_nurbs(self, datablock):
         """ """
-        
+
         print("Creating cyclic nurbs curves...")
-    
+
     def curve_noncyclic_poly(self, datablock):
         """ """
-        
+
         print("Creating noncyclic poly curves...")
-    
+
     def curve_noncyclic_bezier(self, datablock):
         """ """
-        
+
         print("Creating noncyclic bezier curves...")
-    
+
     def curve_noncyclic_nurbs(self, datablock):
         """ """
-        
+
         print("Creating noncyclic nurbs curves...")
-    
+
     def curve_points(self, datablock):
         """ """
-        
+
         print("Creating curve points...")
-    
+
     def surface_nupatch(self, datablock):
         """ """
-        
+
         print("Creating nupatch...")
-    
+
     def surface_points(self, datablock):
         """ """
-        
+
         print("Creating surface points...")
-    
+
     def metaball_blobby(self, datablock):
         """ """
-        
+
         print("Creating meta blobby...")
-    
+
     def metaball_points(self, datablock):
         """ """
-        
+
         print("Creating meta points...")
-
-
-

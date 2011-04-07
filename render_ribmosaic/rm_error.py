@@ -61,8 +61,6 @@ MODULE = os.path.dirname(__file__).split(os.sep)[-1]
 exec("import " + MODULE + " as rm")
 
 
-
-
 # #############################################################################
 # ERROR HANDLER CLASS
 # #############################################################################
@@ -71,20 +69,19 @@ exec("import " + MODULE + " as rm")
 
 class RibmosaicError(Exception):
     """UI and console error messages"""
-    
-    
+
     # ### Private attributes
-    
-    _message = "" # Message to report
-    _exc_info = None # Execution info and traceback object to print
-    
+
+    _message = ""  # Message to report
+    _exc_info = None  # Execution info and traceback object to print
+
     def __init__(self, message, exc_info=None):
         self._message = message
         self._exc_info = exc_info
-    
+
     def __str__(self):
         return self._message
-    
+
     def ReportError(self, operator=None):
         print(rm.ENGINE + " Error: " + self._message)
         traceback.print_exc()
@@ -93,8 +90,6 @@ class RibmosaicError(Exception):
             traceback.print_tb(self._exc_info[2])
             for t in self._exc_info[:2]:
                 print(t)
-        
+
         if operator:
             operator.report({'ERROR'}, self._message)
-
-

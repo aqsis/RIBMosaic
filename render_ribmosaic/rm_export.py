@@ -416,9 +416,12 @@ class ExporterManager():
         """Prepares the export attributes and folders for a new export process.
         Should be called before any other public export_manager methods.
 
-        active_scene = The scene we are exporting and retrieving properties from
-        clean_paths = Remove all files in specified self.export_paths dict keys
-        purge_paths = Remove everything in specified self.export_paths dict keys
+        active_scene = The scene we are exporting and
+                       retrieving properties from
+        clean_paths = Remove all files in specified
+                      self.export_paths dict keys
+        purge_paths = Remove everything in specified
+                      self.export_paths dict keys
         shader_library = Pipeline of shader library to prepare
         """
 
@@ -465,7 +468,8 @@ class ExporterManager():
 
                 # Check that export folders exist and clean or purge them
                 for p in self.export_paths:
-                    path = self.export_directory + os.sep.join(self.export_paths[p])
+                    path = self.export_directory + \
+                           os.sep.join(self.export_paths[p])
 
                     if not os.path.exists(path):
                         os.makedirs(path)
@@ -500,8 +504,9 @@ class ExporterManager():
                 except:
                     pass
             except:
-                raise rm_error.RibmosaicError("Could not prepare export directory, "
-                                              "check console for details",
+                raise rm_error.RibmosaicError("Could not prepare export"
+                                              " directory, check console"
+                                              " for details",
                                               sys.exc_info())
         else:
             raise rm_error.RibmosaicError("Blend must be saved before "
@@ -527,7 +532,8 @@ class ExporterManager():
                                                         type='INFO')
 
         # Setup generic export context object
-        ec = rm_context.ExportContext(None, self.export_scene, self.active_pass)
+        ec = rm_context.ExportContext(None, self.export_scene,
+                                      self.active_pass)
         ec.root_path = self.export_directory
         ec.context_window = 'SCENE'
         ec.pointer_render = render_object
@@ -555,7 +561,8 @@ class ExporterManager():
 
                 if lib:
                     libraries.append(lib)
-            elif eval(rm.pipeline_manager.get_attr(ec, p, "enabled", False, "True")):
+            elif eval(rm.pipeline_manager.get_attr(ec, p, "enabled",
+                                                   False, "True")):
                 libraries.append("xml")
 
             # Only export shaders if pipeline contains shader libraries
@@ -608,15 +615,16 @@ class ExporterManager():
 
                             if name:
                                 if purge:
-                                    source = rm.pipeline_manager.get_text(ec, xmlp)
+                                    source = rm.pipeline_manager.get_text(ec,
+                                                                    xmlp)
                                     f = open(path + name, 'w')
                                     f.write(source)
                                     f.close()
 
                                 is_shaders = True
                             else:
-                                raise rm_error.RibmosaicError("Attribute error in " + \
-                                                xmlp + ", must specify filepath")
+                                raise rm_error.RibmosaicError("Attribute error"
+                                    " in " + xmlp + ", must specify filepath")
 
                     # If no shaders exported remove empty directory
                     if not is_shaders:
@@ -624,27 +632,29 @@ class ExporterManager():
                             os.rmdir(path)
                         except:
                             pass
-                # Setup for library processing (only create compile and info commands)
+                # Setup for library processing
+                # (only create compile and info commands)
                 else:
                     # Always setup library path to be absolute
                     path = os.path.realpath(bpy.path.abspath(library)) + os.sep
                     is_shaders = True
 
                     if path:
-                        compile = eval(rm.pipeline_manager.get_attr(ec, p, "compile",
-                                                                False, "False"))
+                        compile = eval(rm.pipeline_manager.get_attr(ec,
+                                       p, "compile", False, "False"))
 
                         # Only check for building info if export option is set
                         if self.export_scene.ribmosaic_compileshd:
-                            info = eval(rm.pipeline_manager.get_attr(ec, p, "build",
-                                                                False, "False"))
+                            info = eval(rm.pipeline_manager.get_attr(ec,
+                                        p, "build", False, "False"))
                         else:
                             info = False
 
                         ec.target_path = path
                         ec.target_name = ""
                     else:
-                        raise rm_error.RibmosaicError("Pipeline library incorrect for " + p)
+                        raise rm_error.RibmosaicError("Pipeline library"
+                                                      " incorrect for " + p)
 
                 # generate command scripts for pipelines with shaders
                 if is_shaders:
@@ -657,7 +667,7 @@ class ExporterManager():
                         ec.context_pipeline = segs[0]
                         ec.context_category = segs[1]
                         ec.context_panel = segs[2]
-                        
+
                         # Only export enabled command panels
                         if compile and ec._panel_enabled():
                             ec.current_command += 1
@@ -665,7 +675,7 @@ class ExporterManager():
                                    "COMPILE_S@[EVAL:.current_library:#####]@"
                                    "_C@[EVAL:.current_command:#####]@")
                             path = "." + os.sep
-                            
+
                             try:
                                 s = ExporterCommand(ec, c, False, path, name)
                                 s.build_code("begin")
@@ -673,8 +683,8 @@ class ExporterManager():
                                 s.build_code("end", True)
                             except:
                                 s.close_archive()
-                                raise rm_error.RibmosaicError("Failed to build command " +
-                                                              name, sys.exc_info())
+                                raise rm_error.RibmosaicError("Failed to"
+                                    " build command " + name, sys.exc_info())
 
                             self.command_scripts['COMPILE'].append(s)
 
@@ -699,8 +709,8 @@ class ExporterManager():
                                 s = ExporterCommand(ec, c, True, path, name)
                             except:
                                 s.close_archive()
-                                raise rm_error.RibmosaicError("Failed to build command " +
-                                                              name, sys.exc_info())
+                                raise rm_error.RibmosaicError("Failed to build"
+                                    "command " + name, sys.exc_info())
 
                             self.command_scripts['INFO'].append(s)
 
@@ -724,15 +734,16 @@ class ExporterManager():
     def export_rib(self, render_object=None):
         """Entry point to RIB exporting process for all passes under current
         frame. This creates a root export context object and populates it with
-        information from export_scene and active passes. Then an ExportPass object
-        is initialized from the export context object, automatically initializing
-        archives and inheriting new objects down the scene's object tree. This
-        method is meant to work with the RenderEngine.render() method to produce
-        all archives and commands necessary to render one frame at a time while
-        producing a complete archive package that can be run later from console.
+        information from export_scene and active passes. Then an ExportPass
+        object is initialized from the export context object, automatically
+        initializing archives and inheriting new objects down the scene's
+        object tree. This method is meant to work with the
+        RenderEngine.render() method to produce all archives and commands
+        necessary to render one frame at a time while producing a complete
+        archive package that can be run later from console.
         It also produces RIB and commands per frame so they can be more easily
         distributed on a farm.
-        
+
         render_object = The RenderEngine object currently exporting from
         """
         if DEBUG_PRINT:
@@ -746,7 +757,7 @@ class ExporterManager():
                                                        type='RENDER')
         postrender_commands = rm.pipeline_manager.list_panels("command_panels",
                                                            type='POSTRENDER')
-        
+
         # Setup scene information
         f = self.export_scene.frame_current
         r = self.export_scene.render
@@ -754,7 +765,7 @@ class ExporterManager():
         y = int(r.resolution_y * r.resolution_percentage * 0.01)
         export_rib = self.export_scene.ribmosaic_exportrib
         only_active = self.export_scene.ribmosaic_activepass
-        
+
         self.export_frame = f
         self.display_output = {'x': x, 'y': y, 'passes': []}
 
@@ -776,14 +787,15 @@ class ExporterManager():
                 ec.dims_resx = x
                 ec.dims_resy = y
                 target_name = ec._resolve_links("P@[EVAL:.current_pass:#####]@"
-                                          "_F@[EVAL:.current_frame:#####]@.rib")
+                                         "_F@[EVAL:.current_frame:#####]@.rib")
 
                 # Add to display list if a beauty pass
                 if ec.pass_type == 'BEAUTY':
                     display_output = ec._resolve_links(ec.pass_output)
-                    self.display_output['passes'].append({'file': display_output,
-                                                'layer': ec.pass_layer,
-                                                'multilayer': ec.pass_multilayer})
+                    self.display_output['passes'].append(
+                        {'file': display_output,
+                         'layer': ec.pass_layer,
+                         'multilayer': ec.pass_multilayer})
 
                 # Do not build RIB if disabled in export options
                 if export_rib and (not only_active or p == self.active_pass):
@@ -795,7 +807,7 @@ class ExporterManager():
                         pa.close_archive()
                         del pa
                         raise rm_error.RibmosaicError("Failed to build RIB " +
-                                                      target_name, sys.exc_info())
+                                                   target_name, sys.exc_info())
 
                 # Build RENDER command scripts
                 for c in render_commands:
@@ -809,19 +821,22 @@ class ExporterManager():
                     # Only export enabled command panels
                     if ec._panel_enabled():
                         ec.current_command += 1
-                        name = ec._resolve_links("RENDER_P@[EVAL:.current_pass:#####]@"
-                                                 "_F@[EVAL:.current_frame:#####]@"
-                                                 "_C@[EVAL:.current_command:#####]@")
+                        name = ec._resolve_links(
+                                "RENDER_P@[EVAL:.current_pass:#####]@"
+                                "_F@[EVAL:.current_frame:#####]@"
+                                "_C@[EVAL:.current_command:#####]@")
 
                         try:
-                            s = ExporterCommand(ec, c, False, command_path, name)
+                            s = ExporterCommand(ec, c, False,
+                                                command_path, name)
                             s.build_code("begin")
                             s.build_code("middle")
                             s.build_code("end", True)
                         except:
                             s.close_archive()
-                            raise rm_error.RibmosaicError("Failed to build command " +
-                                                          name, sys.exc_info())
+                            raise rm_error.RibmosaicError(
+                                    "Failed to build command " +
+                                    name, sys.exc_info())
 
                         self.command_scripts['RENDER'].append(s)
 
@@ -833,30 +848,33 @@ class ExporterManager():
                     ec.context_panel = segs[2]
                     ec.target_path = ""
                     ec.target_name = ""
-                    
+
                     # Only export enabled command panels
                     if ec._panel_enabled():
                         ec.current_command += 1
-                        name = ec._resolve_links("RENDER_P@[EVAL:.current_pass:#####]@"
-                                                 "_F@[EVAL:.current_frame:#####]@"
-                                                 "_C@[EVAL:.current_command:#####]@")
-                        
+                        name = ec._resolve_links(
+                                "RENDER_P@[EVAL:.current_pass:#####]@"
+                                "_F@[EVAL:.current_frame:#####]@"
+                                "_C@[EVAL:.current_command:#####]@")
+
                         try:
-                            s = ExporterCommand(ec, c, False, command_path, name)
+                            s = ExporterCommand(ec, c, False,
+                                                command_path, name)
                             s.build_code("begin")
                             s.build_code("middle")
                             s.build_code("end", True)
                         except:
                             s.close_archive()
-                            raise rm_error.RibmosaicError("Failed to build command " +
-                                                          name, sys.exc_info())
-                        
+                            raise rm_error.RibmosaicError(
+                                    "Failed to build command " +
+                                    name, sys.exc_info())
+
                         self.command_scripts['POSTRENDER'].append(s)
-                
+
                 del ec
-        
+
         self._exporting_scene = False
-    
+
     def execute_commands(self):
         """Executes any accumulated commands in the command_scripts attribute.
         This method automatically checks the render export options to determine
@@ -865,18 +883,19 @@ class ExporterManager():
         """
         if DEBUG_PRINT:
             print("ExportManager.execute_commands")
-        
+
         c = self.export_scene.ribmosaic_compileshd
         o = self.export_scene.ribmosaic_optimizetex
         r = self.export_scene.ribmosaic_renderrib
-        
+
         # If in interactive mode ALWAYS render archives
         if self.export_scene.ribmosaic_interactive:
             r = True
-        
+
         # Create one root shell script to rule them all
-        root = ExporterCommand(None, "", False, "." + os.sep, "START.sh.bat", 'a')
-        
+        root = ExporterCommand(None, "", False, "." + os.sep,
+                               "START.sh.bat", 'a')
+
         try:
             # Cycle through commands of each type and execute
             for t in ['OPTIMIZE', 'COMPILE', 'INFO', 'RENDER', 'POSTRENDER']:
@@ -886,17 +905,17 @@ class ExporterManager():
                             ((t == 'COMPILE' or t == 'INFO') and c) or
                             (t == 'OPTIMIZE' and o)):
                         s.execute_command()
-                    
+
                     if t != 'INFO':
                         # Write all but info commands to root shell script
                         root.write_text("." + os.sep + s.archive_name + "\n")
-                
+
                 # Clear executed command objects
                 if not self.export_scene.ribmosaic_interactive:
                     self.command_scripts[t] = []
         except:
             pass
-        
+
         # Clean up
         root.close_archive()
 
@@ -973,53 +992,56 @@ class ExporterArchive(rm_context.ExportContext):
         # If archive path specified use it
         if archive_path:
             self.archive_path = archive_path
-        
+
         # If archive name specified use it
         if archive_name:
             self.archive_name = archive_name
-    
+
     # #### Public methods
-    
+
     def open_archive(self, gzipped=None, execute=None, mode='w'):
         """Opens a new archive for writing using archive_path and archive_name.
-        
+
         gzippped = Create archive using gzip compression (True/False)
         execute = Create archive with executable permissions (True/False)
         mode = File 'r', 'a', 'w' open mode (gzipped is always binary mode)
         """
         if DEBUG_PRINT:
             print("ExporterArchive.open_archive()")
-        
+
         if gzipped is not None:
             self.is_gzip = gzipped
-        
+
         if execute is not None:
             self.is_exec = execute
-        
+
         if self.archive_name:
             filepath = self.archive_path + self.archive_name
-            
+
             try:
                 if self.is_gzip:
                     self._pointer_file = gzip.open(filepath, mode)
                 else:
                     self._pointer_file = open(filepath, mode)
-                
+
                 if self.is_exec:
-                    os.chmod(filepath, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR |
-                                       stat.S_IRGRP | stat.S_IXGRP |
-                                       stat.S_IROTH | stat.S_IXOTH)
-                
-                self.is_root = True  # If creating a new archive this object is root
+                    os.chmod(filepath, stat.S_IRUSR | stat.S_IWUSR |
+                                       stat.S_IXUSR | stat.S_IRGRP |
+                                       stat.S_IXGRP | stat.S_IROTH |
+                                       stat.S_IXOTH)
+                 # If creating a new archive this object is root
+                self.is_root = True
             except:
-                raise rm_error.RibmosaicError("Could not open archive \"" + filepath +
-                                              "\" for '" + mode + "'", sys.exc_info())
+                raise rm_error.RibmosaicError(
+                        "Could not open archive \"" + filepath +
+                        "\" for '" + mode + "'", sys.exc_info())
         else:
-            raise rm_error.RibmosaicError("Archive's path and name must be specified")
-    
+            raise rm_error.RibmosaicError(
+                    "Archive's path and name must be specified")
+
     def close_archive(self):
         """Close archive object for writing and apply regex objects"""
-        
+
         if DEBUG_PRINT:
             print("ExporterArchive.close_archive()")
 
@@ -1029,15 +1051,16 @@ class ExporterArchive(rm_context.ExportContext):
             if self._pointer_cache:
                 self._pointer_cache.close()
                 self._pointer_cache = None
-            
+
             # Close down any archive pointers
             if self._pointer_file:
                 try:
                     self._pointer_file.close()
                     self._pointer_file = None
                 except:
-                    raise rm_error.RibmosaicError("Cannot close archive", sys.exc_info())
-                
+                    raise rm_error.RibmosaicError("Cannot close archive",
+                                                   sys.exc_info())
+
                 # Apply regex objects to archive
                 if self._archive_regexes:
                     try:
@@ -1045,130 +1068,135 @@ class ExporterArchive(rm_context.ExportContext):
                         self.open_archive(mode='r')
                         text = self._pointer_file.read()
                         self._pointer_file.close()
-                        
+
                         # Get each regexes element
                         for xmlpath in self._archive_regexes:
                             # Get each regex sub element in regexes
-                            for element in rm.pipeline_manager.list_elements(xmlpath):
+                            for element in \
+                               rm.pipeline_manager.list_elements(xmlpath):
                                 regpath = xmlpath + "/" + element
-                                
+
                                 # Get regex attributes
-                                regex = rm.pipeline_manager.get_attr(self, regpath,
-                                                            "regex", True, "")
-                                replace = rm.pipeline_manager.get_attr(self, regpath,
-                                                            "replace", True, "")
-                                matches = rm.pipeline_manager.get_attr(self, regpath,
-                                                            "matches", True, "0")
-                                
+                                regex = rm.pipeline_manager.get_attr(self,
+                                            regpath, "regex", True, "")
+                                replace = rm.pipeline_manager.get_attr(self,
+                                            regpath, "replace", True, "")
+                                matches = rm.pipeline_manager.get_attr(self,
+                                            regpath, "matches", True, "0")
+
                                 # If gzipped setup binary regex
                                 if self.is_gzip:
                                     regex = bytes(regex.encode())
                                     replace = bytes(replace.encode())
-                                
+
                                 # Apply regex to text
                                 text = re.sub(regex, replace, text,
                                               int(matches), re.MULTILINE)
-                        
+
                         # Write text back to archive
                         self.open_archive(mode='w')
                         self.write_text(text)
                         self._pointer_file.close()
-                        
+
                         self._pointer_file = None
                     except:
-                        rm_error.RibmosaicError("Cannot apply regex to archive",
-                                                sys.exc_info())
-    
+                        rm_error.RibmosaicError(
+                                "Cannot apply regex to archive",
+                                sys.exc_info())
+
     def write_text(self, text="", use_indent=True, close=False):
-        """Writes text to this archive's open file handle. Also properly writes
-        text as either encoded binary or text mode according to is_gzip attribute.
-        
+        """Writes text to this archive's open file handle.
+           Also properly writes text as either encoded binary or text
+           mode according to is_gzip attribute.
+
         text = The text to write (can contain escape characters)
         use_indent = if true then indent the text
         close = If true closes script archive when complete
         """
         if DEBUG_PRINT:
             print("ExporterArchive.write_text()")
-        
+
         if text:
             # split the text up into lines
             lines = text.splitlines(True)
             for ln in lines:
                 if use_indent and self.current_indent > 0:
                     ln = " ".rjust(self.current_indent * 4) + ln
-            
+
                 if self._pointer_file:
                     if self.is_gzip:
                         self._pointer_file.write(ln.encode())
                     else:
                         self._pointer_file.write(ln)
                 else:
-                    raise rm_error.RibmosaicError("Archive already closed, cannot write text")
-        
+                    raise rm_error.RibmosaicError(
+                            "Archive already closed, cannot write text")
+
         if close:
             self.close_archive()
-    
+
     def write_code(self, xmlpath="", close=False):
         """Build and write element text code to archive. Also uses the
         element's "target" attribute to set a target path/file including the
         *.ext wildcard for multiple targets by extension. The target path/file
-        is searched and each match is set to the export context's "target_path",
-        "target_name" attributes (for link resolution in panel code), then the
-        code within the element is built and written.
-        
+        is searched and each match is set to the export context's
+        "target_path", "target_name" attributes (for link resolution in panel
+        code), then the code within the element is built and written.
+
         element = The code text element to build
         close = If true closes script archive when complete
         """
 
         if DEBUG_PRINT:
             print("ExporterArchive.write_code()")
-        
+
         target = rm.pipeline_manager.get_attr(self, xmlpath, "target", False)
-        
+
         for t in self.list_targets(target):
             if t[0]:
                 self.target_path = t[0]
-            
+
             if t[1]:
                 self.target_name = t[1]
-            
+
             text = rm.pipeline_manager.get_text(self, xmlpath)
-            
+
             self.write_text(text)
-        
+
         if close:
             self.close_archive()
-    
+
     def list_targets(self, target=""):
         """Searches target path/file.ext and returns a list of matches. If path
         is not specified export context target_path is used, if no file then
         export context target_name is used. If file uses the * operator then
         all files matching extension are listed.
-        
+
         target = path/file.ext of target to search or path/*.ext for wildcard
         returns = list of matching target (path, file) or "" if no matches
         """
 
         if DEBUG_PRINT:
             print("ExporterArchive.list_targets()")
-        
+
         # Populate files list according to target
         if target:
             target = target = os.path.split(target)
-            
+
             if target[0]:
                 path = target[0] + os.sep
             else:
                 path = self.target_path
-            
+
             if target[1].startswith("*"):
                 if path:
                     try:
                         matches = [(path, f) for f in os.listdir(path) \
                                  if os.path.splitext(f)[1] == target[1][1:]]
                     except:
-                        raise rm_error.RibmosaicError("Cannot find target directory/file, "
-                                                      "check export and/or library paths")
+                        raise rm_error.RibmosaicError(
+                                "Cannot find target directory/file, "
+                                "check export and/or library paths")
                 else:
                     matches = [("", "")]
             else:
@@ -1178,56 +1206,59 @@ class ExporterArchive(rm_context.ExportContext):
                     matches = [(path, self.target_name)]
         else:
             matches = [("", "")]
-        
+
         return matches
-    
+
     def add_regexes(self, xmlpath):
-        """Add specified xmlpath of a regexes XML element onto this archives regex
-        list. All regex sub elements will be evaluated into regular expressions
-        and applied to this archive's text when close_archive() is issued.
+        """Add specified xmlpath of a regexes XML element onto this archives
+        regex list. All regex sub elements will be evaluated into regular
+        expressions and applied to this archive's text when close_archive()
+        is issued.
         The path is either added to the archive or target list depending on its
         target element attribute.
-        
+
         xmlpath = XML pipeline path to a panels regexes element
         """
 
         if DEBUG_PRINT:
             print("ExporterArchive.add_regexes()")
-        
+
         if xmlpath:
             subelements = rm.pipeline_manager.list_elements(xmlpath)
-            
+
             if subelements:
-                target = rm.pipeline_manager.get_attr(self, xmlpath, "target", False)
-                
+                target = rm.pipeline_manager.get_attr(self, xmlpath,
+                                                      "target", False)
+
                 if target:
                     self._target_regexes.append(xmlpath)
                 else:
                     self._archive_regexes.append(xmlpath)
-    
+
     def apply_regextargets(self):
-        """Applies target based regexes from self._target_regexes. This works by
-        building a list of target files from each regexes target attribute and
-        applying the regex to each.
+        """Applies target based regexes from self._target_regexes.
+        This works by building a list of target files from each regexes target
+        attribute and applying the regex to each.
         """
 
         if DEBUG_PRINT:
             print("ExporterArchive.apply_regextargets()")
-        
+
         # Get each target regex xmlpath
         for xmlpath in self._target_regexes:
-            target = rm.pipeline_manager.get_attr(self, xmlpath, "target", False)
-            
+            target = rm.pipeline_manager.get_attr(self, xmlpath,
+                                                  "target", False)
+
             for t in [t for t in self.list_targets(target) if t[1]]:
                 self._test_break()
-                
+
                 # Open file as new archive initialized from self
                 archive = ExporterArchive(self, t[0], t[1])
-                
+
                 # Apply target regex to archive regex
                 archive._archive_regexes = [xmlpath]
                 archive._target_regexes = []
-                
+
                 # Open and close archive to apply regex
                 archive.open_archive(mode='r')
                 archive.close_archive()
@@ -1237,7 +1268,8 @@ class ExporterArchive(rm_context.ExportContext):
         self.write_text("##RenderMan RIB-Structure 1.1\n")
         self.write_text("##Scene: %s\n" % rm.export_manager.export_scene.name)
         self.write_text("##Creator: RIBMOSAIC %s for Blender\n" % rm.VERSION)
-        self.write_text("##CreationDate: " + time.strftime("%I:%M%p %m/%d/%Y", time.localtime()).lower() + "\n")
+        self.write_text("##CreationDate: " + time.strftime("%I:%M%p %m/%d/%Y",
+                        time.localtime()).lower() + "\n")
         self.write_text("##For: %s\n" % self.blend_name)
         #self.write_text("##Frames: "+str(fraEnd-fraStart+1)+"\n")
         self.write_text("version 3.03\n")
@@ -1253,7 +1285,7 @@ class ExporterArchive(rm_context.ExportContext):
     def riWorldBegin(self):
         self.write_text('WorldBegin\n')
         self.inc_indent()
-        
+
     def riWorldEnd(self):
         self.dec_indent()
         self.write_text('WorldEnd\n')
@@ -1265,55 +1297,61 @@ class ExporterArchive(rm_context.ExportContext):
     def riAttributeEnd(self):
         self.dec_indent()
         self.write_text('AttributeEnd\n')
-        
+
     def riIlluminate(self, idx, state=1):
         self.write_text('Illuminate "%s" %s\n' % (idx, state))
-        
+
     def riColor(self, color=(0, 0, 0)):
         self.write_text('Color [%s %s %s]\n' % (color[0], color[1], color[2]))
 
     def riOpacity(self, color=(0, 0, 0)):
-        self.write_text('Opacity [%s %s %s]\n' % (color[0], color[1], color[2]))
+        self.write_text('Opacity [%s %s %s]\n' % (color[0], color[1],
+                        color[2]))
 
 
 # #### Pipeline panel sub classes (all derived from ExporterArchive)
 
 class ExporterCommand(ExporterArchive):
-    """This subclass represents a shell script created from the data in a xmlpath
-    of a pipeline command panel. It provides all necessary public methods and
-    attributes for creating, building and executing a shell script from XML source.
+    """This subclass represents a shell script created from the data in a
+    xmlpath of a pipeline command panel. It provides all necessary public
+    methods and attributes for creating, building and executing a shell script
+    from XML source.
     """
 
     # #### Public attributes
-    
+
     command_xmlpath = ""  # XML path to command panel this object represents
     command_process = None  # Pointer to Popen process
     delay_build = False  # Delay building command until execution
 
     # #### Private methods
 
-    def __init__(self, export_object=None, command_xmlpath="", delay_build=False,
-                       archive_path="", archive_name="", archive_mode="w"):
-        """Initialize attributes using export_object and command_xmlpath as well
-        as create shell script file ready for writing.
-        
+    def __init__(self, export_object=None, command_xmlpath="",
+                 delay_build=False, archive_path="", archive_name="",
+                 archive_mode="w"):
+        """Initialize attributes using export_object and command_xmlpath
+        as well as create shell script file ready for writing.
+
         export_object = Any object subclassed from ExportContext
         command_xmlpath = XML pipeline path to command to process
-        archive_path = Path to save script to (otherwise export_object.archive_path)
-        archive_name = Name to save script as (otherwise export_object.archive_name)
+        archive_path = Path to save script to
+                       (otherwise export_object.archive_path)
+        archive_name = Name to save script as
+                       (otherwise export_object.archive_name)
         archive_mode = File open mode ('r', 'a', 'w')
         """
-        
+
         self.command_xmlpath = command_xmlpath
         self.delay_build = delay_build
-        
+
         # Append file extension from command panel extension attribute
         if command_xmlpath and archive_name:
-            archive_name += rm.pipeline_manager.get_attr(self, command_xmlpath,
-                                                          "extension", False)
-        
-        ExporterArchive.__init__(self, export_object, archive_path, archive_name)
-        
+            archive_name += rm.pipeline_manager.get_attr(
+                                self, command_xmlpath, "extension", False)
+
+        ExporterArchive.__init__(self, export_object,
+                                 archive_path, archive_name)
+
         # Automatically add regexes and create archive
         if command_xmlpath:
             self.add_regexes(command_xmlpath + "/regexes")
@@ -1327,7 +1365,7 @@ class ExporterCommand(ExporterArchive):
 
         if DEBUG_PRINT:
             print("ExporterCommand.terminate_command()")
-        
+
         try:
             try:  # Try it unix style
                 os.killpg(self.command_process.pid, signal.SIGTERM)
@@ -1335,12 +1373,12 @@ class ExporterCommand(ExporterArchive):
                 self.command_process.terminate()
         except:
             pass
-    
+
     def execute_command(self):
         """Execute the script generated by this object and store the process"""
-        
+
         xmlpath = self.command_xmlpath
-        
+
         if DEBUG_PRINT:
             print("ExporterCommand.execute_command()")
             print("xmlpath: " + xmlpath)
@@ -1351,32 +1389,36 @@ class ExporterCommand(ExporterArchive):
                 self.build_code("begin")
                 self.build_code("middle")
                 self.build_code("end")
-            
+
             self.close_archive()
-        
-        # Resolve execute attribute to determine execution and trigger EXEC links
+
+        # Resolve execute attribute to determine
+        # execution and trigger EXEC links
         try:
-            execute = eval(rm.pipeline_manager.get_attr(self, xmlpath, "execute",
-                                                           True, "True"))
+            execute = eval(rm.pipeline_manager.get_attr(self, xmlpath,
+                           "execute", True, "True"))
         except:
-            raise rm_error.RibmosaicError("Invalid result for \"execute\" attribute in " +
-                                          xmlpath + ", expected True/False")
-        
+            raise rm_error.RibmosaicError(
+                       "Invalid result for \"execute\" attribute in " +
+                       xmlpath + ", expected True/False")
+
         if execute:
             try:
                 self.close_archive()
-                
+
                 # Run command as sub process and save pointer
                 command = self.archive_path + self.archive_name
-                
+
                 try:  # Try it unix style
-                    self.command_process = subprocess.Popen(command, shell=True,
-                                                            preexec_fn=os.setsid)
+                    self.command_process = subprocess.Popen(command,
+                                             shell=True, preexec_fn=os.setsid)
                 except:  # Try it windows style
-                    self.command_process = subprocess.Popen(command, shell=True)
+                    self.command_process = subprocess.Popen(command,
+                                                            shell=True)
             except:
-                raise rm_error.RibmosaicError("Could not execute command " + command)
-            
+                raise rm_error.RibmosaicError(
+                                "Could not execute command " + command)
+
             # Only poll and apply target regexes if not interactive
             if not self.pointer_datablock.ribmosaic_interactive:
                 # Wait for process to quit while checking for key presses
@@ -1385,21 +1427,21 @@ class ExporterCommand(ExporterArchive):
                         self._test_break()
                     except:
                         self.terminate_command()
-                
+
                 # Apply any target regexes
                 self.apply_regextargets()
-    
+
     def build_code(self, element, close=False):
         """Build and write element panel code to archive.
         This is just a wrapper for ExporterArchive.write_code().
-        
+
         element = The panels code element to build
         close = If true closes archive when complete
         """
 
         if DEBUG_PRINT:
             print("ExporterCommand.build_code()")
-        
+
         self.write_code(self.command_xmlpath + "/" + element, close)
 
 
@@ -1408,41 +1450,39 @@ class ExporterUtility(ExporterArchive):
     of a pipeline utility panel. It provides all necessary public methods and
     attributes for building utility RIB from XML source.
     """
-    
-    
+
     # #### Public attributes
-    
+
     utility_xmlpath = ""  # XML path to utility panel this object represents
-    
-    
+
     # #### Private methods
-    
+
     def __init__(self, export_object=None, utility_xmlpath=""):
         """Initialize attributes using export_object and utility_xmlpath.
-        
+
         export_object = The archive object this panel writes to
         utility_xmlpath = XML pipeline path to utility panel to process
         """
-        
+
         self.utility_xmlpath = utility_xmlpath
-        
+
         ExporterArchive.__init__(self, export_object)
-        
+
         # Automatically add regexes to parent archive
         if utility_xmlpath:
             self.add_regexes(utility_xmlpath + "/regexes")
-    
+
     def build_code(self, element, close=False):
         """Build and write element panel code to archive.
         This is just a wrapper for ExporterArchive.write_code().
-        
+
         element = The panels code element to build
         close = If true closes archive when complete
         """
 
         if DEBUG_PRINT:
             print("ExporterUtility.build_code()")
-        
+
         self.write_code(self.utility_xmlpath + "/" + element, close)
 
 
@@ -1452,37 +1492,35 @@ class ExporterShader(ExporterArchive):
     attributes for building shader RIB from XML source.
     """
 
-
     # #### Public attributes
-    
+
     shader_xmlpath = ""  # XML path to shader panel this object represents
 
-    
     # #### Private methods
-    
+
     def __init__(self, export_object=None, shader_xmlpath=""):
         """Initialize attributes using export_object and utility_xmlpath.
-        
+
         export_object = The archive object this panel writes to
         shader_xmlpath = XML pipeline path to utility panel to process
         """
-        
+
         self.shader_xmlpath = shader_xmlpath
-        
+
         ExporterArchive.__init__(self, export_object)
-        
+
         # Automatically add regexes to parent archive
         if shader_xmlpath:
             self.add_regexes(shader_xmlpath + "/regexes")
-    
+
     def build_code(self, element, close=False):
         """Build and write element panel code to archive.
         This is just a wrapper for ExporterArchive.write_code().
-        
+
         element = The panels code element to build
         close = If true closes archive when complete
         """
-        
+
         if DEBUG_PRINT:
             print("ExporterShader.build_code()")
 
@@ -1493,31 +1531,31 @@ class ExporterShader(ExporterArchive):
 
 class ExportPass(ExporterArchive):
     """This subclass represents a pass archive created from the data in its
-    export context attributes (setup before initialization by pipeline_manager's
-    export_rib()). It provides all necessary public methods and attributes for
-    creating a root pass RIB archive.
+    export context attributes (setup before initialization by
+    pipeline_manager's export_rib()). It provides all necessary public
+    methods and attributes for creating a root pass RIB archive.
     """
-    
-    
+
     # #### Private methods
-    
+
     def __init__(self, export_object=None, archive_path="", archive_name=""):
         """Initialize attributes using export_object and parameters.
         Automatically create the RIB this object represents.
-        
+
         export_object = Any object subclassed from ExportContext
         archive_path = Path to save archive to (from export_object otherwise)
         archive_name = Name to save archive as (from export_object otherwise)
         """
-        
-        ExporterArchive.__init__(self, export_object, archive_path, archive_name)
-        
+
+        ExporterArchive.__init__(self, export_object, archive_path,
+                                 archive_name)
+
         # Determine if compressed RIB is enabled
         if self.pointer_datablock:
             compress = self.pointer_datablock.ribmosaic_compressrib
         else:
             compress = False
-        
+
         self.open_archive(gzipped=compress)
 
     def _export_lights(self, lights):
@@ -1556,7 +1594,7 @@ class ExportPass(ExporterArchive):
     def _export_pass_properties(self):
         if DEBUG_PRINT:
             print("ExportPass._export_pass_properties()")
-            
+
         self.write_text(self._resolve_links(
             "Format @[EVAL:.dims_resx:]@ @[EVAL:.dims_resy:]@ 1\n"))
         self.write_text(self._resolve_links(
@@ -1566,7 +1604,7 @@ class ExportPass(ExporterArchive):
         self.write_text(self._resolve_links(
             "@[EVAL:\"ShadingRate @[EVAL:.pointer_pass.pass_shadingrate:]@\" "
             "if @[EVAL:.pointer_pass.pass_shadingrate:]@ else \"\":]@\n"))
-            
+
         renderpass = self.pointer_pass
         if renderpass.pass_eyesplits > 0:
             self.write_text('Option "limits" "int eyesplits" [%i]\n'
@@ -1577,138 +1615,140 @@ class ExportPass(ExporterArchive):
         if renderpass.pass_texturemem > 0:
             self.write_text('Option "limits" "int texturememory" [%i]\n'
                             % renderpass.pass_texturemem)
-        
-        
+
     def _export_searchpaths(self):
         """ Export the user defined search paths for archive, shader, texture
             display, procedural, resource.
         """
         scene = self.get_scene()
-        
+
         # TODO add archive searchpath
-        
+
         if scene.ribmosaic_shader_searchpath != '':
             self.write_text('Option "searchpath" "string shader"'
                             '[ "@:.:%s" ]\n' %
                             scene.ribmosaic_shader_searchpath)
-            
+
         if scene.ribmosaic_texture_searchpath != '':
             self.write_text('Option "searchpath" "string texture"'
                             '[ "@:.:%s" ]\n' %
                             scene.ribmosaic_texture_searchpath)
-            
+
         if scene.ribmosaic_display_searchpath != '':
             self.write_text('Option "searchpath" "string display"'
                             '[ "@:.:%s" ]\n' %
                             scene.ribmosaic_display_searchpath)
-            
+
         if scene.ribmosaic_procedural_searchpath != '':
             self.write_text('Option "searchpath" "string procedural"'
                             '[ "@:.:%s" ]\n' %
                             scene.ribmosaic_procedural_searchpath)
-            
+
         if scene.ribmosaic_resource_searchpath != '':
             self.write_text('Option "searchpath" "string resource"'
                             '[ "@:.:%s" ]\n' %
                             scene.ribmosaic_resource_searchpath)
-    
+
     # #### Public methods
-    
+
     def export_rib(self):
         """ """
-        
+
         # TODO Setup RIB header from scene properties
         # TODO Setup insertion point for instance geometry
         # TODO Setup sub-frames and camera's
         # TODO Setup world shaders
         # TODO Setup insertion point for light archive
-        
+
         #world = ExportWorld(self)
         #world.export_rib()
         #del world
-        
+
         #objects = ExportObject(self)
         #objects.export_rib()
         #del objects
-        
+
         if DEBUG_PRINT:
             print("ExportPass.export_rib()")
-        
-        
+
         # #### Setup basic test RIB for now
-        
+
         # Push objects attributes
         pipeline = self.context_pipeline
         category = self.context_category
         panel = self.context_panel
         datablock = self.pointer_datablock
-        
+
         # Panel object lists
         scene_utilities = []
         render_utilities = []
         world_utilities = []
         world_shaders = []
-        
+
         # Initialize objects for enabled panels in render and scene
-        for p in rm.pipeline_manager.list_panels("utility_panels", window='SCENE'):
+        for p in rm.pipeline_manager.list_panels("utility_panels",
+                                                 window='SCENE'):
             segs = p.split("/")
             self.context_pipeline = segs[0]
             self.context_category = segs[1]
             self.context_panel = segs[2]
-            
+
             if self._panel_enabled():
                 scene_utilities.append(ExporterUtility(self, p))
-        
-        for p in rm.pipeline_manager.list_panels("utility_panels", window='RENDER'):
+
+        for p in rm.pipeline_manager.list_panels("utility_panels",
+                                                 window='RENDER'):
             segs = p.split("/")
             self.context_pipeline = segs[0]
             self.context_category = segs[1]
             self.context_panel = segs[2]
-            
+
             if self._panel_enabled():
                 render_utilities.append(ExporterUtility(self, p))
-        
+
         # Initialize objects for enabled panels in world
         self.pointer_datablock = datablock.world
-        
-        for p in rm.pipeline_manager.list_panels("utility_panels", window='WORLD'):
+
+        for p in rm.pipeline_manager.list_panels("utility_panels",
+                                                 window='WORLD'):
             segs = p.split("/")
             self.context_pipeline = segs[0]
             self.context_category = segs[1]
             self.context_panel = segs[2]
-            
+
             if self._panel_enabled():
                 world_utilities.append(ExporterUtility(self, p))
-        
-        for p in rm.pipeline_manager.list_panels("shader_panels", window='WORLD'):
+
+        for p in rm.pipeline_manager.list_panels("shader_panels",
+                                                 window='WORLD'):
             segs = p.split("/")
             self.context_pipeline = segs[0]
             self.context_category = segs[1]
             self.context_panel = segs[2]
-            
+
             if self._panel_enabled():
                 world_shaders.append(ExporterShader(self, p))
-        
+
         # Pop objects attributes
         self.context_pipeline = pipeline
         self.context_category = category
         self.context_panel = panel
         self.pointer_datablock = datablock
-        
+
         scene = self.get_scene()
-        
+
         # output rib header
         self.ribHeader()
-        
+
         self._export_searchpaths()
-        
+
         # Write everything to archive
         for p in scene_utilities:
             p.build_code("begin")
-        
+
         if scene.ribmosaic_use_frame:
             self.riFrameBegin()
-        
+
         for p in render_utilities:
             p.current_indent = self.current_indent
             p.build_code("begin")
@@ -1729,8 +1769,6 @@ class ExportPass(ExporterArchive):
             raise rm_error.RibmosaicError("Failed to build camera " +
                                          sys.exc_info())
 
-
-
         self.write_text("Sides 2\n")
 
         if scene.ribmosaic_use_world:
@@ -1739,11 +1777,11 @@ class ExportPass(ExporterArchive):
         for p in world_utilities:
             p.current_indent = self.current_indent
             p.build_code("begin")
-        
+
         for p in world_shaders:
             p.current_indent = self.current_indent
             p.build_code("rib")
-        
+
         # figure out what objects in the scene are renderable
         # build a collection of all renderable objects which includes:
         # light, camera, mesh, empty
@@ -1754,25 +1792,25 @@ class ExportPass(ExporterArchive):
 
         # export all the objects to RIB
         self._export_objects(objects)
-       
+
         for p in world_utilities:
             p.current_indent = self.current_indent
             p.build_code("end")
-        
+
         if scene.ribmosaic_use_world:
             self.riWorldEnd()
-        
+
         for p in render_utilities:
             p.current_indent = self.current_indent
             p.build_code("end")
-        
+
         if scene.ribmosaic_use_frame:
             self.riFrameEnd()
-        
+
         for p in scene_utilities:
             p.current_indent = self.current_indent
             p.build_code("end")
-        
+
         self.close_archive()
 
     def get_scene(self):
@@ -1781,13 +1819,12 @@ class ExportPass(ExporterArchive):
 
 class ExportWorld(ExporterArchive):
     """Represents shaders on world data-blocks"""
-    
-    
+
     # #### Public methods
-    
+
     def export(self):
         """ """
-        
+
         print("Exporting world...")
 
 
@@ -1799,19 +1836,19 @@ class ExportObject(ExporterArchive):
     and each is passed to a new instance of ExportObjects. This class also
     automatically handles nesting of CSG through parenting.
     """
-    
+
     # #### Private methods
-    
+
     def __init__(self, export_object=None, pointer_object=None):
         """Initialize attributes using export_object and parameters.
         Automatically create the RIB this object represents.
-        
+
         export_object = ExportObject subclassed from ExportContext
        """
-        
+
         ExporterArchive.__init__(self, export_object)
         self._set_pointer_datablock(pointer_object)
-        
+
         # TODO open the archive if using ReadArchive mode
         # for now default to using the parents file pointer
 
@@ -1820,7 +1857,7 @@ class ExportObject(ExporterArchive):
         #    compress = getattr(export_object, "is_gzip", False)
         #else:
         #    compress = False
-        
+
         #self.open_archive(gzipped=compress)
 
     def _export_camera_rib(self):
@@ -1831,29 +1868,31 @@ class ExportObject(ExporterArchive):
         scene = self.get_scene()
         r = scene.render
         camera = ob.data
-    
+
         xaspect, yaspect, aspectratio = render_get_aspect(r)
-    
+
         if camera.ribmosaic_dof:
             # allow an object to be used for dof distance
             if camera.dof_object:
-                dof_distance = (ob.location - camera.dof_object.location).length
+                dof_distance = (ob.location -
+                    camera.dof_object.location).length
             else:
                 dof_distance = camera.dof_distance
-                
-            self.write_text('DepthOfField %f %f %f\n' % (camera.ribmosaic_f_stop,
-                camera.ribmosaic_focal_length, dof_distance))
-                
+
+            self.write_text('DepthOfField %f %f %f\n' %
+                (camera.ribmosaic_f_stop, camera.ribmosaic_focal_length,
+                 dof_distance))
+
         # TODO setup motion blur parameters
         #if scene.renderman.motion_blur:
-        #    file.write('Shutter %f %f\n' % (rm.shutter_open, rm.shutter_close))
-        #    file.write('Option "shutter" "efficiency" [ %f %f ] \n' %
+        #  file.write('Shutter %f %f\n' % (rm.shutter_open, rm.shutter_close))
+        #  file.write('Option "shutter" "efficiency" [ %f %f ] \n' %
         #        (rm.shutter_efficiency_open, rm.shutter_efficiency_close))
 
         if scene.ribmosaic_use_clipping:
             self.write_text('Clipping %f %f\n'
                 % (camera.clip_start, camera.clip_end))
-    
+
         if scene.ribmosaic_use_projection:
             if camera.type == 'PERSP':
                 lens = camera.lens
@@ -1869,7 +1908,6 @@ class ExportObject(ExporterArchive):
             self.write_text('ScreenWindow %f %f %f %f\n' %
                 (-xaspect, xaspect, -yaspect, yaspect))
 
-
         # build a transform matrix that is looking at the scene
         mat = ob.matrix_world
         loc = mat.to_translation()
@@ -1882,31 +1920,30 @@ class ExportObject(ExporterArchive):
         r *= mathutils.Matrix.Rotation(-rot[1], 4, 'Y')
         r *= mathutils.Matrix.Rotation(-rot[2], 4, 'Z')
         l = mathutils.Matrix.Translation(-loc)
-    
+
         m = s * r * l
-        
+
         self.write_text('Transform %s\n' % rib_mat_str(m))
 
-    
     # #### Public methods
-    
+
     def export(self):
         """ """
-        
+
         print("Exporting objects...")
-        
+
         light = ExportLight(self)
         light.export_rib()
         del light
-        
+
         material = ExportMaterial(self)
         material.export_rib()
         del material
-        
+
         objdata = ExportObjdata(self)
         objdata.export_rib()
         del objdata
-        
+
         particles = ExportParticles(self)
         particles.export_rib()
         del particles
@@ -1922,11 +1959,12 @@ class ExportObject(ExporterArchive):
         if ob.type == 'CAMERA':
             self._export_camera_rib()
         else:
-            
+
             # need to group mesh data with associated material
-            # if the mesh uses more than one material then mesh has to be split up
-            # for now we just spit out the first material only for testing purposes
-            
+            # if the mesh uses more than one material then mesh has to be
+            # split up for now we just spit out the first material only
+            # for testing purposes
+
             if len(ob.material_slots) > 0:
                 try:
                     em = ExportMaterial(self, ob.material_slots[0].material)
@@ -1934,10 +1972,9 @@ class ExportObject(ExporterArchive):
                     del em
                 except:
                     em.close_archive()
-                    raise rm_error.RibmosaicError("Failed to build object material RIB " +
-                                                  self.data_name, sys.exc_info())
-                    
-                
+                    raise rm_error.RibmosaicError(
+                            "Failed to build object material RIB " +
+                            self.data_name, sys.exc_info())
 
             if ob.parent:
                 mat = ob.parent.matrix_world * ob.matrix_local
@@ -1948,20 +1985,24 @@ class ExportObject(ExporterArchive):
             #     FIXME this is just test code
             #self.write_text('##Renderman  \n')
             self.riAttributeBegin()
-            self.write_text('Attribute "identifier" "name" [ "%s" ]\n' % self.data_name)
-            self.write_text('Transform %s\n' % rib_mat_str(mat))
+            self.write_text('Attribute "identifier" "name" [ "%s" ]\n' %
+                            self.data_name)
+            self.write_text('Transform %s\n' %
+                            rib_mat_str(mat))
 
             # export object data
-            # let the ExportObjdata instance decide how to export the object data
+            # let the ExportObjdata instance decide how to export
+            # the object data
             try:
                 eod = ExportObjdata(self)
                 eod.export_rib()
                 del eod
             except:
                 eod.close_archive()
-                raise rm_error.RibmosaicError("Failed to build object data RIB " +
-                                             self.data_name, sys.exc_info())
-          
+                raise rm_error.RibmosaicError(
+                        "Failed to build object data RIB " +
+                        self.data_name, sys.exc_info())
+
             # create ExportObjectData
 
             self.riAttributeEnd()
@@ -1977,24 +2018,24 @@ class ExportObject(ExporterArchive):
 
 class ExportLight(ExporterArchive):
     """Represents shaders on lamp data-blocks"""
-        
+
     def __init__(self, export_object=None, pointer_object=None):
         """Initialize attributes using export_object and parameters.
         Automatically create the RIB this object represents.
-        
+
         export_object = ExportObject subclassed from ExportContext
        """
-        
+
         ExporterArchive.__init__(self, export_object)
         self._set_pointer_datablock(pointer_object)
-     
+
     def _export_lightcolor(self, color=(1, 1, 1)):
         self.write_text('"color lightcolor" [ %s ]\n'
                         % rib_param_val('float', color))
-        
+
     def _export_intensity(self, energy=1):
         self.write_text('"float intensity" %s\n' % (energy * 50))
-            
+
     def _export_from(self, loc=(0, 0, 0)):
         self.write_text('"uniform point from" [ %s ]\n'
                         % rib_param_val('float', loc))
@@ -2002,18 +2043,18 @@ class ExportLight(ExporterArchive):
     def _export_to(self, loc=(0, 0, 0)):
         self.write_text('"uniform point to" [ %s ]\n'
                         % rib_param_val('float', loc))
-        
+
     # #### Public methods
-    
+
     def export(self):
         """ """
-        
+
         print("Exporting lamp...")
-        
+
     def export_rib(self):
         if DEBUG_PRINT:
             print("ExportLight.export_rib()")
-            
+
         ob = self.pointer_datablock
         lamp = ob.data
 
@@ -2022,23 +2063,25 @@ class ExportLight(ExporterArchive):
         else:
             m = ob.matrix_world
             loc = m.to_translation()
-    
+
         loc = m.to_translation()
         lvec = [loc[0] - m[2][0], loc[1] - m[2][1], loc[2] - m[2][2]]
         params = []
-    
+
         self.riAttributeBegin()
         # TODO add support for all light types
-        
+
         # these are automatic shaders based on blender lamp type
         if lamp.type == 'HEMI':
-            self.write_text('LightSource "ambient" %s\n' % self.current_lightid)
+            self.write_text('LightSource "ambient" %s\n' %
+                            self.current_lightid)
             self.inc_indent()
             self._export_intensity(lamp.energy)
             self._export_lightcolor(lamp.color)
 
         elif lamp.type == 'SUN':
-            self.write_text('LightSource "distantlight" %s\n' % self.current_lightid)
+            self.write_text('LightSource "distantlight" %s\n' %
+                            self.current_lightid)
             self.inc_indent()
             self._export_intensity(lamp.energy)
             self._export_lightcolor(lamp.color)
@@ -2046,7 +2089,8 @@ class ExportLight(ExporterArchive):
             self._export_to(lvec)
 
         elif lamp.type == 'SPOT':
-            self.write_text('LightSource "spotlight" %s\n' % self.current_lightid)
+            self.write_text('LightSource "spotlight" %s\n' %
+                            self.current_lightid)
             self.inc_indent()
             self._export_intensity(lamp.energy)
             self._export_lightcolor(lamp.color)
@@ -2054,12 +2098,13 @@ class ExportLight(ExporterArchive):
             self._export_to(lvec)
             if hasattr(lamp, "spot_size"):
                 coneangle = lamp.spot_size / 2.0
-                self.write_text('"float coneangle" %s\n'
-                    % (rib_param_val('float', coneangle)))
-            
+                self.write_text('"float coneangle" %s\n' %
+                            (rib_param_val('float', coneangle)))
+
         else:
             # default to a pointlight if no lamp type match
-            self.write_text('LightSource "pointlight" %s\n' % self.current_lightid)
+            self.write_text('LightSource "pointlight" %s\n' %
+                            self.current_lightid)
             self.inc_indent()
             self._export_intensity(lamp.energy)
             self._export_lightcolor(lamp.color)
@@ -2069,7 +2114,6 @@ class ExportLight(ExporterArchive):
         self.riAttributeEnd()
         self.riIlluminate(self.current_lightid)
         self.write_text('\n', False)
-        
 
 
 class ExportMaterial(ExporterArchive):
@@ -2078,16 +2122,15 @@ class ExportMaterial(ExporterArchive):
     def __init__(self, export_object=None, pointer_object=None):
         """Initialize attributes using export_object and parameters.
         Automatically create the RIB this object represents.
-        
+
         export_object = ExportObject subclassed from ExportContext
        """
-        
+
         ExporterArchive.__init__(self, export_object)
         self._set_pointer_datablock(pointer_object)
-   
-    
+
     # #### Public methods
-    
+
     def export(self):
         """ """
 
@@ -2123,12 +2166,13 @@ class ExportMaterial(ExporterArchive):
         material_shaders = []
 
         # export all enabled shader panels for this material
-        for p in rm.pipeline_manager.list_panels("shader_panels", window='MATERIAL'):
+        for p in rm.pipeline_manager.list_panels("shader_panels",
+                                                 window='MATERIAL'):
             segs = p.split("/")
             self.context_pipeline = segs[0]
             self.context_category = segs[1]
             self.context_panel = segs[2]
-            
+
             if self._panel_enabled():
                 material_shaders.append(ExporterShader(self, p))
 
@@ -2143,8 +2187,6 @@ class ExportMaterial(ExporterArchive):
             p.build_code("rib")
 
 
-
-
 class ExportObjdata(ExporterArchive):
     """Represents geometry, lights and cameras using objectdata data-blocks.
     Can also handle export of multiple meshes setup in LOD list
@@ -2153,7 +2195,7 @@ class ExportObjdata(ExporterArchive):
     def __init__(self, export_object=None):
         """Initialize attributes using export_object and parameters.
         Automatically create the RIB this object data represents.
-        
+
         export_object = Any object subclassed from ExportContext
        """
 
@@ -2166,7 +2208,6 @@ class ExportObjdata(ExporterArchive):
         #    compress = False
 
         #self.open_archive(gzipped=compress)
-
 
     def _export_polygon_mesh(self):
        # create a mesh that has all modifiers applied to mesh data
@@ -2239,7 +2280,6 @@ class ExportObjdata(ExporterArchive):
 
 class ExportParticles(ExporterArchive):
     """Represents particle systems connected to particle data-blocks"""
-
 
     # #### Public methods
 
