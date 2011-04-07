@@ -2073,7 +2073,7 @@ class ExportLight(ExporterArchive):
 
         # these are automatic shaders based on blender lamp type
         if lamp.type == 'HEMI':
-            self.write_text('LightSource "ambient" %s\n' %
+            self.write_text('LightSource "ambientlight" %s\n' %
                             self.current_lightid)
             self.inc_indent()
             self._export_intensity(lamp.energy)
