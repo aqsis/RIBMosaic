@@ -70,28 +70,35 @@ DEBUG_PRINT = False
 # local helper functions
 # Mesh data access
 def get_mesh(mesh):
-    nverts = []
-    verts = []
-    P = []
-    f_uvs = {}
+    nverts = []  # list of vertex count for each face
+    verts = []  # list of vertex indices for each face
+    P = []  # list of vertex points
+    f_uvs = {}  # list of uv for each face
     uvs = []
-    N = []
+    N = []  # list of normals for each face
 
     for v in mesh.vertices:
         co = v.co
         P += [co[0], co[1], co[2]]
-        N += [v.normal[0], v.normal[1], v.normal[2]]
 
     for f in mesh.faces:
-        if len(f.vertices) == 3:
-            n = 3
-        else:
-            n = 4
-
+        n = len(f.vertices)
+        # add the number of vertices to the nverts list
         nverts += [n]
+        # iterate through each vertex index in the face
         for a in range(0, n):
-            verts += [f.vertices[a]]
-
+            #get the index of the vertice
+            vi = f.vertices[a]
+            # add the index to the verts list of indices
+            verts += [vi]
+            # build the normals list
+            # if face is smooth then use the mesh.vertices[index].normal
+            if f.use_smooth:
+                v = mesh.vertices[vi]
+                N += [v.normal[0], v.normal[1], v.normal[2]]
+            else:
+                # otherwise the face is flat so use the face normal
+                N += [f.normal[0], f.normal[1], f.normal[2]]
     try:
         uv_layer = mesh.uv_textures.active.data
     except:
@@ -227,14 +234,18 @@ class Ribify():
             self.write_text('"P"\n')
             self.write_rib_list(P, 3, 14)
 
+            # FIXME should be based on user options
+            # for now its just for testing
             if uvs:
                 self.write_text('\n')
                 self.write_text('"facevarying float[2] st"\n')
                 self.write_rib_list(uvs, 2, 14)
 
-            if N and smooth_normals:
+            # FIXME should be based on user options
+            # for now its just for testing
+            if N:  # and smooth_normals:
                 self.write_text('\n')
-                self.write_text('"varying normal N"\n')
+                self.write_text('"facevarying normal N"\n')
                 self.write_rib_list(N, 3, 14)
 
     def mesh_subdivisionmesh(self, datablock):
