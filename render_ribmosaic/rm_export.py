@@ -1577,7 +1577,7 @@ class ExportPass(ExporterArchive):
 
     def _export_objects(self, objects):
         if DEBUG_PRINT:
-            print("ExportPass._export_lights()")
+            print("ExportPass._export_objects()")
 
         for ob in objects:
             target_name = ob.name + ".rib"
@@ -1620,6 +1620,9 @@ class ExportPass(ExporterArchive):
         """ Export the user defined search paths for archive, shader, texture
             display, procedural, resource.
         """
+        if DEBUG_PRINT:
+            print("ExportPass._searchpaths()")
+
         scene = self.get_scene()
 
         # TODO add archive searchpath
@@ -1829,7 +1832,8 @@ class ExportWorld(ExporterArchive):
 
 
 class ExportObject(ExporterArchive):
-    """This subclass represents object transforms and uses its inherited
+    """
+    This subclass represents object transforms and uses its inherited
     attributes to setup and export a object. The object"s objdata and particles
     are then iterated through according to material associations. If the object
     contains children, duplis or particles objects they are iterated through
@@ -1960,16 +1964,21 @@ class ExportObject(ExporterArchive):
             self._export_camera_rib()
         else:
 
+            # TODO
             # need to group mesh data with associated material
             # if the mesh uses more than one material then mesh has to be
-            # split up for now we just spit out the first material only
-            # for testing purposes
+            # split up. For now we just spit out the first material only
+            # for testing purposes.
 
             if len(ob.material_slots) > 0:
                 try:
-                    em = ExportMaterial(self, ob.material_slots[0].material)
-                    em.export_rib()
-                    del em
+                    # There may be a material slot but ther may be no
+                    # material so need to check.
+                    if ob.material_slots[0].material is not None:
+                        em = ExportMaterial(self,
+                                            ob.material_slots[0].material)
+                        em.export_rib()
+                        del em
                 except:
                     em.close_archive()
                     raise rm_error.RibmosaicError(
@@ -1983,7 +1992,6 @@ class ExportObject(ExporterArchive):
             #print(mat)
 
             #     FIXME this is just test code
-            #self.write_text('##Renderman  \n')
             self.riAttributeBegin()
             self.write_text('Attribute "identifier" "name" [ "%s" ]\n' %
                             self.data_name)
@@ -2141,6 +2149,9 @@ class ExportMaterial(ExporterArchive):
             print("ExportMaterial.export_rib()")
 
         material = self.pointer_datablock
+        if DEBUG_PRINT:
+            print("Material Name: " + material.name)
+            print("Material Type: " + material.type)
 
         # export riColor if enabled
         if material.ribmosaic_ri_color:
