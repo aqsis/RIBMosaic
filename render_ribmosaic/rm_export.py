@@ -1972,7 +1972,7 @@ class ExportObject(ExporterArchive):
 
             if len(ob.material_slots) > 0:
                 try:
-                    # There may be a material slot but ther may be no
+                    # There may be a material slot but there may be no
                     # material so need to check.
                     if ob.material_slots[0].material is not None:
                         em = ExportMaterial(self,
