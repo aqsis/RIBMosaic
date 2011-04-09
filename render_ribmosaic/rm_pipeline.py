@@ -1099,17 +1099,19 @@ class PipelineManager():
                 index = children.index(element)
 
                 # If only one element then adjust parent text if it exists
-                if childlen == 1 and parent.text:
-                    parent.text = parent.text.rstrip("\t") + tabs[:-1]
+                if childlen == 1:
+                    if parent.text is not None:
+                        parent.text = parent.text.rstrip("\t") + tabs[:-1]
                 # If the last element then adjust previous element
                 elif index == childlen - 1:
                     p = children[index - 1]
-                    p.tail = p.tail.rstrip("\t") + tabs[:-1]
+                    if p.tail is not None:
+                        p.tail = p.tail.rstrip("\t") + tabs[:-1]
 
             # if no parent found but element was found
             # then assume parent is the root
-            if parent is None and element is not None:
-                parent = self._pipeline_tree.getroot()
+            #if parent is None and element is not None:
+            #    parent = self._pipeline_tree.getroot()
             # Get rid of it
             parent.remove(element)
         except:
