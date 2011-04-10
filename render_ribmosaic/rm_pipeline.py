@@ -1108,10 +1108,6 @@ class PipelineManager():
                     if p.tail is not None:
                         p.tail = p.tail.rstrip("\t") + tabs[:-1]
 
-            # if no parent found but element was found
-            # then assume parent is the root
-            #if parent is None and element is not None:
-            #    parent = self._pipeline_tree.getroot()
             # Get rid of it
             parent.remove(element)
         except:
@@ -2608,7 +2604,7 @@ class PipelineManager():
             # If panel already exists copy user settings otherwise initialize
             shader = self.get_element(xmlpath)
 
-            if shader:
+            if shader is not None:
                 for p in self.get_element(xmlpath + "/properties"):
                     if 'link' in p.attrib and p.attrib['link']:
                         links[p.tag] = p.attrib['link']
@@ -2630,7 +2626,7 @@ class PipelineManager():
             for a in [(slauth, 'authors'),
                       (slcopy, 'copyright'),
                       (sldesc, 'description')]:
-                if a[0] is not None and a[0].text:
+                if a[0] is not None and a[0].text is not None:
                     lines = [l.strip() for l in a[0].text.splitlines() \
                         if l.strip()]
                     message += a[1].capitalize() + ":\\n" + \
