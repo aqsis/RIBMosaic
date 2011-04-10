@@ -11,7 +11,7 @@
     </shader_panels>
 
     <utility_panels filter="UTILITY">
-        <Framebuffer_Display delete="False" description="" duplicate="False" enabled="True" filter="" register="True" type="DISPLAY" windows="RENDER">
+        <Framebuffer_Display delete="False" description="" duplicate="False" enabled="False" filter="" register="True" type="DISPLAY" windows="RENDER">
             <read target="">
             </read>
             <begin target="">
@@ -139,7 +139,7 @@ sdrinfo @[EVAL:.target_name:STR]@ &gt; "@[EVAL:.target_name:]@.slmeta"
 echo "Info complete"
 
             </end>
-            <regexes target="*.slmeta">
+            <regexes target="*.sdr.slmeta">
                 <head_name matches="1" regex=" &quot;" replace="&quot; name=&quot;" />
                 <head_ext matches="1" regex=".sdr" replace="" />
                 <head_close matches="1" regex="$" replace="&gt;" />
