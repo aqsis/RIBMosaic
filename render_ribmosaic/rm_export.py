@@ -1181,7 +1181,7 @@ class ExporterArchive(rm_context.ExportContext):
 
         # Populate files list according to target
         if target:
-            target = target = os.path.split(target)
+            target = os.path.split(target)
 
             if target[0]:
                 path = target[0] + os.sep
