@@ -428,7 +428,7 @@ class ExporterManager():
         if DEBUG_PRINT:
             print("ExportManager.prepare_directory")
 
-        if not bpy.data.is_dirty:
+        if bpy.data.is_saved:
             self._update_directory(active_scene)
 
             try:
