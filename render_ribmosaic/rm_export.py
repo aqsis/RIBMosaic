@@ -237,7 +237,7 @@ class DummyPass():
     pass_samples_x = 0
     pass_samples_y = 0
     # Pass filter properties
-    pass_filter = ""
+    pass_filter = "NONE"
     pass_width_x = 1
     pass_width_y = 1
     # Pass control properties
@@ -1615,6 +1615,17 @@ class ExportPass(ExporterArchive):
         if renderpass.pass_texturemem > 0:
             self.write_text('Option "limits" "int texturememory" [%i]\n'
                             % renderpass.pass_texturemem)
+
+        # default orientation to left hand winding on geometry
+        self.write_text('Orientation "lh"\n')
+
+        #PixelFilter settings
+        if renderpass.pass_filter != 'NONE':
+            self.write_text('PixelFilter "%s" %f %f\n' % (
+                            renderpass.pass_filter,
+                            renderpass.pass_width_x,
+                            renderpass.pass_width_y))
+
 
     def _export_searchpaths(self):
         """ Export the user defined search paths for archive, shader, texture

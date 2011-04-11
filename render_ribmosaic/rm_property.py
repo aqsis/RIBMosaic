@@ -86,6 +86,14 @@ pass_panel_logic = [('ENABLE', "Enable",
             ('TOGGLE', "Toggle",
              "Like Exclusive but toggles enable/disable states in group")]
 
+pass_filters = [('box', "Box", ""),
+            ('triangle', "Triangle", ""),
+            ('catmull-rom', "Catmull-Rom", ""),
+            ('sinc', "Sinc", ""),
+            ('gaussian', "Gaussian", ""),
+            ('CUSTOM', "Custom",""),
+            ('NONE', "None", "")]
+
 gc = 'DEFAULT'
 gd = "Scene Default"
 archives_material = [('INLINE', "Inline Code", ""),
@@ -394,9 +402,13 @@ class RibmosaicPassProps(bpy.types.PropertyGroup):
                 soft_max=1024)
 
     # Pass filter properties
-    pass_filter = bpy.props.StringProperty(name="Pixel Filter",
+    pass_filter = bpy.props.EnumProperty(name="Pixel Filter",
                 description="Pixel filter (box, sinc, triangle,"
                             "gaussian, ect)",
+                items=pass_filters,
+                default='NONE')
+    pass_customfilter = bpy.props.StringProperty(name="Custom Pixel Filter",
+                description="custom Pixel filter name",
                 maxlen=256,
                 default="")
 
