@@ -145,9 +145,9 @@ echo "Info complete"
                 <head_close matches="1" regex="$" replace="&gt;" />
                 <xml_start matches="1" regex="\A" replace="&lt;?xml version=&quot;1.0&quot; ?&gt;\n&lt;k3dml&gt;\n\t&lt;shaders&gt;\n\t\t&lt;shader type=&quot;" />
                 <xml_close matches="1" regex="\Z" replace="\t\t&lt;/shader&gt;\n\t&lt;/shaders&gt;\n&lt;/k3dml&gt;\n" />
-                <para_name matches="0" regex="^    " replace="\t\t\t&lt;argument name=" />
-                <para_output matches="0" regex="&quot;output parameter " replace="output=&quot;true&quot; storage_class=&quot;" />
-                <para_class matches="0" regex="&quot;parameter " replace="output=&quot;false&quot; storage_class=&quot;" />
+                <para_name matches="0" regex="^\t&quot;" replace="\t\t\t&lt;argument name=&quot;" />
+                <para_output matches="0" regex="&quot;output " replace="output=&quot;true&quot; storage_class=&quot;" />
+                <para_class matches="0" regex="&quot; &quot;" replace="&quot; output=&quot;false&quot; storage_class=&quot;" />
                 <para_type matches="0" regex=" (color|float|point|vector|normal|matrix|string)(?=&quot;|\[)" replace="&quot; type=&quot;\1&quot; extended_type=&quot;\1PARA_ARRAY" />
                 <para_muldim matches="0" regex="PARA_ARRAY\[(\d+)\]&quot;" replace="&quot; array_count=&quot;\1&quot;" />
                 <para_onedim matches="0" regex="PARA_ARRAY&quot;\n" replace="&quot; array_count=&quot;1&quot;\n" />
