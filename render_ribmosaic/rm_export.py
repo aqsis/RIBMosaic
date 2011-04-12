@@ -1190,9 +1190,12 @@ class ExporterArchive(rm_context.ExportContext):
 
             if target[1].startswith("*"):
                 if path:
+                    matchstr = target[1][1:]
                     try:
+                        # add file if its end matches what is after the * in
+                        # the target
                         matches = [(path, f) for f in os.listdir(path) \
-                                 if os.path.splitext(f)[1] == target[1][1:]]
+                                 if f.endswith(matchstr)]
                     except:
                         raise rm_error.RibmosaicError(
                                 "Cannot find target directory/file, "
