@@ -503,7 +503,7 @@ class WM_OT_ribmosaic_xml_file(rm_context.ExportContext,
             path = self.directory
 
             if self.relativepath:
-                if not bpy.data.is_dirty:
+                if bpy.data.is_saved:
                     rm.export_manager._update_directory()
                     export = rm.export_manager.export_directory
                     path = os.path.relpath(path, export) + os.sep
@@ -850,7 +850,7 @@ class WM_OT_ribmosaic_panel_update(rm_context.ExportContext,
         wm = context.window_manager
 
         try:
-            if not bpy.data.is_dirty:
+            if bpy.data.is_saved:
                 if self.xmlpath:
                     return wm.invoke_props_dialog(self)
                 else:
@@ -927,7 +927,7 @@ class WM_OT_ribmosaic_library_set(rm_context.ExportContext,
         p = self.pipeline
 
         try:
-            if not bpy.data.is_dirty:
+            if bpy.data.is_saved:
                 lib = rm.pipeline_manager.get_attr(self, p, "library", False)
                 compile = rm.pipeline_manager.get_attr(self, p, "compile",
                                                        False)
@@ -1187,7 +1187,7 @@ class WM_OT_ribmosaic_library_addpanel(rm_context.ExportContext,
 
     def invoke(self, context, event):
         try:
-            if not bpy.data.is_dirty:
+            if bpy.data.is_saved:
                 lib = rm.pipeline_manager.get_attr(self, self.pipeline, \
                                                    "library", False)
 
@@ -1519,7 +1519,7 @@ class WM_OT_ribmosaic_pipeline_update(rm_context.ExportContext,
         wm = context.window_manager
 
         try:
-            if not bpy.data.is_dirty:
+            if bpy.data.is_saved:
                 if self.pipeline:
                     return wm.invoke_props_dialog(self)
                 else:
