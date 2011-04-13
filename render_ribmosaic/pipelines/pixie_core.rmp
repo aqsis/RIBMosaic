@@ -160,7 +160,9 @@ echo "Info complete"
                 <para_lblock matches="0" regex="\[" replace="(" />
                 <para_rblock matches="0" regex="\]" replace=")" />
                 <para_close matches="0" regex="$(?&lt;!&gt;)(?&lt;!\n)" replace="&quot;/&gt;" />
-                <para_clean matches="0" regex="&quot;&quot;" replace="&quot;" />
+                <para_trailspaces matches="0" regex=" &quot;/&gt;" replace="&quot;/&gt;" />
+                <para_doublequote matches="0" regex="&quot;&quot;" replace="&quot;" />
+                <para_fixquote matches="0" regex="=&quot;/&gt;" replace="=&quot;&quot;/&gt;" />
             </regexes>
             <properties>
             </properties>
