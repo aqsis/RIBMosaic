@@ -1302,7 +1302,7 @@ class ExporterArchive(rm_context.ExportContext):
         self.write_text('AttributeEnd\n')
 
     def riIlluminate(self, idx, state=1):
-        self.write_text('Illuminate "%s" %s\n' % (idx, state))
+        self.write_text('Illuminate %i %i\n' % (idx, state))
 
     def riColor(self, color=(0, 0, 0)):
         self.write_text('Color [%s %s %s]\n' % (color[0], color[1], color[2]))
