@@ -76,10 +76,7 @@ def get_mesh(mesh):
     f_uvs = {}  # list of uv for each face
     uvs = []
     N = []  # list of normals for each face
-
-    for v in mesh.vertices:
-        co = v.co
-        P += [co[0], co[1], co[2]]
+    vertcount = 0 # highest vertex index used by faces
 
     for f in mesh.faces:
         n = len(f.vertices)
@@ -89,6 +86,9 @@ def get_mesh(mesh):
         for a in range(0, n):
             #get the index of the vertice
             vi = f.vertices[a]
+            # keep track of the highest vertex index used
+            if vi > vertcount:
+                vertcount = vi
             # add the index to the verts list of indices
             verts += [vi]
             # build the normals list
@@ -99,6 +99,12 @@ def get_mesh(mesh):
             else:
                 # otherwise the face is flat so use the face normal
                 N += [f.normal[0], f.normal[1], f.normal[2]]
+
+    # only build a list of verts used by the faces
+    for i in range(0, vertcount + 1):
+        co = mesh.vertices[i].co
+        P += [co[0], co[1], co[2]]
+
     try:
         uv_layer = mesh.uv_textures.active.data
     except:
