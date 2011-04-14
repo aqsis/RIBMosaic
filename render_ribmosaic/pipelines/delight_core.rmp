@@ -11,7 +11,7 @@
     </shader_panels>
 
     <utility_panels filter="UTILITY">
-        <Framebuffer_Display delete="False" description="" duplicate="False" enabled="True" filter="" register="True" type="DISPLAY" windows="RENDER">
+        <Framebuffer_Display delete="False" description="" duplicate="False" enabled="False" filter="" register="True" type="DISPLAY" windows="RENDER">
             <read target="">
             </read>
             <begin target="">
@@ -139,7 +139,8 @@ shaderinfo @[EVAL:.target_name:STR]@ &gt; "@[EVAL:.target_name:]@.slmeta"
 echo "Info complete"
 
             </end>
-            <regexes target="*.slmeta">
+            <regexes target="*.sdl.slmeta">
+                <head_start matches="1" regex="$\n" replace="" />
                 <head_name matches="1" regex=" &quot;" replace="&quot; name=&quot;" />
                 <head_ext matches="1" regex=".sld" replace="" />
                 <head_close matches="1" regex="$" replace="&gt;" />
@@ -151,10 +152,9 @@ echo "Info complete"
                 <para_type matches="0" regex=" (color|float|point|vector|normal|matrix|string)(?=&quot;|\[)" replace="&quot; type=&quot;\1&quot; extended_type=&quot;\1PARA_ARRAY" />
                 <para_muldim matches="0" regex="PARA_ARRAY\[(\d+)\]&quot;" replace="&quot; array_count=&quot;\1&quot;" />
                 <para_onedim matches="0" regex="PARA_ARRAY&quot;\n" replace="&quot; array_count=&quot;1&quot;\n" />
-                <para_spaces matches="0" regex=" &quot;(current|object|world|camera|screen|raster|NDC|rgb|hsv|hsl|xyz|XYZ)&quot;" replace="" />
+                <para_spaces matches="0" regex=" &quot;(shader|current|object|world|camera|screen|raster|NDC|rgb|hsv|hsl|xyz|XYZ)&quot; \[" replace=" [" />
                 <para_default matches="0" regex="\n\t\tDefault value: ((.|\s(?!\t\t\t&lt;))*)" replace=" default_value=&quot;\1" />
-                <para_defaults matches="0" regex="\n\t\tDefault value: " replace="," />
-                <para_curlys matches="0" regex="(?&lt;!&quot;1&quot; )default_value=&quot;(.*)" replace="default_value=&quot;{\1}" />
+                <para_curlys matches="0" regex="(?&lt;!&quot;1&quot; )default_value=&quot;(.*)" replace="default_value=&quot;\1" />
                 <para_commas matches="0" regex="(?&lt;=\d) (?=\d)" replace="," />
                 <para_escapes matches="0" regex="((?&lt;=,|{)&quot;)|(&quot;(?=,|}))" replace="&amp;quot;" />
                 <para_lblock matches="0" regex="\[" replace="(" />
