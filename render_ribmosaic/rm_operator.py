@@ -1818,7 +1818,7 @@ class RENDER_OT_ribmosaic_pass_copy(rm_context.ExportContext,
         ribmosaic_passes = bpy.context.scene.ribmosaic_passes
         active_index = ribmosaic_passes.active_index
         active_pass = ribmosaic_passes.collection[active_index]
-        pass_clipboard = RENDER_PT_ribmosaic_passes.pass_clipboard
+        pass_clipboard = rm_panel.RENDER_PT_ribmosaic_passes.pass_clipboard
         pass_clipboard.clear()
 
         for p in dir(active_pass):
@@ -1847,7 +1847,7 @@ class RENDER_OT_ribmosaic_pass_paste(rm_context.ExportContext,
         ribmosaic_passes = bpy.context.scene.ribmosaic_passes
         active_index = ribmosaic_passes.active_index
         active_pass = ribmosaic_passes.collection[active_index]
-        pass_clipboard = RENDER_PT_ribmosaic_passes.pass_clipboard
+        pass_clipboard = rm_panel.RENDER_PT_ribmosaic_passes.pass_clipboard
 
         for p in pass_clipboard.items():
             v = p[1]
