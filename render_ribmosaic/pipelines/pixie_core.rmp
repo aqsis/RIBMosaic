@@ -151,9 +151,8 @@ echo "Info complete"
                 <para_type matches="0" regex=" (color|float|point|vector|normal|matrix|string)(?=&quot;|\[)" replace="&quot; type=&quot;\1&quot; extended_type=&quot;\1PARA_ARRAY" />
                 <para_muldim matches="0" regex="PARA_ARRAY\[(\d+)\]&quot;" replace="&quot; array_count=&quot;\1&quot;" />
                 <para_onedim matches="0" regex="PARA_ARRAY&quot;\n" replace="&quot; array_count=&quot;1&quot;\n" />
-                <para_spaces matches="0" regex=" &quot;(current|object|world|camera|screen|raster|NDC|rgb|hsv|hsl|xyz|XYZ)&quot;" replace="" />
+                <para_spaces matches="0" regex=" &quot;(shader|current|object|world|camera|screen|raster|NDC|rgb|hsv|hsl|xyz|XYZ)&quot; \[" replace=" [" />
                 <para_default matches="0" regex="\n\t\tDefault value: ((.|\s(?!\t\t\t&lt;))*)" replace=" default_value=&quot;\1" />
-                <para_defaults matches="0" regex="\n\t\tDefault value: " replace="," />
                 <para_curlys matches="0" regex="(?&lt;!&quot;1&quot; )default_value=&quot;(.*)" replace="default_value=&quot;{\1}" />
                 <para_commas matches="0" regex="(?&lt;=\d) (?=\d)" replace="," />
                 <para_escapes matches="0" regex="((?&lt;=,|{)&quot;)|(&quot;(?=,|}))" replace="&amp;quot;" />
