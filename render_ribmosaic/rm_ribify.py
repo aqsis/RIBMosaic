@@ -67,67 +67,6 @@ exec("import " + MODULE + " as rm")
 DEBUG_PRINT = False
 
 
-# local helper functions
-# Mesh data access
-def get_mesh(mesh):
-    nverts = []  # list of vertex count for each face
-    verts = []  # list of vertex indices for each face
-    P = []  # list of vertex points
-    f_uvs = {}  # list of uv for each face
-    uvs = []
-    N = []  # list of normals for each face
-    vertcount = 0 # highest vertex index used by faces
-
-    for f in mesh.faces:
-        n = len(f.vertices)
-        # add the number of vertices to the nverts list
-        nverts += [n]
-        # iterate through each vertex index in the face
-        for a in range(0, n):
-            #get the index of the vertice
-            vi = f.vertices[a]
-            # keep track of the highest vertex index used
-            if vi > vertcount:
-                vertcount = vi
-            # add the index to the verts list of indices
-            verts += [vi]
-            # build the normals list
-            # if face is smooth then use the mesh.vertices[index].normal
-            if f.use_smooth:
-                v = mesh.vertices[vi]
-                N += [v.normal[0], v.normal[1], v.normal[2]]
-            else:
-                # otherwise the face is flat so use the face normal
-                N += [f.normal[0], f.normal[1], f.normal[2]]
-
-    # only build a list of verts used by the faces
-    for i in range(0, vertcount + 1):
-        co = mesh.vertices[i].co
-        P += [co[0], co[1], co[2]]
-
-    try:
-        uv_layer = mesh.uv_textures.active.data
-    except:
-        uv_layer = None
-
-    if uv_layer:
-        for fi, tf in enumerate(uv_layer):
-            # "1.0 -" because
-            # pixie expects UVs flipped
-            # vertically from blender
-
-            f_uvs[fi] = [tf.uv1[0], 1.0 - tf.uv1[1]]
-            f_uvs[fi] += [tf.uv2[0], 1.0 - tf.uv2[1]]
-            f_uvs[fi] += [tf.uv3[0], 1.0 - tf.uv3[1]]
-            if len(mesh.faces[fi].vertices) == 4:
-                f_uvs[fi] += [tf.uv4[0], 1.0 - tf.uv4[1]]
-
-        for uv in f_uvs.values():
-            uvs.extend(uv)
-    else:
-        uvs = None
-
-    return (nverts, verts, P, uvs, N)
 
 
 # #############################################################################
@@ -145,6 +84,101 @@ class Ribify():
     pointer_file = None  # File object to write RIB to
     is_gzip = False  # If file gzipped
     indent = 0  # how many tabs to indent from the left
+
+    # decomposed data from a blender mesh
+    nverts = []  # list of vertex count for each face
+    verts = []  # list of vertex indices for each face
+    P = []  # list of vertex points
+    uvs = []
+    N = []  # list of normals for each face
+    vertcount = 0 # highest vertex index used by faces
+
+    # local helper functions
+    # Mesh data access
+    def _decompose_mesh(self, mesh):
+        # clear all of the lists
+        self.nverts = []
+        self.verts = []
+        self.P = []
+        self.uvs = []
+        self.N = []
+        self.vertcount = 0
+
+        for f in mesh.faces:
+            n = len(f.vertices)
+            # add the number of vertices to the nverts list
+            self.nverts += [n]
+            # iterate through each vertex index in the face
+            for a in range(0, n):
+                #get the index of the vertice
+                vi = f.vertices[a]
+                # keep track of the highest vertex index used
+                if vi > self.vertcount:
+                    self.vertcount = vi
+                # add the index to the verts list of indices
+                self.verts += [vi]
+                # build the normals list
+                # if face is smooth then use the mesh.vertices[index].normal
+                if f.use_smooth:
+                    v = mesh.vertices[vi]
+                    self.N += [v.normal[0], v.normal[1], v.normal[2]]
+                else:
+                    # otherwise the face is flat so use the face normal
+                    self.N += [f.normal[0], f.normal[1], f.normal[2]]
+
+        # only build a list of verts used by the faces
+        for i in range(0, self.vertcount + 1):
+            co = mesh.vertices[i].co
+            self.P += [co[0], co[1], co[2]]
+
+        try:
+            #FIXME should be exporting all the uv layers not just the active
+            uv_layer = mesh.uv_textures.active.data
+        except:
+            uv_layer = None
+
+        if uv_layer:
+            f_uvs = {}  # sequence array of uv for each face
+            for fi, tf in enumerate(uv_layer):
+                # "1.0 -" because
+                # renderman expects UVs flipped
+                # vertically from blender
+
+                f_uvs[fi] = [tf.uv1[0], 1.0 - tf.uv1[1]]
+                f_uvs[fi] += [tf.uv2[0], 1.0 - tf.uv2[1]]
+                f_uvs[fi] += [tf.uv3[0], 1.0 - tf.uv3[1]]
+                if len(mesh.faces[fi].vertices) == 4:
+                    f_uvs[fi] += [tf.uv4[0], 1.0 - tf.uv4[1]]
+
+            for uv in f_uvs.values():
+                self.uvs.extend(uv)
+        else:
+            self.uvs = None
+
+
+    def _export_faces(self):
+        self.inc_indent()
+        self.write_rib_list(self.nverts, 10, 12)
+        self.write_rib_list(self.verts, 3, 12)
+        self.write_text('\n')
+
+    def _export_vertices(self):
+        self.write_text('"P"\n')
+        self.write_rib_list(self.P, 3, 14)
+
+    def _export_normals(self):
+        # TODO eventually this should be done by data_to_primvar()
+        if self.N:
+            self.write_text('\n')
+            self.write_text('"facevarying normal N"\n')
+            self.write_rib_list(self.N, 3, 14)
+
+    def _export_uvs(self):
+        # TODO eventually this should be done by data_to_primvar()
+        if self.uvs:
+            self.write_text('\n')
+            self.write_text('"facevarying float[2] st"\n')
+            self.write_rib_list(self.uvs, 2, 14)
 
     # ### Public methods
 
@@ -226,68 +260,42 @@ class Ribify():
         if DEBUG_PRINT:
             print("Creating pointpolygons...")
 
-        samples = [get_mesh(datablock)]
+        self._decompose_mesh(datablock)
 
-        for sample in samples:
-            # extract data sets from sample
-            nverts, verts, P, uvs, N = sample
 
-            self.write_text('PointsPolygons \n')
-            self.inc_indent()
-            self.write_rib_list(nverts, 10, 12)
-            self.write_rib_list(verts, 3, 12)
-            self.write_text('\n')
-            self.write_text('"P"\n')
-            self.write_rib_list(P, 3, 14)
+        self.write_text('PointsPolygons \n')
+        self.inc_indent()
+        self._export_faces()
+        self._export_vertices()
 
-            # FIXME should be based on user options
-            # for now its just for testing
-            if uvs:
-                self.write_text('\n')
-                self.write_text('"facevarying float[2] st"\n')
-                self.write_rib_list(uvs, 2, 14)
-
-            # FIXME should be based on user options
-            # for now its just for testing
-            if N:  # and smooth_normals:
-                self.write_text('\n')
-                self.write_text('"facevarying normal N"\n')
-                self.write_rib_list(N, 3, 14)
+        # FIXME should be based on user options
+        # for now its just for testing
+        self._export_uvs()
+        # FIXME should be based on user options
+        # for now its just for testing
+        self._export_normals()
 
     def mesh_subdivisionmesh(self, datablock):
         """ """
         if DEBUG_PRINT:
             print("Creating subdivisionmesh...")
-        samples = [get_mesh(datablock)]
+        self._decompose_mesh(datablock)
 
-        for sample in samples:
-            # extract data sets from sample
-            nverts, verts, P, uvs, N = sample
+        self.write_text('SubdivisionMesh "catmull-clark"\n')
+        self._export_faces()
 
-            self.write_text('SubdivisionMesh "catmull-clark"\n')
-            self.inc_indent()
-            self.write_rib_list(nverts, 10, 12)
-            self.write_rib_list(verts, 3, 12)
-            self.write_text('\n')
-            self.write_text('["interpolateboundary"] [0 0] [] []\n')
+        # if there are creases then need to write crease info
+        self.write_text('["interpolateboundary"] [0 0] [] []\n')
 
-            # if there are creases then need to write crease info
-            self.write_text('"P"\n')
-            self.write_rib_list(P, 3, 14)
+        # output vertices
+        self._export_vertices()
 
-            # FIXME should be based on user options
-            # for now its just for testing
-            if uvs:
-                self.write_text('\n')
-                self.write_text('"facevarying float[2] st"\n')
-                self.write_rib_list(uvs, 2, 14)
-
-            # FIXME should be based on user options
-            # for now its just for testing
-            if N:  # and smooth_normals:
-                self.write_text('\n')
-                self.write_text('"facevarying normal N"\n')
-                self.write_rib_list(N, 3, 14)
+        # FIXME should be based on user options
+        # for now its just for testing
+        self._export_uvs()
+        # FIXME should be based on user options
+        # for now its just for testing
+        self._export_normals()
 
     def mesh_points(self, datablock):
         """ """
