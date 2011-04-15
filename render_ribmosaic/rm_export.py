@@ -2235,7 +2235,7 @@ class ExportObjdata(ExporterArchive):
         #self.open_archive(gzipped=compress)
 
     def _export_polygon_mesh(self):
-       # create a mesh that has all modifiers applied to mesh data
+        # create a mesh that has all modifiers applied to mesh data
         mesh = create_mesh(self.get_scene(), self.get_object())
         # set the file pointer for ribify
         rm.ribify.pointer_file = self._pointer_file
@@ -2243,6 +2243,21 @@ class ExportObjdata(ExporterArchive):
         rm.ribify.indent = self.current_indent
         # ribify the mesh data
         rm.ribify.mesh_pointspolygons(mesh)
+
+        # don't need the mesh data anymore so tell blender to
+        # get rid of it
+        bpy.data.meshes.remove(mesh)
+
+    def _export_subdiv_mesh(self):
+        # create a mesh that has all modifiers applied to mesh data
+        # but make sure subdiv modifier render option is false
+        mesh = create_mesh(self.get_scene(), self.get_object())
+        # set the file pointer for ribify
+        rm.ribify.pointer_file = self._pointer_file
+        # set the indent level of the rib output
+        rm.ribify.indent = self.current_indent
+        # ribify the mesh data
+        rm.ribify.mesh_subdivisionmesh(mesh)
 
         # don't need the mesh data anymore so tell blender to
         # get rid of it
@@ -2257,6 +2272,8 @@ class ExportObjdata(ExporterArchive):
 
         if prim == 'POLYGON_MESH':
             self._export_polygon_mesh()
+        elif prim == 'SUBDIVISION_MESH':
+            self._export_subdiv_mesh()
 
     # #### Public methods
 

@@ -258,6 +258,36 @@ class Ribify():
         """ """
         if DEBUG_PRINT:
             print("Creating subdivisionmesh...")
+        samples = [get_mesh(datablock)]
+
+        for sample in samples:
+            # extract data sets from sample
+            nverts, verts, P, uvs, N = sample
+
+            self.write_text('SubdivisionMesh "catmull-clark"\n')
+            self.inc_indent()
+            self.write_rib_list(nverts, 10, 12)
+            self.write_rib_list(verts, 3, 12)
+            self.write_text('\n')
+            self.write_text('["interpolateboundary"] [0 0] [] []\n')
+
+            # if there are creases then need to write crease info
+            self.write_text('"P"\n')
+            self.write_rib_list(P, 3, 14)
+
+            # FIXME should be based on user options
+            # for now its just for testing
+            if uvs:
+                self.write_text('\n')
+                self.write_text('"facevarying float[2] st"\n')
+                self.write_rib_list(uvs, 2, 14)
+
+            # FIXME should be based on user options
+            # for now its just for testing
+            if N:  # and smooth_normals:
+                self.write_text('\n')
+                self.write_text('"facevarying normal N"\n')
+                self.write_rib_list(N, 3, 14)
 
     def mesh_points(self, datablock):
         """ """
