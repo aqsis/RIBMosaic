@@ -166,20 +166,6 @@ class Ribify():
         self.write_text('"P"\n')
         self.write_rib_list(self.P, 3, 14)
 
-    def _export_normals(self):
-        # TODO eventually this should be done by data_to_primvar()
-        if self.N:
-            self.write_text('\n')
-            self.write_text('"facevarying normal N"\n')
-            self.write_rib_list(self.N, 3, 14)
-
-    def _export_uvs(self):
-        # TODO eventually this should be done by data_to_primvar()
-        if self.uvs:
-            self.write_text('\n')
-            self.write_text('"facevarying float[2] st"\n')
-            self.write_rib_list(self.uvs, 2, 14)
-
     # ### Public methods
 
     def write_text(self, text="", use_indent=True):
@@ -237,12 +223,13 @@ class Ribify():
         # end of the RIB array list block
         self.write_text(' ]\n', False)
 
-    def data_to_primvar(self, datablock, **primvar):
+    def data_to_primvar(self,  **primvar):
         """Append to file_object specified data-block member from Blender
         data-block into RenderMan primitive variable as class type using
         specified define name.
 
-        datablock = Blender mesh data-block
+        The Blender mesh datablock must already be setup.
+
         **primvar = dictionary containing following members:
         member = data-block member to build primvar from (such as Normal, ect)
         define = what will the primvar be called
@@ -254,33 +241,40 @@ class Ribify():
                   "sorted as", primvar['pclass'], "for", primvar['member'],
                   "in", datablock, "...")
 
-    def mesh_pointspolygons(self, datablock, smooth_normals=False):
+        self.write_text('\n')
+
+        member = primvar['member']
+        primvar_rib = '"%s %s %s"\n' % (primvar['pclass'], primvar['ptype'], primvar['define'])
+        # figure out what mesh data to output for primvar
+        if member == 'N':
+            if self.N is not None:
+                self.write_text(primvar_rib)
+                self.write_rib_list(self.N, 3, 14)
+        elif member == 'UV':
+            if self.uvs is not None:
+                self.write_text(primvar_rib)
+                self.write_rib_list(self.uvs, 2, 14)
+
+
+    def mesh_pointspolygons(self, datablock):
         """ """
 
         if DEBUG_PRINT:
             print("Creating pointpolygons...")
 
         self._decompose_mesh(datablock)
-
-
         self.write_text('PointsPolygons \n')
         self.inc_indent()
         self._export_faces()
         self._export_vertices()
 
-        # FIXME should be based on user options
-        # for now its just for testing
-        self._export_uvs()
-        # FIXME should be based on user options
-        # for now its just for testing
-        self._export_normals()
 
     def mesh_subdivisionmesh(self, datablock):
         """ """
         if DEBUG_PRINT:
             print("Creating subdivisionmesh...")
-        self._decompose_mesh(datablock)
 
+        self._decompose_mesh(datablock)
         self.write_text('SubdivisionMesh "catmull-clark"\n')
         self._export_faces()
 
@@ -290,12 +284,6 @@ class Ribify():
         # output vertices
         self._export_vertices()
 
-        # FIXME should be based on user options
-        # for now its just for testing
-        self._export_uvs()
-        # FIXME should be based on user options
-        # for now its just for testing
-        self._export_normals()
 
     def mesh_points(self, datablock):
         """ """

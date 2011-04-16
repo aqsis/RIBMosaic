@@ -155,15 +155,16 @@ def is_subdmesh(ob):
 
 
 def detect_primitive(ob):
-#    rm = ob.renderman
-
-#    if rm.primitive == 'AUTO':
     if ob.type == 'MESH':
-        if is_subdmesh(ob):
-            return 'SUBDIVISION_MESH'
+        # if the rm primitive is auto
+        if ob.data.ribmosaic_primitive == 'AUTOSELECT':
+            if is_subdmesh(ob):
+                return 'SUBDIVISIONMESH'
+            else:
+                return 'POINTSPOLYGONS'
         else:
-            return 'POLYGON_MESH'
-#    else:
+            return ob.data.ribmosaic_primitive
+#   else:
 #        return rm.primitive
 
 
@@ -2234,35 +2235,6 @@ class ExportObjdata(ExporterArchive):
 
         #self.open_archive(gzipped=compress)
 
-    def _export_polygon_mesh(self):
-        # create a mesh that has all modifiers applied to mesh data
-        mesh = create_mesh(self.get_scene(), self.get_object())
-        # set the file pointer for ribify
-        rm.ribify.pointer_file = self._pointer_file
-        # set the indent level of the rib output
-        rm.ribify.indent = self.current_indent
-        # ribify the mesh data
-        rm.ribify.mesh_pointspolygons(mesh)
-
-        # don't need the mesh data anymore so tell blender to
-        # get rid of it
-        bpy.data.meshes.remove(mesh)
-
-    def _export_subdiv_mesh(self):
-        # create a mesh that has all modifiers applied to mesh data
-        # but make sure subdiv modifier render option is false
-        mesh = create_mesh(self.get_scene(), self.get_object())
-        # set the file pointer for ribify
-        rm.ribify.pointer_file = self._pointer_file
-        # set the indent level of the rib output
-        rm.ribify.indent = self.current_indent
-        # ribify the mesh data
-        rm.ribify.mesh_subdivisionmesh(mesh)
-
-        # don't need the mesh data anymore so tell blender to
-        # get rid of it
-        bpy.data.meshes.remove(mesh)
-
     def _export_geometry(self):
         if DEBUG_PRINT:
             print("ExportObjdata._export_geometry")
@@ -2270,10 +2242,31 @@ class ExportObjdata(ExporterArchive):
         # determine whate type of geometry is to be exported
         prim = detect_primitive(self.get_object())
 
-        if prim == 'POLYGON_MESH':
-            self._export_polygon_mesh()
-        elif prim == 'SUBDIVISION_MESH':
-            self._export_subdiv_mesh()
+        # create a mesh that has all modifiers applied to mesh data
+        # but make sure subdiv modifier render option is false
+        mesh = create_mesh(self.get_scene(), self.get_object())
+        # set the file pointer for ribify
+        rm.ribify.pointer_file = self._pointer_file
+        # set the indent level of the rib output
+        rm.ribify.indent = self.current_indent
+
+        if prim == 'POINTSPOLYGONS':
+            rm.ribify.mesh_pointspolygons(mesh)
+        elif prim == 'SUBDIVISIONMESH':
+            rm.ribify.mesh_subdivisionmesh(mesh)
+
+        meshdata = self.get_mesh()
+        # check if normal primvar is to be exported
+        if meshdata.ribmosaic_n_export:
+            rm.ribify.data_to_primvar(member="N", define="N",
+                                     ptype="normal", pclass=meshdata.ribmosaic_n_class)
+        # check if st primvar is to be exported
+        if meshdata.ribmosaic_st_export:
+            rm.ribify.data_to_primvar(member="UV", define="st",
+                                     ptype="float[2]", pclass=meshdata.ribmosaic_st_class)
+        # don't need the mesh data anymore so tell blender to
+        # get rid of it
+        bpy.data.meshes.remove(mesh)
 
     # #### Public methods
 
@@ -2318,6 +2311,9 @@ class ExportObjdata(ExporterArchive):
     # helper method to get the blender object that is currently being exported
     def get_object(self):
         return self.pointer_datablock
+
+    def get_mesh(self):
+        return self.pointer_datablock.data
 
 
 class ExportParticles(ExporterArchive):
