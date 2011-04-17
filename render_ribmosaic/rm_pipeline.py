@@ -1135,7 +1135,8 @@ class PipelineManager():
             else:
                 text_data = bpy.context.blend_data.texts.new(text)
 
-            xml = ET.tostring(element, encoding="UTF-8").decode("UTF-8")
+            xml ='<?xml version=\'1.0\' encoding=\'UTF-8\'?>\n'
+            xml += ET.tostring(element, encoding="UTF-8").decode("UTF-8")
             text_data.from_string(xml)
 
             self.revisions += 1
