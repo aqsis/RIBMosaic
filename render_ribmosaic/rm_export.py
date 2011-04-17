@@ -2254,15 +2254,23 @@ class ExportObjdata(ExporterArchive):
             rm.ribify.mesh_pointspolygons(mesh)
         elif prim == 'SUBDIVISIONMESH':
             rm.ribify.mesh_subdivisionmesh(mesh)
+        elif prim == 'POINTS':
+            rm.ribify.mesh_points(mesh)
 
         meshdata = self.get_mesh()
         # check if normal primvar is to be exported
         if meshdata.ribmosaic_n_export:
-            rm.ribify.data_to_primvar(member="N", define="N",
-                                     ptype="normal", pclass=meshdata.ribmosaic_n_class)
+            pv_class = meshdata.ribmosaic_n_class
+            if prim in ['POINTS']:
+                # face class not supported in these primitives
+                if pv_class[:4] == 'face':
+                    pv_class = pv_class[4:]
+
+            rm.ribify.data_to_primvar(mesh, member="N", define="N",
+                                     ptype="normal", pclass=pv_class)
         # check if st primvar is to be exported
         if meshdata.ribmosaic_st_export:
-            rm.ribify.data_to_primvar(member="UV", define="st",
+            rm.ribify.data_to_primvar(mesh, member="UV", define="st",
                                      ptype="float[2]", pclass=meshdata.ribmosaic_st_class)
         # don't need the mesh data anymore so tell blender to
         # get rid of it

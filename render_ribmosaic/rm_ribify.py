@@ -84,53 +84,119 @@ class Ribify():
     pointer_file = None  # File object to write RIB to
     is_gzip = False  # If file gzipped
     indent = 0  # how many tabs to indent from the left
-
-    # decomposed data from a blender mesh
-    nverts = []  # list of vertex count for each face
-    verts = []  # list of vertex indices for each face
-    P = []  # list of vertex points
-    uvs = []
-    N = []  # list of normals for each face
     vertcount = 0 # highest vertex index used by faces
 
-    # local helper functions
-    # Mesh data access
-    def _decompose_mesh(self, mesh):
-        # clear all of the lists
-        self.nverts = []
-        self.verts = []
-        self.P = []
-        self.uvs = []
-        self.N = []
+    # vars for tracking array items output
+    itemcount = 0  # number of array items that have been outputed
+    firstline = True  # output of array items on first line
+    items_per_line = 3  # number of array items per line
+    space_indent = 1  # number of spaces to indent
+
+
+    def _start_rib_array(self, items_per_line=3, space_indent=1):
+        self.itemcount = 0
+        self.firstline = True
+        self.items_per_line = items_per_line
+        self.space_indent = space_indent
+        self.write_text('[')
+
+
+    def _write_rib_array_item(self, item):
+
+        # if on the first item of the line then indent
+        if self.itemcount == 0 and not self.firstline:
+            self.write_text('\n', False)
+            self.write_text('  ')
+        else:
+            # adding another item on the line so just put a space
+            #  between items don't use indentation
+            self.write_text(' ', False)
+        # output the item in the list but with no indentation
+        self.write_text(str(item), False)
+        self.itemcount += 1
+
+        # only allow so many items per line
+        if self.itemcount == self.items_per_line:
+            self.itemcount = 0
+            self.firstline = False
+
+    def _end_rib_array(self):
+        # end of the RIB array list block
+        self.write_text(' ]\n', False)
+
+    def _write_rib_array_list(self, vect):
+        for v in vect:
+            self._write_rib_array_item(v)
+
+    def _export_faces(self, mesh):
         self.vertcount = 0
 
-        for f in mesh.faces:
-            n = len(f.vertices)
-            # add the number of vertices to the nverts list
-            self.nverts += [n]
+        self.inc_indent()
+        # output the number of vertices for each face
+        self._start_rib_array(10, 12)
+        for face in mesh.faces:
+            self._write_rib_array_item(len(face.vertices))
+        self._end_rib_array()
+
+        # output the vertex index for each face corner
+        self._start_rib_array(3, 12)
+        for face in mesh.faces:
+            n = len(face.vertices)
             # iterate through each vertex index in the face
-            for a in range(0, n):
-                #get the index of the vertice
-                vi = f.vertices[a]
+            for idx in range(0, n):
+                #get the index of the vertiex
+                vi = face.vertices[idx]
                 # keep track of the highest vertex index used
                 if vi > self.vertcount:
                     self.vertcount = vi
                 # add the index to the verts list of indices
-                self.verts += [vi]
-                # build the normals list
-                # if face is smooth then use the mesh.vertices[index].normal
-                if f.use_smooth:
-                    v = mesh.vertices[vi]
-                    self.N += [v.normal[0], v.normal[1], v.normal[2]]
-                else:
-                    # otherwise the face is flat so use the face normal
-                    self.N += [f.normal[0], f.normal[1], f.normal[2]]
+                self._write_rib_array_item(vi)
+        self._end_rib_array()
+        self.write_text('\n')
 
-        # only build a list of verts used by the faces
+
+    def _export_vertices(self, mesh):
+        # rare that these conditions occur but check to make sure
+        # there are faces and vertices to export
+        if len(mesh.vertices) == 0:
+            return
+
+        self.write_text('"P"\n')
+        self._start_rib_array(3, 14)
         for i in range(0, self.vertcount + 1):
-            co = mesh.vertices[i].co
-            self.P += [co[0], co[1], co[2]]
+            self._write_rib_array_list(mesh.vertices[i].co)
+        self._end_rib_array()
 
+
+    def _export_normals(self, primvar_rib, mesh, per_vertex=True):
+        # rare that these conditions occur but check to make sure
+        # there are faces and vertices to export
+        if len(mesh.vertices) == 0 or len(mesh.faces) == 0:
+            return
+
+        self.write_text(primvar_rib)
+        self._start_rib_array(3, 14)
+        if per_vertex:
+            for i in range(0, self.vertcount + 1):
+                self._write_rib_array_list(mesh.vertices[i].normal)
+        else:
+            for face in mesh.faces:
+                n = len(face.vertices)
+                # iterate through each vertex index in the face
+                for idx in range(0, n):
+                    # build the normals list
+                    # if face is smooth then use the vertex normal
+                    if face.use_smooth:
+                        #get the index of the vertex
+                        vi = face.vertices[idx]
+                        self._write_rib_array_list(mesh.vertices[vi].normal)
+                    else:
+                        # otherwise the face is flat so use the face normal
+                        self._write_rib_array_list(face.normal)
+        self._end_rib_array()
+
+
+    def _export_uvs(self, primvar_rib, mesh):
         try:
             #FIXME should be exporting all the uv layers not just the active
             uv_layer = mesh.uv_textures.active.data
@@ -138,33 +204,22 @@ class Ribify():
             uv_layer = None
 
         if uv_layer:
-            f_uvs = {}  # sequence array of uv for each face
+            self.write_text(primvar_rib)
+            self._start_rib_array(2, 14)
             for fi, tf in enumerate(uv_layer):
                 # "1.0 -" because
-                # renderman expects UVs flipped
+                # renderman? expects UVs flipped
                 # vertically from blender
-
-                f_uvs[fi] = [tf.uv1[0], 1.0 - tf.uv1[1]]
-                f_uvs[fi] += [tf.uv2[0], 1.0 - tf.uv2[1]]
-                f_uvs[fi] += [tf.uv3[0], 1.0 - tf.uv3[1]]
+                self._write_rib_array_item(tf.uv1[0])
+                self._write_rib_array_item(1.0 - tf.uv1[1])
+                self._write_rib_array_item(tf.uv2[0])
+                self._write_rib_array_item(1.0 - tf.uv2[1])
+                self._write_rib_array_item(tf.uv3[0])
+                self._write_rib_array_item(1.0 - tf.uv3[1])
                 if len(mesh.faces[fi].vertices) == 4:
-                    f_uvs[fi] += [tf.uv4[0], 1.0 - tf.uv4[1]]
-
-            for uv in f_uvs.values():
-                self.uvs.extend(uv)
-        else:
-            self.uvs = None
-
-
-    def _export_faces(self):
-        self.inc_indent()
-        self.write_rib_list(self.nverts, 10, 12)
-        self.write_rib_list(self.verts, 3, 12)
-        self.write_text('\n')
-
-    def _export_vertices(self):
-        self.write_text('"P"\n')
-        self.write_rib_list(self.P, 3, 14)
+                    self._write_rib_array_item(tf.uv4[0])
+                    self._write_rib_array_item(1.0 - tf.uv4[1])
+            self._end_rib_array()
 
     # ### Public methods
 
@@ -197,39 +252,13 @@ class Ribify():
         if self.indent < 0:
             self.indent = 0
 
-    def write_rib_list(self, list, items_per_line=3, space_indent=1):
-        itemcount = 0
-        firstline = True
-        self.write_text('[')
 
-        for i in list:
-            # if on the first item of the line then indent
-            if itemcount == 0 and not firstline:
-                self.write_text('\n', False)
-                self.write_text('  ')
-            else:
-                # adding another item on the line so just put a space
-                #  between items don't use indentation
-                self.write_text(' ', False)
-            # output the item in the list but with no indentation
-            self.write_text(str(i), False)
-            itemcount += 1
-
-            # only allow so many items per line
-            if itemcount == items_per_line:
-                itemcount = 0
-                firstline = False
-
-        # end of the RIB array list block
-        self.write_text(' ]\n', False)
-
-    def data_to_primvar(self,  **primvar):
+    def data_to_primvar(self,  datablock, **primvar):
         """Append to file_object specified data-block member from Blender
         data-block into RenderMan primitive variable as class type using
         specified define name.
 
-        The Blender mesh datablock must already be setup.
-
+        datablock = Blender mesh data
         **primvar = dictionary containing following members:
         member = data-block member to build primvar from (such as Normal, ect)
         define = what will the primvar be called
@@ -247,26 +276,23 @@ class Ribify():
         primvar_rib = '"%s %s %s"\n' % (primvar['pclass'], primvar['ptype'], primvar['define'])
         # figure out what mesh data to output for primvar
         if member == 'N':
-            if self.N is not None:
-                self.write_text(primvar_rib)
-                self.write_rib_list(self.N, 3, 14)
+            # determine if per vertex normals wanted instead of face
+            per_vertex = primvar['pclass'][0:4] != 'face'
+            self._export_normals(primvar_rib, datablock, per_vertex)
         elif member == 'UV':
-            if self.uvs is not None:
-                self.write_text(primvar_rib)
-                self.write_rib_list(self.uvs, 2, 14)
+            self._export_uvs(primvar_rib, datablock)
+
 
 
     def mesh_pointspolygons(self, datablock):
         """ """
-
         if DEBUG_PRINT:
             print("Creating pointpolygons...")
 
-        self._decompose_mesh(datablock)
         self.write_text('PointsPolygons \n')
         self.inc_indent()
-        self._export_faces()
-        self._export_vertices()
+        self._export_faces(datablock)
+        self._export_vertices(datablock)
 
 
     def mesh_subdivisionmesh(self, datablock):
@@ -274,21 +300,27 @@ class Ribify():
         if DEBUG_PRINT:
             print("Creating subdivisionmesh...")
 
-        self._decompose_mesh(datablock)
         self.write_text('SubdivisionMesh "catmull-clark"\n')
-        self._export_faces()
+        self.inc_indent()
+        self._export_faces(datablock)
 
         # if there are creases then need to write crease info
         self.write_text('["interpolateboundary"] [0 0] [] []\n')
 
         # output vertices
-        self._export_vertices()
+        self._export_vertices(datablock)
 
 
     def mesh_points(self, datablock):
         """ """
+        if DEBUG_PRINT:
+            print("Creating mesh points...")
 
-        print("Creating mesh points...")
+        self.write_text('Points\n')
+        self.inc_indent()
+        # output vertices
+        self.vertcount = len(datablock.vertices) - 1
+        self._export_vertices(datablock)
 
     def mesh_curves(self, datablock):
         """ """
