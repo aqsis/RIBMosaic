@@ -1787,7 +1787,7 @@ class ExportPass(ExporterArchive):
             raise rm_error.RibmosaicError("Failed to build camera " +
                                          sys.exc_info())
 
-        self.write_text("Sides 2\n")
+        self.write_text("Sides 1\n")
 
         if scene.ribmosaic_use_world:
             self.riWorldBegin()
