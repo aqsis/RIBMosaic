@@ -118,10 +118,10 @@ archives_inline = [('INLINE', "Inline Code", ""),
 
 primvar_desc = "Specify what RenderMan primitive type to export or use" \
                "auto select"
-primvar_class = [('VERTEX', "Vertex", ""),
-            ('VARYING', "Varying", ""),
-            ('FACEVERTEX', "FaceVertex", ""),
-            ('FACEVARYING', "FaceVarying", "")]
+primvar_class = [('vertex', "Vertex", ""),
+            ('varying', "Varying", ""),
+            ('facevertex', "FaceVertex", ""),
+            ('facevarying', "FaceVarying", "")]
 
 csg_desc = " for this object and its children"
 csg_ops = [('NOCSG', "No CSG", "Disable Constructive Solid Modelling"),
@@ -1027,21 +1027,21 @@ def create_props():
                 description="Specify what N primitive variable"
                             " class to export",
                 items=primvar_class,
-                default='FACEVARYING')
+                default='facevarying')
 
     bpy.types.Mesh.ribmosaic_cs_class = bpy.props.EnumProperty(
                 name="Cs Class",
                 description="Specify what Cs primitive variable"
                             " class to export",
                 items=primvar_class,
-                default='FACEVARYING')
+                default='facevarying')
 
     bpy.types.Mesh.ribmosaic_st_class = bpy.props.EnumProperty(
                 name="st Class",
                 description="Specify what st primitive variable class"
                             " to export",
                 items=primvar_class,
-                default='FACEVARYING')
+                default='facevarying')
 
     bpy.types.Mesh.ribmosaic_primitive = bpy.props.EnumProperty(
                 name="Primitive Type",
