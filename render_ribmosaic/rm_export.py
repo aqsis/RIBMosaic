@@ -1427,6 +1427,10 @@ class ExporterCommand(ExporterArchive):
             if not self.pointer_datablock.ribmosaic_interactive:
                 # Wait for process to quit while checking for key presses
                 while self.command_process.poll() is None:
+                    # goto sleep while waiting for subprocess to finish.
+                    # This can reduce subprocess execution times by upto
+                    # 60% on single core machines.
+                    time.sleep(0.25)  # sleep for 1/4 of a second
                     try:
                         self._test_break()
                     except:
