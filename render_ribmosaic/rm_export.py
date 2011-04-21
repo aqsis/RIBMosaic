@@ -293,6 +293,7 @@ class ExporterManager():
     display_output = {'x': 0, 'y': 0, 'passes': []}
     # Dictionary of all export path combinations
     export_paths = {'DIR': [],
+                    'COM': ['.'],
                     'FRA': ["Archives"],
                     'WLD': ["Archives", "Worlds"],
                     'LAM': ["Archives", "Lights"],
@@ -410,6 +411,15 @@ class ExporterManager():
 
     # #### Public methods
 
+    def make_export_path(self, exp_key='DIR'):
+        """
+          Build an export path based on the export path dictionary.
+
+          exp_key = key for the export path in the dictionary
+        """
+        return os.sep.join(self.export_paths[exp_key])
+
+
     def prepare_export(self, active_scene=None,
                        clean_paths=['DIR'],
                        purge_paths=['TMP'],
@@ -469,8 +479,7 @@ class ExporterManager():
 
                 # Check that export folders exist and clean or purge them
                 for p in self.export_paths:
-                    path = self.export_directory + \
-                           os.sep.join(self.export_paths[p])
+                    path = self.export_directory + self.make_export_path(p)
 
                     if not os.path.exists(path):
                         os.makedirs(path)
@@ -576,8 +585,7 @@ class ExporterManager():
                     info = self.export_scene.ribmosaic_compileshd
 
                     # Setup shader paths to be relative from export directory
-                    path = "." + os.sep + \
-                           os.sep.join(self.export_paths['SHD']) + \
+                    path = "." + os.sep + self.make_export_path('SHD') + \
                            os.sep + p + os.sep
                     ec.target_path = path
                     ec.target_name = ""
@@ -753,7 +761,7 @@ class ExporterManager():
         # Setup global information
         self._exporting_scene = True
         command_path = "." + os.sep
-        target_path = "." + os.sep + "Archives" + os.sep
+        target_path = command_path + self.make_export_path('FRA') + os.sep
         render_commands = rm.pipeline_manager.list_panels("command_panels",
                                                        type='RENDER')
         postrender_commands = rm.pipeline_manager.list_panels("command_panels",
@@ -801,7 +809,7 @@ class ExporterManager():
                 # Do not build RIB if disabled in export options
                 if export_rib and (not only_active or p == self.active_pass):
                     try:
-                        pa = ExportPass(ec, target_path, target_name)
+                        pa = ExportPass(ec, target_name)
                         pa.export_rib()
                         del pa
                     except:
@@ -828,8 +836,7 @@ class ExporterManager():
                                 "_C@[EVAL:.current_command:#####]@")
 
                         try:
-                            s = ExporterCommand(ec, c, False,
-                                                command_path, name)
+                            s = ExporterCommand(ec, c, False, "", name)
                             s.build_code("begin")
                             s.build_code("middle")
                             s.build_code("end", True)
@@ -859,8 +866,7 @@ class ExporterManager():
                                 "_C@[EVAL:.current_command:#####]@")
 
                         try:
-                            s = ExporterCommand(ec, c, False,
-                                                command_path, name)
+                            s = ExporterCommand(ec, c, False, "", name)
                             s.build_code("begin")
                             s.build_code("middle")
                             s.build_code("end", True)
@@ -894,8 +900,7 @@ class ExporterManager():
             r = True
 
         # Create one root shell script to rule them all
-        root = ExporterCommand(None, "", False, "." + os.sep,
-                               "START.sh.bat", 'a')
+        root = ExporterCommand(None, "", False, "", "START.sh.bat", 'a')
 
         try:
             # Cycle through commands of each type and execute
@@ -948,18 +953,21 @@ class ExporterArchive(rm_context.ExportContext):
     _pointer_cache = None
     _archive_regexes = []
     _target_regexes = []
+    _archive_key = 'COM'  # the key used for the dictionary archive path
+
 
     # #### Private methods
 
-    def __init__(self, export_object=None, archive_path="", archive_name=""):
+
+    def __init__(self, export_object=None, archive_key='COM', archive_name=""):
         """Initialize attributes using export_object and parameters.
 
         export_object = Any object subclassed from ExportContext
         archive_path = Path to save archive to (from export_object otherwise)
         archive_name = Name to save archive as (from export_object otherwise)
         """
-
         rm_context.ExportContext.__init__(self, export_object)
+        self._archive_key = archive_key
 
         # If export object is already a file object pass its attributes
         if getattr(export_object, "is_file", False):
@@ -991,8 +999,9 @@ class ExporterArchive(rm_context.ExportContext):
             self._target_regexes = list(self._target_regexes)
 
         # If archive path specified use it
-        if archive_path:
-            self.archive_path = archive_path
+        #if archive_path:
+        self.archive_path = rm.export_manager.make_export_path(
+                            self._archive_key) + os.sep
 
         # If archive name specified use it
         if archive_name:
@@ -1331,15 +1340,16 @@ class ExporterCommand(ExporterArchive):
     # #### Private methods
 
     def __init__(self, export_object=None, command_xmlpath="",
-                 delay_build=False, archive_path="", archive_name="",
-                 archive_mode="w"):
+                 delay_build=False, archive_path="",
+                 archive_name="", archive_mode="w"):
         """Initialize attributes using export_object and command_xmlpath
         as well as create shell script file ready for writing.
 
         export_object = Any object subclassed from ExportContext
         command_xmlpath = XML pipeline path to command to process
-        archive_path = Path to save script to
-                       (otherwise export_object.archive_path)
+        archive_path = path to where the command script will be executed.
+                       if "" then archive_path will be set to the default
+                       "COM" key directory archive path
         archive_name = Name to save script as
                        (otherwise export_object.archive_name)
         archive_mode = File open mode ('r', 'a', 'w')
@@ -1354,7 +1364,11 @@ class ExporterCommand(ExporterArchive):
                                 self, command_xmlpath, "extension", False)
 
         ExporterArchive.__init__(self, export_object,
-                                 archive_path, archive_name)
+                                 'COM', archive_name)
+
+        # override archive_path if set
+        if archive_path:
+            self.archive_path = archive_path
 
         # Automatically add regexes and create archive
         if command_xmlpath:
@@ -1515,7 +1529,7 @@ class ExporterShader(ExporterArchive):
 
         self.shader_xmlpath = shader_xmlpath
 
-        ExporterArchive.__init__(self, export_object)
+        ExporterArchive.__init__(self, export_object, 'SHD')
 
         # Automatically add regexes to parent archive
         if shader_xmlpath:
@@ -1546,7 +1560,7 @@ class ExportPass(ExporterArchive):
 
     # #### Private methods
 
-    def __init__(self, export_object=None, archive_path="", archive_name=""):
+    def __init__(self, export_object=None, archive_name=""):
         """Initialize attributes using export_object and parameters.
         Automatically create the RIB this object represents.
 
@@ -1555,8 +1569,7 @@ class ExportPass(ExporterArchive):
         archive_name = Name to save archive as (from export_object otherwise)
         """
 
-        ExporterArchive.__init__(self, export_object, archive_path,
-                                 archive_name)
+        ExporterArchive.__init__(self, export_object, 'FRA', archive_name)
 
         # Determine if compressed RIB is enabled
         if self.pointer_datablock:
@@ -1869,7 +1882,7 @@ class ExportObject(ExporterArchive):
         export_object = ExportObject subclassed from ExportContext
        """
 
-        ExporterArchive.__init__(self, export_object)
+        ExporterArchive.__init__(self, export_object, 'OBJ')
         self._set_pointer_datablock(pointer_object)
 
         # TODO open the archive if using ReadArchive mode
@@ -2053,7 +2066,7 @@ class ExportLight(ExporterArchive):
         export_object = ExportObject subclassed from ExportContext
        """
 
-        ExporterArchive.__init__(self, export_object)
+        ExporterArchive.__init__(self, export_object, 'LAM')
         self._set_pointer_datablock(pointer_object)
 
     def _export_lightcolor(self, color=(1, 1, 1)):
@@ -2153,7 +2166,7 @@ class ExportMaterial(ExporterArchive):
         export_object = ExportObject subclassed from ExportContext
        """
 
-        ExporterArchive.__init__(self, export_object)
+        ExporterArchive.__init__(self, export_object, 'MAT')
         self._set_pointer_datablock(pointer_object)
 
     # #### Public methods
@@ -2229,7 +2242,7 @@ class ExportObjdata(ExporterArchive):
         export_object = Any object subclassed from ExportContext
        """
 
-        ExporterArchive.__init__(self, export_object)
+        ExporterArchive.__init__(self, export_object, 'GEO')
 
         # Determine if compressed RIB is enabled
         #if self.pointer_datablock:
