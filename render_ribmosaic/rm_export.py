@@ -419,6 +419,13 @@ class ExporterManager():
         """
         return os.sep.join(self.export_paths[exp_key])
 
+    def get_archive_paths(self):
+        """
+        Returns a list of the archive paths
+        """
+        return ([self.make_export_path(k) for k in ['FRA', 'WLD', 'LAM',
+                'OBJ', 'GEO', 'MAT']])
+
 
     def prepare_export(self, active_scene=None,
                        clean_paths=['DIR'],
@@ -998,8 +1005,6 @@ class ExporterArchive(rm_context.ExportContext):
             self._archive_regexes = list(self._archive_regexes)
             self._target_regexes = list(self._target_regexes)
 
-        # If archive path specified use it
-        #if archive_path:
         self.archive_path = rm.export_manager.make_export_path(
                             self._archive_key) + os.sep
 
@@ -1658,29 +1663,32 @@ class ExportPass(ExporterArchive):
         scene = self.get_scene()
 
         # TODO add archive searchpath
+        self.write_text('Option "searchpath" "string archive" '
+                        '[ "@:.:%s" ]\n' %
+                        ( ":".join(rm.export_manager.get_archive_paths())))
 
         if scene.ribmosaic_shader_searchpath != '':
-            self.write_text('Option "searchpath" "string shader"'
+            self.write_text('Option "searchpath" "string shader" '
                             '[ "@:.:%s" ]\n' %
                             scene.ribmosaic_shader_searchpath)
 
         if scene.ribmosaic_texture_searchpath != '':
-            self.write_text('Option "searchpath" "string texture"'
+            self.write_text('Option "searchpath" "string texture" '
                             '[ "@:.:%s" ]\n' %
                             scene.ribmosaic_texture_searchpath)
 
         if scene.ribmosaic_display_searchpath != '':
-            self.write_text('Option "searchpath" "string display"'
+            self.write_text('Option "searchpath" "string display" '
                             '[ "@:.:%s" ]\n' %
                             scene.ribmosaic_display_searchpath)
 
         if scene.ribmosaic_procedural_searchpath != '':
-            self.write_text('Option "searchpath" "string procedural"'
+            self.write_text('Option "searchpath" "string procedural" '
                             '[ "@:.:%s" ]\n' %
                             scene.ribmosaic_procedural_searchpath)
 
         if scene.ribmosaic_resource_searchpath != '':
-            self.write_text('Option "searchpath" "string resource"'
+            self.write_text('Option "searchpath" "string resource" '
                             '[ "@:.:%s" ]\n' %
                             scene.ribmosaic_resource_searchpath)
 
