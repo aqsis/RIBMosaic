@@ -239,13 +239,13 @@ class ExportContext():
             self.pass_ribstr = getattr(p, "pass_rib_string",
                                         self.pass_ribstr)
 
-            self._set_pointer_datablock(pointer_datablock)
+        self._set_pointer_datablock(pointer_datablock)
 
     def _set_pointer_datablock(self, pointer_datablock=None):
         if pointer_datablock:
             self.pointer_datablock = pointer_datablock
             self.data_name = getattr(pointer_datablock, "name", "")
-            self.data_type = getattr(pointer_datablock, "type", "")
+            self.data_type = getattr(pointer_datablock, "type", self.data_type)
 
     def _public_attrs(self, *include):
         """Returns list of public attributes plus any defined in include"""
