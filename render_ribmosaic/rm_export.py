@@ -818,6 +818,7 @@ class ExporterManager():
                     try:
                         pa = ExportPass(ec, target_name)
                         pa.export_rib()
+                        pa.close_archive()
                         del pa
                     except:
                         pa.close_archive()
@@ -1013,6 +1014,31 @@ class ExporterArchive(rm_context.ExportContext):
             self.archive_name = archive_name
 
     # #### Public methods
+
+    def archive_exists(self):
+        """
+        check to see if the archive already exists as a file.
+        Sets _archive_exists to True if archive exists as a file.
+        Returns True if archive already exits.
+        """
+
+        exists = False # indicates that the archive already exits
+
+        if self.archive_name:
+            filepath = self.archive_path + self.archive_name
+
+            try:
+                exists = os.path.isfile(filepath)
+
+            except:
+                raise rm_error.RibmosaicError(
+                        "Could not check archive " + filepath, sys.exc_info())
+        else:
+            raise rm_error.RibmosaicError(
+                "archive_exists: Archive's path and name must be specified")
+
+        return exists
+
 
     def open_archive(self, gzipped=None, execute=None, mode='w'):
         """Opens a new archive for writing using archive_path and archive_name.
@@ -1281,7 +1307,50 @@ class ExporterArchive(rm_context.ExportContext):
                 archive.open_archive(mode='r')
                 archive.close_archive()
 
+    def get_scene(self):
+        return rm.export_manager.export_scene
+
     # helper methods for outputting RIB code
+    def open_rib_archive(self, archive_mode='DEFAULT'):
+        """
+        Determine the open action to be taken with rib archive export.  This
+        is based on the ribmosaic_rib_archive property and the scene's
+        ribmosaic_object_archives, ribmosaic_data_archives,
+        ribmosaic_material_archives properties.
+
+        archive_mode = the mode in which the archive will be used:
+                       INLINE, READARCHIVE, NOEXPORT, UNREADARCHIVE, INSTANCE,
+                       DELAYEDARCHIVE, UNREADARCHIVE
+        """
+
+        # determine what type of export to do
+        archive_mode = self.pointer_datablock.ribmosaic_rib_archive
+        # for now just testing inline and readarchive
+        if archive_mode == 'DEFAULT':
+            if self.data_type in ['MESH']:
+                archive_mode = self.get_scene().ribmosaic_data_archives
+            elif self.data_type == 'MATERIAL':
+                archive_mode = self.get_scene().ribmosaic_material_archives
+
+        if archive_mode in ['READARCHIVE', 'DELAYEDARCHIVE', 'INSTANCE']:
+            # make archive name
+            self.archive_name = self.data_name + '.rib'
+            # setup readarchive in parent archive
+            # rely on the file pointer still setup for the parent
+            self.riReadArchive()
+            # if archive does not exist then allow export
+            if not self.archive_exists():
+                # Determine if compressed RIB is enabled
+                self.open_archive(
+                    gzipped=self.get_scene().ribmosaic_compressrib)
+            else:
+                self._pointer_file = None
+            # since in own archive, start indentation at the left margin
+            self.current_indent = 0
+        elif archive_mode == 'NOEXPORT':
+            self._pointer_file = None
+        # all other modes default to inline
+
     def ribHeader(self):
         self.write_text("##RenderMan RIB-Structure 1.1\n")
         self.write_text("##Scene: %s\n" % rm.export_manager.export_scene.name)
@@ -1291,6 +1360,9 @@ class ExporterArchive(rm_context.ExportContext):
         self.write_text("##For: %s\n" % self.blend_name)
         #self.write_text("##Frames: "+str(fraEnd-fraStart+1)+"\n")
         self.write_text("version 3.03\n")
+
+    def riReadArchive(self):
+        self.write_text('ReadArchive "%s"\n' % self.archive_name)
 
     def riFrameBegin(self):
         self.write_text('FrameBegin %s\n' % self.current_rmframe)
@@ -1610,6 +1682,7 @@ class ExportPass(ExporterArchive):
             try:
                 eo = ExportObject(self, ob)
                 eo.export_rib()
+                eo.close_archive()
                 del eo
             except:
                 eo.close_archive()
@@ -1856,9 +1929,6 @@ class ExportPass(ExporterArchive):
 
         self.close_archive()
 
-    def get_scene(self):
-        return self.pointer_datablock
-
 
 class ExportWorld(ExporterArchive):
     """Represents shaders on world data-blocks"""
@@ -1997,6 +2067,9 @@ class ExportObject(ExporterArchive):
         if DEBUG_PRINT:
             print("ExportObject.export_rib()")
 
+        if self._pointer_file == None:
+            return
+
         ob = self.get_object()
 
         # if a camera object then do special camera output
@@ -2055,10 +2128,8 @@ class ExportObject(ExporterArchive):
 
             self.riAttributeEnd()
             self.write_text('\n')
-            self.close_archive()
 
-    def get_scene(self):
-        return self.pointer_parent.get_scene()
+        self.close_archive()
 
     def get_object(self):
         return self.pointer_datablock
@@ -2162,6 +2233,7 @@ class ExportLight(ExporterArchive):
         self.riAttributeEnd()
         self.riIlluminate(self.current_lightid)
         self.write_text('\n', False)
+        self.close_archive()
 
 
 class ExportMaterial(ExporterArchive):
@@ -2176,6 +2248,9 @@ class ExportMaterial(ExporterArchive):
 
         ExporterArchive.__init__(self, export_object, 'MAT')
         self._set_pointer_datablock(pointer_object)
+        # material has no type attribute
+        self.data_type = 'MATERIAL'
+        self.open_rib_archive()
 
     # #### Public methods
 
@@ -2187,6 +2262,9 @@ class ExportMaterial(ExporterArchive):
     def export_rib(self):
         if DEBUG_PRINT:
             print("ExportMaterial.export_rib()")
+        # if no file pointer which indicates no export required then exit
+        if self._pointer_file == None:
+            return
 
         material = self.pointer_datablock
         if DEBUG_PRINT:
@@ -2235,7 +2313,10 @@ class ExportMaterial(ExporterArchive):
         # output rib code for the shaders
         for p in material_shaders:
             p.current_indent = self.current_indent
+            p.archive_path = self.archive_path
             p.build_code("rib")
+
+        self.close_archive()
 
 
 class ExportObjdata(ExporterArchive):
@@ -2243,33 +2324,32 @@ class ExportObjdata(ExporterArchive):
     Can also handle export of multiple meshes setup in LOD list
     """
 
+    blender_object = None
+
     def __init__(self, export_object=None):
         """Initialize attributes using export_object and parameters.
         Automatically create the RIB this object data represents.
 
         export_object = Any object subclassed from ExportContext
-       """
+        """
 
         ExporterArchive.__init__(self, export_object, 'GEO')
+        self.blender_object = self.pointer_datablock
+        self._set_pointer_datablock(self.pointer_datablock.data)
+        self.open_rib_archive()
 
-        # Determine if compressed RIB is enabled
-        #if self.pointer_datablock:
-        #    compress = self.pointer_datablock.ribmosaic_compressrib
-        #else:
-        #    compress = False
 
-        #self.open_archive(gzipped=compress)
 
     def _export_geometry(self):
         if DEBUG_PRINT:
             print("ExportObjdata._export_geometry")
 
         # determine whate type of geometry is to be exported
-        prim = detect_primitive(self.get_object())
+        prim = detect_primitive(self.blender_object)
 
         # create a mesh that has all modifiers applied to mesh data
         # but make sure subdiv modifier render option is false
-        mesh = create_mesh(self.get_scene(), self.get_object())
+        mesh = create_mesh(self.get_scene(), self.blender_object)
         # set the file pointer for ribify
         rm.ribify.pointer_file = self._pointer_file
         # set the indent level of the rib output
@@ -2282,7 +2362,7 @@ class ExportObjdata(ExporterArchive):
         elif prim == 'POINTS':
             rm.ribify.mesh_points(mesh)
 
-        meshdata = self.get_mesh()
+        meshdata = self.pointer_datablock
         # check if normal primvar is to be exported
         if meshdata.ribmosaic_n_export:
             pv_class = meshdata.ribmosaic_n_class
@@ -2333,20 +2413,15 @@ class ExportObjdata(ExporterArchive):
         if DEBUG_PRINT:
             print('ExportObjData.export_rib()')
 
+        # if no file pointer which indicates no export required then exit
+        if self._pointer_file == None:
+            return
+
         # determine what type of object data needs to be exported
-        if self.pointer_datablock.type in ('MESH', 'EMPTY'):
+        if self.blender_object.type in ('MESH', 'EMPTY'):
             self. _export_geometry()
 
-    # helper method to get the blender scene the object is in
-    def get_scene(self):
-        return self.pointer_parent.get_scene()
-
-    # helper method to get the blender object that is currently being exported
-    def get_object(self):
-        return self.pointer_datablock
-
-    def get_mesh(self):
-        return self.pointer_datablock.data
+        self.close_archive()
 
 
 class ExportParticles(ExporterArchive):
