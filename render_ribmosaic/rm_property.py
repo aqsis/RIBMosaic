@@ -791,7 +791,7 @@ def create_props():
     bpy.types.WindowManager.ribmosaic_preview_samples = bpy.props.IntProperty(
                 name="Samples",
                 description="Preview samples quality",
-                default=1,
+                default=2,
                 min=1,
                 max=1024,
                 soft_min=1,
@@ -802,7 +802,7 @@ def create_props():
                 name="Shading",
                 description="Preview shading rate quality",
                 precision=3,
-                default=4.0,
+                default=2.0,
                 min=0.001,
                 max=1024.0,
                 soft_min=0.001,
