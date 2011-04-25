@@ -90,14 +90,12 @@ class Ribify():
     itemcount = 0  # number of array items that have been outputed
     firstline = True  # output of array items on first line
     items_per_line = 3  # number of array items per line
-    space_indent = 1  # number of spaces to indent
 
 
-    def _start_rib_array(self, items_per_line=3, space_indent=1):
+    def _start_rib_array(self, items_per_line=3):
         self.itemcount = 0
         self.firstline = True
         self.items_per_line = items_per_line
-        self.space_indent = space_indent
         self.write_text('[')
 
 
@@ -133,13 +131,13 @@ class Ribify():
 
         self.inc_indent()
         # output the number of vertices for each face
-        self._start_rib_array(10, 12)
+        self._start_rib_array(10)
         for face in mesh.faces:
             self._write_rib_array_item(len(face.vertices))
         self._end_rib_array()
 
         # output the vertex index for each face corner
-        self._start_rib_array(3, 12)
+        self._start_rib_array(9)
         for face in mesh.faces:
             n = len(face.vertices)
             # iterate through each vertex index in the face
@@ -154,6 +152,42 @@ class Ribify():
         self._end_rib_array()
         self.write_text('\n')
 
+    def _export_creases(self, mesh):
+        # export blender mesh edges that have a crease value != 0
+        Creases = [e for e in mesh.edges if e.crease != 0]
+        self._start_rib_array(5)
+        self._write_rib_array_item('"interpolateboundary"')
+        for edge in Creases:
+            self._write_rib_array_item('"crease"')
+        self._end_rib_array()
+
+        self._start_rib_array(10)
+        self._write_rib_array_item("0 0")
+        # write out data arrangement for creases:
+        # first array set has 2 values for each crease
+        # second array set has 1 value for each crease
+        for edge in Creases:
+            self._write_rib_array_item("2 1")
+        self._end_rib_array()
+
+        # output first array set:
+        # use two vertex indices to define each crease
+        self._start_rib_array(10)
+        for edge in Creases:
+            self._write_rib_array_item('%i %i' % (edge.vertices[0], edge.vertices[1]))
+        self._end_rib_array()
+
+        # output second array set which is the crease sharpness weight value
+        self._start_rib_array(10)
+        for edge in Creases:
+            #Calculate crease up to 5.5
+            #(looks the same as blenders up to that point)
+            crease = edge.crease * 5.5
+            #After 5.0 increase sharpening rate to match blenders rate
+            if (crease > 5.0): crease = crease + ((crease - 5.0) * 6)
+            self._write_rib_array_item(crease)
+
+        self._end_rib_array()
 
     def _export_vertices(self, mesh):
         # rare that these conditions occur but check to make sure
@@ -162,7 +196,7 @@ class Ribify():
             return
 
         self.write_text('"P"\n')
-        self._start_rib_array(3, 14)
+        self._start_rib_array(6)
         for i in range(0, self.vertcount + 1):
             self._write_rib_array_list(mesh.vertices[i].co)
         self._end_rib_array()
@@ -175,7 +209,7 @@ class Ribify():
             return
 
         self.write_text(primvar_rib)
-        self._start_rib_array(3, 14)
+        self._start_rib_array(6)
         if per_vertex:
             for i in range(0, self.vertcount + 1):
                 self._write_rib_array_list(mesh.vertices[i].normal)
@@ -205,7 +239,7 @@ class Ribify():
 
         if uv_layer:
             self.write_text(primvar_rib)
-            self._start_rib_array(2, 14)
+            self._start_rib_array(8)
             for fi, tf in enumerate(uv_layer):
                 # "1.0 -" because
                 # renderman? expects UVs flipped
@@ -305,7 +339,7 @@ class Ribify():
         self._export_faces(datablock)
 
         # if there are creases then need to write crease info
-        self.write_text('["interpolateboundary"] [0 0] [] []\n')
+        self._export_creases(datablock)
 
         # output vertices
         self._export_vertices(datablock)
