@@ -404,7 +404,8 @@ class ExporterManager():
         try:
             os.chdir(path)
         except:
-            pass
+            raise rm_error.RibmosaicError("ExportManager._update_directory: "
+                                          "invalid export path")
 
         self.export_scene = scene
         self.export_directory = path
@@ -463,8 +464,14 @@ class ExporterManager():
                     else:
                         activepass = active_scene.ribmosaic_activepass
                         purgerib = active_scene.ribmosaic_purgerib
-                        purgeshd = active_scene.ribmosaic_purgeshd
-                        purgetex = active_scene.ribmosaic_purgetex
+                        if active_scene.name == "preview":
+                            purgeshd = \
+                                rm.rm_panel.RibmosaicRender.preview_compile
+                            purgetex = \
+                                rm.rm_panel.RibmosaicRender.preview_optimize
+                        else:
+                            purgeshd = active_scene.ribmosaic_purgeshd
+                            purgetex = active_scene.ribmosaic_purgetex
                         clean_paths = list(clean_paths)
                         purge_paths = list(purge_paths)
 
@@ -519,7 +526,7 @@ class ExporterManager():
                 try:
                     os.chdir(self.export_directory)
                 except:
-                    pass
+                    raise rm_error.RibmosaicError("invalid export path")
             except:
                 raise rm_error.RibmosaicError("Could not prepare export"
                                               " directory, check console"
@@ -589,7 +596,10 @@ class ExporterManager():
                 # Export shader sources
                 if library == "xml":
                     compile = True
-                    info = self.export_scene.ribmosaic_compileshd
+                    if self.export_scene.name == 'preview':
+                        info = rm.rm_panel.RibmosaicRender.preview_compile
+                    else:
+                        info = self.export_scene.ribmosaic_compileshd
 
                     # Setup shader paths to be relative from export directory
                     path = "." + os.sep + self.make_export_path('SHD') + \
@@ -622,7 +632,7 @@ class ExporterManager():
                                 is_shaders = True
                     # Export sources in XML data
                     else:
-                        for e in rm.pipeline_manager.list_elements(p + \
+                        for e in rm.pipeline_manager.list_elements(p +
                                  "/shader_sources"):
                             xmlp = p + "/shader_sources/" + e
                             name = rm.pipeline_manager.get_attr(ec, xmlp,
@@ -1138,7 +1148,8 @@ class ExporterArchive(rm_context.ExportContext):
                         self.open_archive(mode='w')
                         self.write_text(text)
                         self._pointer_file.close()
-
+                        if DEBUG_PRINT:
+                            print(text)
                         self._pointer_file = None
                     except:
                         rm_error.RibmosaicError(
@@ -1219,6 +1230,7 @@ class ExporterArchive(rm_context.ExportContext):
 
         if DEBUG_PRINT:
             print("ExporterArchive.list_targets()")
+            print("target: " + target)
 
         # Populate files list according to target
         if target:
@@ -1251,6 +1263,8 @@ class ExporterArchive(rm_context.ExportContext):
         else:
             matches = [("", "")]
 
+        if DEBUG_PRINT:
+            print(matches)
         return matches
 
     def add_regexes(self, xmlpath):
@@ -1293,19 +1307,25 @@ class ExporterArchive(rm_context.ExportContext):
             target = rm.pipeline_manager.get_attr(self, xmlpath,
                                                   "target", False)
 
-            for t in [t for t in self.list_targets(target) if t[1]]:
-                self._test_break()
+            for t in self.list_targets(target):
+                if DEBUG_PRINT:
+                    print('regex target: ', t[0], t[1])
+                    print('elements: ', len(t))
 
-                # Open file as new archive initialized from self
-                archive = ExporterArchive(self, t[0], t[1])
+                if t[1]:
+                    self._test_break()
+                    if DEBUG_PRINT:
+                        print('applying regex to target: ', t[1])
+                    # Open file as new archive initialized from self
+                    archive = ExporterArchive(self, 'COM', t[1])
+                    archive.archive_path = t[0]
+                    # Apply target regex to archive regex
+                    archive._archive_regexes = [xmlpath]
+                    archive._target_regexes = []
 
-                # Apply target regex to archive regex
-                archive._archive_regexes = [xmlpath]
-                archive._target_regexes = []
-
-                # Open and close archive to apply regex
-                archive.open_archive(mode='r')
-                archive.close_archive()
+                    # Open and close archive to apply regex
+                    archive.open_archive(mode='r')
+                    archive.close_archive()
 
     def get_scene(self):
         return rm.export_manager.export_scene

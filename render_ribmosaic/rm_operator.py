@@ -1188,7 +1188,7 @@ class WM_OT_ribmosaic_library_addpanel(rm_context.ExportContext,
     def invoke(self, context, event):
         try:
             if bpy.data.is_saved:
-                lib = rm.pipeline_manager.get_attr(self, self.pipeline, \
+                lib = rm.pipeline_manager.get_attr(self, self.pipeline,
                                                    "library", False)
 
                 if lib:
