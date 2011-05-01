@@ -220,8 +220,8 @@ class DummyPass():
     pass_enabled = True
     pass_type = 'BEAUTY'
     # Pass output properties
-    pass_display_file = 'Renders/@[EVAL:.current_frame:####]@' \
-                        '@[EVAL:.pass_layer:]@.tif'
+    pass_display_file = 'Renders/P@[EVAL:.current_pass:####]@' \
+                        '_F@[EVAL:.current_frame:####]@.tif'
     pass_multilayer = False
     pass_shadingrate = 1
     pass_eyesplits = 6
@@ -404,8 +404,7 @@ class ExporterManager():
         try:
             os.chdir(path)
         except:
-            raise rm_error.RibmosaicError("ExportManager._update_directory: "
-                                          "invalid export path")
+            pass
 
         self.export_scene = scene
         self.export_directory = path
@@ -526,7 +525,8 @@ class ExporterManager():
                 try:
                     os.chdir(self.export_directory)
                 except:
-                    raise rm_error.RibmosaicError("invalid export path")
+                    pass
+
             except:
                 raise rm_error.RibmosaicError("Could not prepare export"
                                               " directory, check console"

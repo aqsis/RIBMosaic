@@ -304,8 +304,8 @@ class RibmosaicPassProps(bpy.types.PropertyGroup):
     pass_display_file = bpy.props.StringProperty(name="Display File",
                 description="Output path/file.ext used by displays for render",
                 maxlen=512,
-                default="Renders/@[EVAL:.current_frame:####]@"
-                        "@[EVAL:.pass_layer:]@.tif")
+                default="Renders/P@[EVAL:.current_pass:####]@"
+                        "_F@[EVAL:.current_frame:####]@.tif")
 
     pass_multilayer = bpy.props.BoolProperty(name="MultiLayer Output",
                 description="This passes display output is a MultiLayer EXR",
