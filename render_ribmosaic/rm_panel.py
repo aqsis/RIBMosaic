@@ -1348,8 +1348,9 @@ class DATA_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
 
             if data.type == 'SPOT':
                 # Force shadow as buffer so clipping shows in view port
-                if data.shadow_method != 'BUFFER_SHADOW':
-                    data.shadow_method = 'BUFFER_SHADOW'
+                #FIXME: can't write to blender data when refreshing panel
+                #if data.shadow_method != 'BUFFER_SHADOW':
+                #    data.shadow_method = 'BUFFER_SHADOW'
 
                 sub = layout.split()
                 col = sub.column()
