@@ -519,12 +519,11 @@ class WM_OT_ribmosaic_xml_file(rm_context.ExportContext,
 
             if self.pointer_datablock:
                 try:
-                    exec("self.pointer_datablock." + \
-                         self.event + " = path")
+                    exec("self.pointer_datablock." + self.event + " = path")
                 except:
-                    raise rm_error.RibmosaicError("Cant find property \"" + \
+                    raise rm_error.RibmosaicError("Cant find property \"" +
                                                   self.event + \
-                                                  "\" on datablock \"" + \
+                                                  "\" on datablock \"" +
                                                   str(data) + "\"",
                                                   sys.exc_info())
         except rm_error.RibmosaicError as err:
@@ -2286,8 +2285,7 @@ class SCENE_OT_ribmosaic_exportpath(rm_context.ExportContext,
         if self.relativepath:
             self.directory = bpy.path.relpath(self.directory) + os.sep
 
-        exec(self.exportpath + " = \"" + \
-            self.directory + "\"")
+        exec(self.exportpath + " = \"" + self.directory + "\"")
 
         return {'FINISHED'}
 

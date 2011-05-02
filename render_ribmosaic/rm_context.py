@@ -299,17 +299,17 @@ class ExportContext():
                 string = "".join(link_list)
             except rm_error.RibmosaicError as err:
                 err.ReportError()
-                raise rm_error.RibmosaicError("Link errors from \"" +
-                                              textpath + "\"")
+                raise rm_error.RibmosaicError('Link errors from "' +
+                                              textpath + '"')
 
             return string
 
         # Convert start/end tokens into multidimensional list
         t = repr(text)
         q = t[0]
-        links = eval("[" + q + t[1:-1] \
-                     .replace("@[", q + ", [" + q) \
-                     .replace("]@", q + "], " + q) + \
+        links = eval("[" + q + t[1:-1]
+                     .replace("@[", q + ", [" + q)
+                     .replace("]@", q + "], " + q) +
                      q + "]")
 
         return walk_links(links)
@@ -347,13 +347,13 @@ class ExportContext():
             if eval(enabled) and eval(register):
                 # We need a datablock to check properties
                 if self.pointer_datablock:
-                    enabled_name = rm.PropertyHash(self.context_pipeline + \
-                                                   self.context_category + \
-                                                   self.context_panel + \
+                    enabled_name = rm.PropertyHash(self.context_pipeline +
+                                                   self.context_category +
+                                                   self.context_panel +
                                                    "enabled")
 
                     try:
-                        enabled_prop = eval("self.pointer_datablock." + \
+                        enabled_prop = eval("self.pointer_datablock." +
                                             enabled_name)
                     except:
                         enabled_prop = True
@@ -369,7 +369,7 @@ class ExportContext():
 
                             try:
                                 enabled = eval(self._resolve_links(self,
-                                                panel_filter))
+                                               panel_filter))
                             except:
                                 raise rm_error.RibmosaicError(
                                         "Filter expression error",

@@ -1258,7 +1258,7 @@ class PipelineManager():
                         h = prefix + "op = " + layout + ".operator("
                         p.append(prefix + "op.context = self.bl_context")
                         p.append(prefix + "op.xmlpath = '" + l_path + "'")
-                        p.append(prefix + "op.event = '" + \
+                        p.append(prefix + "op.event = '" +
                                  l_attrs['trigger'] + "'")
                     elif l_type == 'PROPSEARCH' or l_type == 'PROP':
                         prop = "".join(l_path.split("/")[:3]) + l_attrs['prop']
@@ -1268,7 +1268,7 @@ class PipelineManager():
                         if l_type == 'PROPSEARCH':
                             h = pv + ".prop_search("
                             l.append("data, '" + attr + "'")
-                            l.append(", '".join(l_attrs['trigger'] \
+                            l.append(", '".join(l_attrs['trigger']
                                      .rsplit(".", 1)) + "'")
                         elif l_type == 'PROP':
                             h = pv + ".prop("

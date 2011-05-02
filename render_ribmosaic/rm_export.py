@@ -697,7 +697,7 @@ class ExporterManager():
                         # Only export enabled command panels
                         if compile and ec._panel_enabled():
                             ec.current_command += 1
-                            name = ec._resolve_links( \
+                            name = ec._resolve_links(
                                    "COMPILE_S@[EVAL:.current_library:#####]@"
                                    "_C@[EVAL:.current_command:#####]@")
                             path = "." + os.sep
