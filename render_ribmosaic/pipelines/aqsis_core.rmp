@@ -77,7 +77,7 @@ Hider "hidden" "depthfilter" "midpoint"
             <layout>
             </layout>
         </Multipass_Option>
-        <AutoShadow_Attribute delete="False" description="Auto Shadows attribute" duplicate="False" enabled="False" filter="Shadow" register="True" type="ATTR" windows="WORLD">
+        <AutoShadow_Attribute delete="False" description="Auto Shadows attribute" duplicate="False" enabled="False" filter="Shadow" register="True" type="ATTR" windows="LAMP">
             <read target="">
             </read>
             <begin target="">
