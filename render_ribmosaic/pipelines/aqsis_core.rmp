@@ -60,6 +60,46 @@ Display "+@[EVAL:.pass_output:]@" "exr" "float _z" "string layername" "RenderLay
             <layout>
             </layout>
         </Multi_Display>
+        <Multipass_Option delete="False" description="Multipass option for Auto Shadows" duplicate="False" enabled="False" filter="Shadow" register="True" type="OPTION" windows="RENDER">
+            <read target="">
+            </read>
+            <begin target="">
+Option "Render" "integer multipass" [1]
+Hider "hidden" "depthfilter" "midpoint"
+
+            </begin>
+            <end target="">
+            </end>
+            <regexes target="">
+            </regexes>
+            <properties>
+            </properties>
+            <layout>
+            </layout>
+        </Multipass_Option>
+        <AutoShadow_Attribute delete="False" description="Auto Shadows attribute" duplicate="False" enabled="False" filter="Shadow" register="True" type="ATTR" windows="WORLD">
+            <read target="">
+            </read>
+            <begin target="">
+Attribute "autoshadows" "string shadowmapname" [@[DATA:///properties/shad_name:RIB]@] "integer res" [@[DATA:///properties/shad_res:RIB]@]
+
+            </begin>
+            <end target="">
+            </end>
+            <regexes target="">
+            </regexes>
+            <properties>
+                <shad_res type='INT' description="shadow texture size" default="64" min="1" max="1000" softmin="1" softmax="1000" maxlen="" step="" precision="" items="" size="" link="" />
+                <shad_name type='STRING' description="shadow texture name" default="autoshadow.shad" min="" max="" softmin="" softmax="" maxlen="255" step="" precision="" items="" size="" link="" />
+            </properties>
+            <layout>
+                <column type="COLUMN" box="False" align="False" enabled="True" active="True" visible="True">
+                	<shad_res type='PROP' prop="shad_res" text="Shadow map Resolution" expand="False" slider="False" toggle="False" icon="" trigger="" />
+			<shad_name type='PROP' prop="shad_name" text="Shadow map Name" expand="False" slider="False" toggle="False" icon="" trigger="" />
+                </column>
+
+            </layout>
+        </AutoShadow_Attribute>
     </utility_panels>
 
     <command_panels filter="COMMAND">
