@@ -1915,6 +1915,7 @@ class ExportPass(ExporterArchive):
 
         # Write everything to archive
         for p in scene_utilities:
+            p.current_indent = self.current_indent
             p.build_code("begin")
 
         if scene.ribmosaic_use_frame:
@@ -2214,9 +2215,41 @@ class ExportLight(ExporterArchive):
 
 
         self.riAttributeBegin()
-        # TODO add support for all light types
         ob = self.pointer_datablock
         lamp = ob.data
+
+        # Push objects attributes
+        pipeline = self.context_pipeline
+        category = self.context_category
+        panel = self.context_panel
+
+        # Panel object lists
+        light_utilities = []
+
+        # Initialize objects for enabled panels in light data
+        self.pointer_datablock = lamp
+        # Initialize objects for enabled panels in render and scene
+        for p in rm.pipeline_manager.list_panels("utility_panels",
+                                                 window='LAMP'):
+            segs = p.split("/")
+            self.context_pipeline = segs[0]
+            self.context_category = segs[1]
+            self.context_panel = segs[2]
+
+            if self._panel_enabled():
+                light_utilities.append(ExporterUtility(self, p))
+
+        # Pop objects attributes
+        self.context_pipeline = pipeline
+        self.context_category = category
+        self.context_panel = panel
+        #self.pointer_datablock =
+
+        for p in light_utilities:
+            p.current_indent = self.current_indent
+            p.build_code("begin")
+
+        # TODO add support for all light types
         if ob.parent:
             m = ob.parent.matrix_world * ob.matrix_local
         else:
@@ -2269,6 +2302,11 @@ class ExportLight(ExporterArchive):
                 self._export_lightcolor(lamp.color)
 
         self.dec_indent()
+
+        for p in light_utilities:
+            p.current_indent = self.current_indent
+            p.build_code("end")
+
         self.riAttributeEnd()
         self.riIlluminate(self.current_lightid)
         self.write_text('\n', False)
