@@ -1371,6 +1371,47 @@ class ExporterArchive(rm_context.ExportContext):
             self._pointer_file = None
         # all other modes default to inline
 
+    def export_shaders(self, windows):
+        """
+        Build a list of shaders and export to RIB.
+
+        windows = string of blender window names to get shader panels from
+
+        returns True if shaders were exported.
+        """
+
+        # Push objects attributes that will get changed
+        pipeline = self.context_pipeline
+        category = self.context_category
+        panel = self.context_panel
+
+        # Shader Panel lists
+        shaders = []
+
+        # export all enabled shader panels for this archive
+        for p in rm.pipeline_manager.list_panels("shader_panels",
+                                                 window=windows):
+            segs = p.split("/")
+            self.context_pipeline = segs[0]
+            self.context_category = segs[1]
+            self.context_panel = segs[2]
+
+            if self._panel_enabled():
+                shaders.append(ExporterShader(self, p))
+
+        # Pop objects attributes
+        self.context_pipeline = pipeline
+        self.context_category = category
+        self.context_panel = panel
+
+        # output rib code for the shaders
+        for p in shaders:
+            p.current_indent = self.current_indent
+            p.archive_path = self.archive_path
+            p.build_code("rib")
+
+        return len(shaders) > 0
+
     def ribHeader(self):
         self.write_text("##RenderMan RIB-Structure 1.1\n")
         self.write_text("##Scene: %s\n" % rm.export_manager.export_scene.name)
@@ -1417,6 +1458,10 @@ class ExporterArchive(rm_context.ExportContext):
     def riOpacity(self, color=(0, 0, 0)):
         self.write_text('Opacity [%s %s %s]\n' % (color[0], color[1],
                         color[2]))
+
+    def riTransform(self, mat):
+        self.write_text('Transform %s\n' % rib_mat_str(mat))
+
 
 
 # #### Pipeline panel sub classes (all derived from ExporterArchive)
@@ -1819,7 +1864,6 @@ class ExportPass(ExporterArchive):
         scene_utilities = []
         render_utilities = []
         world_utilities = []
-        world_shaders = []
 
         # Initialize objects for enabled panels in render and scene
         for p in rm.pipeline_manager.list_panels("utility_panels",
@@ -1855,15 +1899,6 @@ class ExportPass(ExporterArchive):
             if self._panel_enabled():
                 world_utilities.append(ExporterUtility(self, p))
 
-        for p in rm.pipeline_manager.list_panels("shader_panels",
-                                                 window='WORLD'):
-            segs = p.split("/")
-            self.context_pipeline = segs[0]
-            self.context_category = segs[1]
-            self.context_panel = segs[2]
-
-            if self._panel_enabled():
-                world_shaders.append(ExporterShader(self, p))
 
         # Pop objects attributes
         self.context_pipeline = pipeline
@@ -1914,9 +1949,7 @@ class ExportPass(ExporterArchive):
             p.current_indent = self.current_indent
             p.build_code("begin")
 
-        for p in world_shaders:
-            p.current_indent = self.current_indent
-            p.build_code("rib")
+        self.export_shaders('WORLD')
 
         # figure out what objects in the scene are renderable
         # build a collection of all renderable objects which includes:
@@ -2057,7 +2090,7 @@ class ExportObject(ExporterArchive):
 
         m = s * r * l
 
-        self.write_text('Transform %s\n' % rib_mat_str(m))
+        self.riTransform(m)
 
     # #### Public methods
 
@@ -2124,12 +2157,10 @@ class ExportObject(ExporterArchive):
                 mat = ob.matrix_world
             #print(mat)
 
-            #     FIXME this is just test code
             self.riAttributeBegin()
             self.write_text('Attribute "identifier" "name" [ "%s" ]\n' %
                             self.data_name)
-            self.write_text('Transform %s\n' %
-                            rib_mat_str(mat))
+            self.riTransform(mat)
 
             # export object data
             # let the ExportObjdata instance decide how to export
@@ -2175,79 +2206,67 @@ class ExportLight(ExporterArchive):
     def _export_intensity(self, energy=1):
         self.write_text('"float intensity" %s\n' % (energy * 50))
 
-    def _export_from(self, loc=(0, 0, 0)):
-        self.write_text('"uniform point from" [ %s ]\n'
-                        % rib_param_val('float', loc))
-
-    def _export_to(self, loc=(0, 0, 0)):
-        self.write_text('"uniform point to" [ %s ]\n'
-                        % rib_param_val('float', loc))
-
     # #### Public methods
-
-    def export(self):
-        """ """
-
-        print("Exporting lamp...")
 
     def export_rib(self):
         if DEBUG_PRINT:
             print("ExportLight.export_rib()")
 
+
+        self.riAttributeBegin()
+        # TODO add support for all light types
         ob = self.pointer_datablock
         lamp = ob.data
-
         if ob.parent:
             m = ob.parent.matrix_world * ob.matrix_local
         else:
             m = ob.matrix_world
-            loc = m.to_translation()
 
-        loc = m.to_translation()
-        lvec = [loc[0] - m[2][0], loc[1] - m[2][1], loc[2] - m[2][2]]
-        params = []
+        # Note: up vector for renderman light is opposite of Blender
+        m *= mathutils.Matrix.Rotation(math.pi, 4, 'X')
+        self.riTransform(m)
 
-        self.riAttributeBegin()
-        # TODO add support for all light types
+        # in order to get shaders set pointer_datablock to ob.data
+        self.pointer_datablock = lamp
+        # if a shader is attached then don't use auto light export
+        shaders_exported = self.export_shaders('LAMP')
+        self.pointer_datablock = ob
 
-        # these are automatic shaders based on blender lamp type
-        if lamp.type == 'HEMI':
-            self.write_text('LightSource "ambientlight" %s\n' %
-                            self.current_lightid)
-            self.inc_indent()
-            self._export_intensity(lamp.energy)
-            self._export_lightcolor(lamp.color)
+        if not shaders_exported:
 
-        elif lamp.type == 'SUN':
-            self.write_text('LightSource "distantlight" %s\n' %
-                            self.current_lightid)
-            self.inc_indent()
-            self._export_intensity(lamp.energy)
-            self._export_lightcolor(lamp.color)
-            self._export_from(loc)
-            self._export_to(lvec)
+            # these are automatic shaders based on blender lamp type
+            if lamp.type == 'HEMI':
+                self.write_text('LightSource "ambientlight" %s\n' %
+                                self.current_lightid)
+                self.inc_indent()
+                self._export_intensity(lamp.energy)
+                self._export_lightcolor(lamp.color)
 
-        elif lamp.type == 'SPOT':
-            self.write_text('LightSource "spotlight" %s\n' %
-                            self.current_lightid)
-            self.inc_indent()
-            self._export_intensity(lamp.energy)
-            self._export_lightcolor(lamp.color)
-            self._export_from(loc)
-            self._export_to(lvec)
-            if hasattr(lamp, "spot_size"):
-                coneangle = lamp.spot_size / 2.0
-                self.write_text('"float coneangle" %s\n' %
-                            (rib_param_val('float', coneangle)))
+            elif lamp.type == 'SUN':
+                self.write_text('LightSource "distantlight" %s\n' %
+                                self.current_lightid)
+                self.inc_indent()
+                self._export_intensity(lamp.energy)
+                self._export_lightcolor(lamp.color)
 
-        else:
-            # default to a pointlight if no lamp type match
-            self.write_text('LightSource "pointlight" %s\n' %
-                            self.current_lightid)
-            self.inc_indent()
-            self._export_intensity(lamp.energy)
-            self._export_lightcolor(lamp.color)
-            self._export_from(loc)
+            elif lamp.type == 'SPOT':
+                self.write_text('LightSource "spotlight" %s\n' %
+                                self.current_lightid)
+                self.inc_indent()
+                self._export_intensity(lamp.energy)
+                self._export_lightcolor(lamp.color)
+                if hasattr(lamp, "spot_size"):
+                    coneangle = lamp.spot_size / 2.0
+                    self.write_text('"float coneangle" %s\n' %
+                                (rib_param_val('float', coneangle)))
+
+            else:
+                # default to a pointlight if no lamp type match
+                self.write_text('LightSource "pointlight" %s\n' %
+                                self.current_lightid)
+                self.inc_indent()
+                self._export_intensity(lamp.energy)
+                self._export_lightcolor(lamp.color)
 
         self.dec_indent()
         self.riAttributeEnd()
@@ -2273,11 +2292,6 @@ class ExportMaterial(ExporterArchive):
         self.open_rib_archive()
 
     # #### Public methods
-
-    def export(self):
-        """ """
-
-        print("Exporting materials...")
 
     def export_rib(self):
         if DEBUG_PRINT:
@@ -2305,36 +2319,7 @@ class ExportMaterial(ExporterArchive):
                 ' "string coordinatesystem" ["%s"]\n'
                 % (material.ribmosaic_disp_pad, material.ribmosaic_disp_coor))
 
-        # Build a list of material shaders
-        # Push objects attributes that will get changed
-        pipeline = self.context_pipeline
-        category = self.context_category
-        panel = self.context_panel
-
-        # Panel material lists
-        material_shaders = []
-
-        # export all enabled shader panels for this material
-        for p in rm.pipeline_manager.list_panels("shader_panels",
-                                                 window='MATERIAL'):
-            segs = p.split("/")
-            self.context_pipeline = segs[0]
-            self.context_category = segs[1]
-            self.context_panel = segs[2]
-
-            if self._panel_enabled():
-                material_shaders.append(ExporterShader(self, p))
-
-        # Pop objects attributes
-        self.context_pipeline = pipeline
-        self.context_category = category
-        self.context_panel = panel
-
-        # output rib code for the shaders
-        for p in material_shaders:
-            p.current_indent = self.current_indent
-            p.archive_path = self.archive_path
-            p.build_code("rib")
+        self.export_shaders('MATERIAL')
 
         self.close_archive()
 
