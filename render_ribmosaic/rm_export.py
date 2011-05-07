@@ -411,20 +411,26 @@ class ExporterManager():
 
     # #### Public methods
 
-    def make_export_path(self, exp_key='DIR'):
+    def make_export_path(self, exp_key='DIR', sep=os.sep):
         """
           Build an export path based on the export path dictionary.
 
           exp_key = key for the export path in the dictionary
+          sep = path seperator. Will use os.sep as default path seperator
         """
-        return os.sep.join(self.export_paths[exp_key])
 
-    def get_archive_paths(self):
+        return sep.join(self.export_paths[exp_key])
+
+    def get_archive_paths(self, path_sep='/'):
         """
         Returns a list of the archive paths
+
+        path_sep = character to use for path seperator.
+        Note: path seperator defaults to / since archive paths are for RIB
+
         """
-        return ([self.make_export_path(k) for k in ['FRA', 'WLD', 'LAM',
-                'OBJ', 'GEO', 'MAT']])
+        return ([self.make_export_path(k, path_sep) for k in ['FRA', 'WLD',
+                'LAM', 'OBJ', 'GEO', 'MAT']])
 
 
     def prepare_export(self, active_scene=None,
@@ -1800,7 +1806,6 @@ class ExportPass(ExporterArchive):
 
         scene = self.get_scene()
 
-        # TODO add archive searchpath
         self.write_text('Option "searchpath" "string archive" '
                         '[ "@:.:%s" ]\n' %
                         ( ":".join(rm.export_manager.get_archive_paths())))
