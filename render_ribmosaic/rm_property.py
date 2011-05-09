@@ -348,9 +348,9 @@ class RibmosaicPassProps(bpy.types.PropertyGroup):
                 description="Number of micro-polygons shaded, 0 disables",
                 default=0,
                 min=0,
-                max=1024,
+                max=10000,
                 soft_min=0,
-                soft_max=1024)
+                soft_max=9000)
 
     pass_texturemem = bpy.props.IntProperty(name="Texture Mem",
                 description="Maximum texture space in memory in kb,"
