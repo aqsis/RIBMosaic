@@ -60,6 +60,33 @@ Display "+@[EVAL:.pass_output:]@" "exr" "float _z" "string layername" "RenderLay
             <layout>
             </layout>
         </Multi_Display>
+        <Options delete="False" description="Aqsis render Options" duplicate="False" enabled="True" filter="" register="True" type="OPTION" windows="RENDER">
+            <read target="">
+            </read>
+            <begin target="">
+Option "shadow" "bias" [@[DATA:///properties/shadowbias:RIB]@]
+Option "shadow" "bias0" [@[DATA:///properties/shadowbias0:RIB]@]
+Option "shadow" "bias1" [@[DATA:///properties/shadowbias1:RIB]@]
+
+
+            </begin>
+            <end target="">
+            </end>
+            <regexes target="">
+            </regexes>
+            <properties>
+                <shadowbias type='FLOAT' description="Specifies a small amount to be added (in “camera” space) to the depth values stored in the shadow map" default="0.001" min="0" max="100" softmin="1" softmax="100" maxlen="" step="" precision="" items="" size="" link="" />
+                <shadowbias0 type='FLOAT' description="Specifies the start of the bias range, a value is chosen randomly within this range for the the shadow bias value" default="0.001" min="0" max="100" softmin="1" softmax="100" maxlen="" step="" precision="" items="" size="" link="" />
+                <shadowbias1 type='FLOAT' description="Specifies the end of the bias range, a value is chosen randomly within this range for the the shadow bias value" default="0.001" min="0" max="100" softmin="1" softmax="100" maxlen="" step="" precision="" items="" size="" link="" />
+            </properties>
+            <layout>
+                <column type="COLUMN" box="True" align="True" enabled="True" active="True" visible="True">
+                	<shadowbias type='PROP' prop="shadowbias" text="Shadow Bias" expand="False" slider="False" toggle="False" icon="" trigger="" />
+                	<shadowbias0 type='PROP' prop="shadowbias0" text="Shadow Bias0" expand="False" slider="False" toggle="False" icon="" trigger="" />
+                	<shadowbias1 type='PROP' prop="shadowbias1" text="Shadow Bias1" expand="False" slider="False" toggle="False" icon="" trigger="" />
+                </column>
+            </layout>
+        </Options>
         <Multipass_Option delete="False" description="Multipass option for Auto Shadows" duplicate="False" enabled="False" filter="Shadow" register="True" type="OPTION" windows="RENDER">
             <read target="">
             </read>
