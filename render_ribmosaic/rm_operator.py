@@ -1422,11 +1422,31 @@ class WM_OT_ribmosaic_pipeline_reload(rm_context.ExportContext,
                     description="Name of pipeline")
 
     # ### Public methods
+    def draw(self, context):
+        pass
+
+    def execute(self, context):
+        wm = context.window_manager
+
+        try:
+            rm.pipeline_manager.update_pipeline(self.pipeline)
+
+            rm.RibmosaicInfo("WM_OT_ribmosaic_pipeline_reload.execute:"
+                             "Pipeline " + self.pipeline + " reloaded")
+            self._refresh_panels()
+        except rm_error.RibmosaicError as err:
+            err.ReportError(self)
+            return {'CANCELLED'}
+
+        return {'FINISHED'}
 
     def invoke(self, context, event):
-        rm.pipeline_manager.update_pipeline(self.pipeline)
-        self._refresh_panels()
-        return {'FINISHED'}
+        wm = context.window_manager
+
+        if self.pipeline:
+            return wm.invoke_props_dialog(self)
+        else:
+            return {'CANCELLED'}
 
 
 class WM_OT_ribmosaic_pipeline_help(rm_context.ExportContext,
