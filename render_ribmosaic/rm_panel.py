@@ -638,6 +638,9 @@ class RibmosaicPipelinePanels(RibmosaicPropertiesPanel):
                                                             False)
                 pan.operator("wm.ribmosaic_pipeline_remove",
                              icon='PANEL_CLOSE', text="").pipeline = xmlpath
+                pan.operator("wm.ribmosaic_pipeline_reload",
+                             icon='FILE_REFRESH',
+                             text="").pipeline = xmlpath
                 pan.menu("WM_MT_ribmosaic_pipeline_menu",
                              icon='DOWNARROW_HLT', text="")
 
@@ -656,6 +659,7 @@ class RibmosaicPipelinePanels(RibmosaicPropertiesPanel):
                     row.operator("wm.ribmosaic_pipeline_enable",
                              icon='CHECKBOX_DEHLT',
                              text="").xmlpath = xmlpath
+
                 layout.separator()
                 grp = layout.column()
                 grp.enabled = enabled if not self.pipeline_editor else True
