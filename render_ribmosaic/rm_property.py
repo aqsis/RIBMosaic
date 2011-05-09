@@ -328,6 +328,22 @@ class RibmosaicPassProps(bpy.types.PropertyGroup):
                 soft_min=0,
                 soft_max=1024)
 
+    pass_bucketsize_width = bpy.props.IntProperty(name="Bucket Width",
+                description="Render Bucket width size in pixels",
+                default=16,
+                min=1,
+                max=1024,
+                soft_min=0,
+                soft_max=1024)
+
+    pass_bucketsize_height = bpy.props.IntProperty(name="Bucket Height",
+                description="Render Bucket height size in pixels",
+                default=16,
+                min=1,
+                max=1024,
+                soft_min=0,
+                soft_max=1024)
+
     pass_gridsize = bpy.props.IntProperty(name="Grid Size",
                 description="Number of micro-polygons shaded, 0 disables",
                 default=0,

@@ -895,6 +895,8 @@ class RENDER_PT_ribmosaic_passes(RibmosaicPropertiesPanel, bpy.types.Panel):
             col.prop(active_pass, "pass_shadingrate")
             col.prop(active_pass, "pass_eyesplits")
             col.prop(active_pass, "pass_gridsize")
+            col.prop(active_pass, "pass_bucketsize_width")
+            col.prop(active_pass, "pass_bucketsize_height")
             col.prop(active_pass, "pass_texturemem")
             sub = split.column()
             sub.label(text="Camera:")

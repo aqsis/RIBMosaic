@@ -225,6 +225,8 @@ class DummyPass():
     pass_multilayer = False
     pass_shadingrate = 1
     pass_eyesplits = 6
+    pass_bucketsize_width = 16
+    pass_bucketsize_height = 16
     pass_gridsize = 0
     pass_texturemem = 0
     # Pass camera properties
@@ -1779,6 +1781,9 @@ class ExportPass(ExporterArchive):
         if renderpass.pass_eyesplits > 0:
             self.write_text('Option "limits" "int eyesplits" [%i]\n'
                             % renderpass.pass_eyesplits)
+        self.write_text('Option "limits" "bucketsize" [%i %i]\n'
+                            % (renderpass.pass_bucketsize_width,
+                               renderpass.pass_bucketsize_height))
         if renderpass.pass_gridsize > 0:
             self.write_text('Option "limits" "int gridsize" [%i]\n'
                             % renderpass.pass_gridsize)
