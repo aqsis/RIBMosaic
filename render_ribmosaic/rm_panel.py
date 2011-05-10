@@ -638,6 +638,9 @@ class RibmosaicPipelinePanels(RibmosaicPropertiesPanel):
                                                             False)
                 pan.operator("wm.ribmosaic_pipeline_remove",
                              icon='PANEL_CLOSE', text="").pipeline = xmlpath
+                pan.operator("wm.ribmosaic_pipeline_reload",
+                             icon='FILE_REFRESH',
+                             text="").pipeline = xmlpath
                 pan.menu("WM_MT_ribmosaic_pipeline_menu",
                              icon='DOWNARROW_HLT', text="")
 
@@ -656,6 +659,7 @@ class RibmosaicPipelinePanels(RibmosaicPropertiesPanel):
                     row.operator("wm.ribmosaic_pipeline_enable",
                              icon='CHECKBOX_DEHLT',
                              text="").xmlpath = xmlpath
+
                 layout.separator()
                 grp = layout.column()
                 grp.enabled = enabled if not self.pipeline_editor else True
@@ -891,6 +895,8 @@ class RENDER_PT_ribmosaic_passes(RibmosaicPropertiesPanel, bpy.types.Panel):
             col.prop(active_pass, "pass_shadingrate")
             col.prop(active_pass, "pass_eyesplits")
             col.prop(active_pass, "pass_gridsize")
+            col.prop(active_pass, "pass_bucketsize_width")
+            col.prop(active_pass, "pass_bucketsize_height")
             col.prop(active_pass, "pass_texturemem")
             sub = split.column()
             sub.label(text="Camera:")
