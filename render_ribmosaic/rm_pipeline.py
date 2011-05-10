@@ -1647,17 +1647,6 @@ class PipelineManager():
                     ca = category
                     pa = panel
 
-                    for pr in self._pipeline_panels[pi][ca][pa]['props']:
-                        try:
-                            exec(pr)
-                            if DEBUG_PRINT:
-                                print(pr)
-                        except:
-                            raise rm_error.RibmosaicError(
-                                "PipelineManager._unregister_panel:"
-                                " Failed to delete property",
-                                sys.exc_info())
-
                     for cl in self._pipeline_panels[pi][ca][pa]['classes']:
                         try:
                             if DEBUG_PRINT:
@@ -1669,6 +1658,16 @@ class PipelineManager():
                                 " Failed to unregister panel class",
                                 sys.exc_info())
 
+                    for pr in self._pipeline_panels[pi][ca][pa]['props']:
+                        try:
+                            exec(pr)
+                            if DEBUG_PRINT:
+                                print(pr)
+                        except:
+                            raise rm_error.RibmosaicError(
+                                "PipelineManager._unregister_panel:"
+                                " Failed to delete property",
+                                sys.exc_info())
 
                     self._pipeline_panels[pipeline][category].pop(panel)
 
