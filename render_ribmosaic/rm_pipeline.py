@@ -1612,6 +1612,8 @@ class PipelineManager():
                     " Failed to generate panel " + path, sys.exc_info())
 
             classes.append(local['panel'])
+            if DEBUG_PRINT:
+                print('panel: ', local['panel'])
 
         if pipeline not in self._pipeline_panels:
             self._pipeline_panels[pipeline] = {}
@@ -1647,15 +1649,25 @@ class PipelineManager():
 
                     for cl in self._pipeline_panels[pi][ca][pa]['classes']:
                         try:
-                            bpy.types.unregister(cl)
+                            if DEBUG_PRINT:
+                                print('unregister class: ', cl)
+                            bpy.utils.unregister_class(cl)
                         except:
-                            pass
+                            raise rm_error.RibmosaicError(
+                                "PipelineManager._unregister_panel:"
+                                " Failed to unregister panel class",
+                                sys.exc_info())
 
                     for pr in self._pipeline_panels[pi][ca][pa]['props']:
                         try:
                             exec(pr)
+                            if DEBUG_PRINT:
+                                print(pr)
                         except:
-                            pass
+                            raise rm_error.RibmosaicError(
+                                "PipelineManager._unregister_panel:"
+                                " Failed to delete property",
+                                sys.exc_info())
 
                     self._pipeline_panels[pipeline][category].pop(panel)
 
