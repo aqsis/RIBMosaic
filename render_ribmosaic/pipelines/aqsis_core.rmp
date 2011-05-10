@@ -64,10 +64,11 @@ Display "+@[EVAL:.pass_output:]@" "exr" "float _z" "string layername" "RenderLay
             <read target="">
             </read>
             <begin target="">
+@[EVAL:"Hider \"hidden\" \"depthfilter\" [\"midpoint\"]" if @[DATA:///properties/multipass:]@ else "":]@
 Option "shadow" "bias" [@[DATA:///properties/shadowbias:RIB]@]
 Option "shadow" "bias0" [@[DATA:///properties/shadowbias0:RIB]@]
 Option "shadow" "bias1" [@[DATA:///properties/shadowbias1:RIB]@]
-
+@[EVAL:"Option \"Render\" \"integer multipass\" [1]" if @[DATA:///properties/multipass:]@ else "":]@
 
             </begin>
             <end target="">
@@ -78,32 +79,22 @@ Option "shadow" "bias1" [@[DATA:///properties/shadowbias1:RIB]@]
                 <shadowbias type='FLOAT' description="Specifies a small amount to be added (in “camera” space) to the depth values stored in the shadow map" default="0.001" min="0" max="100" softmin="1" softmax="100" maxlen="" step="" precision="" items="" size="" link="" />
                 <shadowbias0 type='FLOAT' description="Specifies the start of the bias range, a value is chosen randomly within this range for the the shadow bias value" default="0.001" min="0" max="100" softmin="1" softmax="100" maxlen="" step="" precision="" items="" size="" link="" />
                 <shadowbias1 type='FLOAT' description="Specifies the end of the bias range, a value is chosen randomly within this range for the the shadow bias value" default="0.001" min="0" max="100" softmin="1" softmax="100" maxlen="" step="" precision="" items="" size="" link="" />
+                <multipass type='BOOL' description="Enables the use of multipass rendering. Used in conjunction with the “autoshadows” Attributes, this option enables the generation of automatic shadow maps" default="False" min="" max="" softmin="" softmax="" maxlen="" step="" precision="" items="" size="" link="" />
             </properties>
             <layout>
-                <column type="COLUMN" box="True" align="True" enabled="True" active="True" visible="True">
-                	<shadowbias type='PROP' prop="shadowbias" text="Shadow Bias" expand="False" slider="False" toggle="False" icon="" trigger="" />
-                	<shadowbias0 type='PROP' prop="shadowbias0" text="Shadow Bias0" expand="False" slider="False" toggle="False" icon="" trigger="" />
-                	<shadowbias1 type='PROP' prop="shadowbias1" text="Shadow Bias1" expand="False" slider="False" toggle="False" icon="" trigger="" />
+                <column type="COLUMN" box="True" align="False" enabled="True" active="True" visible="True">
+	                <row type="ROW" box="False" align="True" enabled="True" active="True" visible="True">
+		                <shadow_label type='LABEL' text="Shadows:" />
+        	        	<shadowbias type='PROP' prop="shadowbias" text="Bias" expand="False" slider="False" toggle="False" icon="" trigger="" />
+	                </row>
+	                <row2 type="ROW" box="False" align="True" enabled="True" active="True" visible="True">
+        	        	<shadowbias0 type='PROP' prop="shadowbias0" text="Bias0" expand="False" slider="False" toggle="False" icon="" trigger="" />
+        	        	<shadowbias1 type='PROP' prop="shadowbias1" text="Bias1" expand="False" slider="False" toggle="False" icon="" trigger="" />
+	                </row2>
+		        <multipass type='PROP' prop="multipass" text="Multi Pass - generate automatic shadow maps" expand="False" slider="False" toggle="False" icon="" trigger="" />
                 </column>
             </layout>
         </Options>
-        <Multipass_Option delete="False" description="Multipass option for Auto Shadows" duplicate="False" enabled="False" filter="Shadow" register="True" type="OPTION" windows="RENDER">
-            <read target="">
-            </read>
-            <begin target="">
-Option "Render" "integer multipass" [1]
-Hider "hidden" "depthfilter" "midpoint"
-
-            </begin>
-            <end target="">
-            </end>
-            <regexes target="">
-            </regexes>
-            <properties>
-            </properties>
-            <layout>
-            </layout>
-        </Multipass_Option>
         <AutoShadow_Attribute delete="False" description="Auto Shadows attribute" duplicate="False" enabled="False" filter="Shadow" register="True" type="ATTR" windows="LAMP">
             <read target="">
             </read>
@@ -124,7 +115,6 @@ Attribute "autoshadows" "string shadowmapname" [@[DATA:///properties/shad_name:R
                 	<shad_res type='PROP' prop="shad_res" text="Shadow map Resolution" expand="False" slider="False" toggle="False" icon="" trigger="" />
 			<shad_name type='PROP' prop="shad_name" text="Shadow map Name" expand="False" slider="False" toggle="False" icon="" trigger="" />
                 </column>
-
             </layout>
         </AutoShadow_Attribute>
     </utility_panels>
