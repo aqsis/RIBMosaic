@@ -8,7 +8,7 @@
 	</shader_sources>
 
 	<shader_panels filter="SHADER">
-		<bluescreen delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="IMAGER" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@bluescreen.slx.slmeta" type="IMAGER" windows="CAMERA">
+		<bluescreen delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="IMAGER" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@bluescreen.slmeta" type="IMAGER" windows="CAMERA">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@bluescreen"
     "uniform color background" @[DATA:///properties/background_prop0:RIB]@
@@ -44,7 +44,7 @@
 				</texturename_row0>
 			</layout>
 		</bluescreen>
-		<background delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="IMAGER" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@background.slx.slmeta" type="IMAGER" windows="CAMERA">
+		<background delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="IMAGER" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@background.slmeta" type="IMAGER" windows="CAMERA">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@background"
     "uniform color bgcolor" @[DATA:///properties/bgcolor_prop0:RIB]@
@@ -71,7 +71,7 @@
 				</bgcolor_row0>
 			</layout>
 		</background>
-		<clamptoalpha delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="IMAGER" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@clamptoalpha.slx.slmeta" type="IMAGER" windows="CAMERA">
+		<clamptoalpha delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="IMAGER" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@clamptoalpha.slmeta" type="IMAGER" windows="CAMERA">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@clamptoalpha"
 

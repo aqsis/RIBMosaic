@@ -8,7 +8,7 @@
 	</shader_sources>
 
 	<shader_panels filter="SHADER">
-		<droop delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@droop.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+		<droop delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@droop.slmeta" type="DISPLACEMENT" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@droop"
     "uniform float Km" @[DATA:///properties/Km_prop0:RIB]@
@@ -35,7 +35,7 @@
 				</Km_row0>
 			</layout>
 		</droop>
-		<slateroofd delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@slateroofd.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+		<slateroofd delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@slateroofd.slmeta" type="DISPLACEMENT" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@slateroofd"
     "uniform float Km" @[DATA:///properties/Km_prop0:RIB]@
@@ -116,7 +116,7 @@
 				</factor_row0>
 			</layout>
 		</slateroofd>
-		<bubbly delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@bubbly.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+		<bubbly delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@bubbly.slmeta" type="DISPLACEMENT" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@bubbly"
     "uniform float mult" @[DATA:///properties/mult_prop0:RIB]@
@@ -170,7 +170,7 @@
 				</bubsize_row0>
 			</layout>
 		</bubbly>
-		<fur1 delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@fur1.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+		<fur1 delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@fur1.slmeta" type="DISPLACEMENT" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@fur1"
     "uniform float height" @[DATA:///properties/height_prop0:RIB]@
@@ -206,7 +206,7 @@
 				</fac_row0>
 			</layout>
 		</fur1>
-		<displacementmap delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@displacementmap.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+		<displacementmap delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@displacementmap.slmeta" type="DISPLACEMENT" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@displacementmap"
     "uniform float Km" @[DATA:///properties/Km_prop0:RIB]@
@@ -251,7 +251,7 @@
 				</texturename_row0>
 			</layout>
 		</displacementmap>
-		<gouge delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@gouge.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+		<gouge delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@gouge.slmeta" type="DISPLACEMENT" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@gouge"
     "uniform float Km" @[DATA:///properties/Km_prop0:RIB]@
@@ -296,7 +296,7 @@
 				</texturename_row0>
 			</layout>
 		</gouge>
-		<stucco delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@stucco.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+		<stucco delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@stucco.slmeta" type="DISPLACEMENT" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@stucco"
     "uniform float Km" @[DATA:///properties/Km_prop0:RIB]@
@@ -341,7 +341,7 @@
 				</frequency_row0>
 			</layout>
 		</stucco>
-		<round delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@round.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+		<round delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@round.slmeta" type="DISPLACEMENT" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@round"
     "uniform float radius" @[DATA:///properties/radius_prop0:RIB]@
@@ -368,7 +368,7 @@
 				</radius_row0>
 			</layout>
 		</round>
-		<ripple delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@ripple.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+		<ripple delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@ripple.slmeta" type="DISPLACEMENT" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@ripple"
     "uniform float amplitude" @[DATA:///properties/amplitude_prop0:RIB]@
@@ -422,7 +422,7 @@
 				</size_row0>
 			</layout>
 		</ripple>
-		<waterdisplacement delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@waterdisplacement.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+		<waterdisplacement delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@waterdisplacement.slmeta" type="DISPLACEMENT" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@waterdisplacement"
     "uniform float Km" @[DATA:///properties/Km_prop0:RIB]@
@@ -458,7 +458,7 @@
 				</bumpmap_row0>
 			</layout>
 		</waterdisplacement>
-		<square_ridges delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@square_ridges.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+		<square_ridges delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@square_ridges.slmeta" type="DISPLACEMENT" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@square_ridges"
     "uniform float Km" @[DATA:///properties/Km_prop0:RIB]@
@@ -503,7 +503,7 @@
 				</Offset_row0>
 			</layout>
 		</square_ridges>
-		<bubbles delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@bubbles.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+		<bubbles delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@bubbles.slmeta" type="DISPLACEMENT" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@bubbles"
     "uniform float radius" @[DATA:///properties/radius_prop0:RIB]@
@@ -548,7 +548,7 @@
 				</frequency_row0>
 			</layout>
 		</bubbles>
-		<bumpy delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@bumpy.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+		<bumpy delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@bumpy.slmeta" type="DISPLACEMENT" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@bumpy"
     "uniform float Km" @[DATA:///properties/Km_prop0:RIB]@
@@ -584,7 +584,7 @@
 				</texturename_row0>
 			</layout>
 		</bumpy>
-		<gloop delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@gloop.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+		<gloop delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@gloop.slmeta" type="DISPLACEMENT" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@gloop"
     "uniform float freq" @[DATA:///properties/freq_prop0:RIB]@
@@ -620,7 +620,7 @@
 				</magnitude_row0>
 			</layout>
 		</gloop>
-		<emboss delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@emboss.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+		<emboss delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@emboss.slmeta" type="DISPLACEMENT" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@emboss"
     "uniform float Km" @[DATA:///properties/Km_prop0:RIB]@
@@ -656,7 +656,7 @@
 				</texturename_row0>
 			</layout>
 		</emboss>
-		<threads delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@threads.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+		<threads delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@threads.slmeta" type="DISPLACEMENT" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@threads"
     "uniform float Km" @[DATA:///properties/Km_prop0:RIB]@
@@ -719,7 +719,7 @@
 				</dampzone_row0>
 			</layout>
 		</threads>
-		<slateroof delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@slateroof.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<slateroof delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@slateroof.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@slateroof"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -827,7 +827,7 @@
 				</txtscale_row0>
 			</layout>
 		</slateroof>
-		<dented delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@dented.slx.slmeta" type="DISPLACEMENT" windows="MATERIAL">
+		<dented delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="DISPLACEMENT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@dented.slmeta" type="DISPLACEMENT" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@dented"
     "uniform float Km" @[DATA:///properties/Km_prop0:RIB]@
