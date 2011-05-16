@@ -399,6 +399,23 @@ class ExporterManager():
 
         return sep.join(self.export_paths[exp_key])
 
+    def make_shader_export_path(self, subname="Text_Editor"):
+        """
+          make path for shader exports
+
+          subname = name of shader sub directory, defualts to "Text_Editor"
+          Returns the relative path
+        """
+        path = ("." + os.sep + self.make_export_path('SHD') +
+            os.sep + subname + os.sep)
+        try:
+            os.makedirs(path)
+        except:
+            pass
+
+        return path
+
+
     def get_archive_paths(self, path_sep='/'):
         """
         Returns a list of the archive paths
@@ -520,6 +537,133 @@ class ExporterManager():
             raise rm_error.RibmosaicError("Blend must be saved before "
                                           "it can be exported")
 
+    def export_text_editor_shaders(self):
+        """
+          Export all shaders in the text editor into text files.
+        """
+        is_shaders = False
+
+        for t in bpy.data.texts:
+            if t.filepath:
+                name = os.path.basename(t.filepath)
+            else:
+                name = t.name
+
+            ext = os.path.splitext(name)[1]
+
+            # Only export source code
+            if ext == ".sl" or ext == ".h":
+                if self.export_scene.ribmosaic_purgeshd:
+                    path = self.make_shader_export_path()
+                    f = open(path + name, 'w')
+                    f.write(t.as_string())
+                    f.close()
+
+                is_shaders = True
+
+        return is_shaders
+
+    def export_xml_shaders(self, pipeline):
+        """
+          Export shaders in pipeline xml into a text file.
+
+          pipeline = pipeline name that has shaders.
+        """
+        is_shaders = False
+
+        for e in rm.pipeline_manager.list_elements(pipeline +
+                 "/shader_sources"):
+            xmlp = pipeline + "/shader_sources/" + e
+            name = rm.pipeline_manager.get_attr(ec, xmlp,
+                                             "filepath", False)
+            name = os.path.basename(name)
+
+            if name:
+                if self.export_scene.ribmosaic_purgeshd:
+                    source = rm.pipeline_manager.get_text(ec, xmlp)
+                    path = self.make_shader_export_path(pipeline)
+                    f = open(path + name, 'w')
+                    f.write(source)
+                    f.close()
+
+                is_shaders = True
+            else:
+                raise rm_error.RibmosaicError("Attribute error"
+                    " in " + xmlp + ", must specify filepath")
+
+        return is_shaders
+
+    def build_shader_compile_commands(self, ec):
+        """
+          Build shader compile commands using ExportCommand class.
+
+          ec = export context instance.
+        """
+        ec.current_command = 0  # Reset command index
+        compile_commands = rm.pipeline_manager.list_panels(
+            "command_panels", type='COMPILE')
+        for c in compile_commands:
+            # Setup command panel context from xmlpath
+            segs = c.split("/")
+            ec.context_pipeline = segs[0]
+            ec.context_category = segs[1]
+            ec.context_panel = segs[2]
+
+            # Only export enabled command panels
+            if ec._panel_enabled():
+                ec.current_command += 1
+                name = ec._resolve_links(
+                       "COMPILE_S@[EVAL:.current_library:#####]@"
+                       "_C@[EVAL:.current_command:#####]@")
+                path = "." + os.sep
+
+                try:
+                    s = ExporterCommand(ec, c, False, path, name)
+                    s.build_code("begin")
+                    s.build_code("middle")
+                    s.build_code("end", True)
+                except:
+                    s.close_archive()
+                    raise rm_error.RibmosaicError("Failed to"
+                        " build command " + name, sys.exc_info())
+
+                self.command_scripts['COMPILE'].append(s)
+
+
+    def build_shader_info_commands(self, ec):
+        """
+          Build shader info commands using ExportCommand class.
+
+          ec = export context instance.
+        """
+        ec.current_command = 0  # Reset command index
+        info_commands = rm.pipeline_manager.list_panels(
+            "command_panels", type='INFO')
+        for c in info_commands:
+            # Setup command panel context from xmlpath
+            segs = c.split("/")
+            ec.context_pipeline = segs[0]
+            ec.context_category = segs[1]
+            ec.context_panel = segs[2]
+
+            # Only export enabled command panels
+            if ec._panel_enabled():
+                ec.current_command += 1
+                name = ec._resolve_links(
+                       "INFO_S@[EVAL:.current_library:#####]@"
+                       "_C@[EVAL:.current_command:#####]@")
+                path = "." + os.sep
+
+                try:
+                    s = ExporterCommand(ec, c, True, path, name)
+                except:
+                    s.close_archive()
+                    raise rm_error.RibmosaicError("Failed to build"
+                        "command " + name, sys.exc_info())
+
+                self.command_scripts['INFO'].append(s)
+
+
     def export_shaders(self, render_object=None, shader_library=""):
         """Exports shaders for all pipelines (including Blender's text editor
         shaders as a virtual pipeline). Also generates both compile and info
@@ -531,13 +675,6 @@ class ExporterManager():
         """
         if DEBUG_PRINT:
             print("ExportManager.export_shaders")
-
-        # Gather available command panels
-        purge = self.export_scene.ribmosaic_purgeshd
-        compile_commands = rm.pipeline_manager.list_panels("command_panels",
-                                                           type='COMPILE')
-        info_commands = rm.pipeline_manager.list_panels("command_panels",
-                                                        type='INFO')
 
         # Setup generic export context object
         ec = rm_context.ExportContext(None, self.export_scene,
@@ -566,7 +703,6 @@ class ExporterManager():
                 libraries.append("xml")
             elif p == shader_library:
                 lib = rm.pipeline_manager.get_attr(ec, p, "library", False, "")
-
                 if lib:
                     libraries.append(lib)
             elif eval(rm.pipeline_manager.get_attr(ec, p, "enabled",
@@ -582,59 +718,25 @@ class ExporterManager():
                     compile = True
                     if self.export_scene.name == 'preview':
                         info = rm.rm_panel.RibmosaicRender.preview_compile
+                        compile = info
                     else:
                         info = self.export_scene.ribmosaic_compileshd
 
                     # Setup shader paths to be relative from export directory
-                    path = "." + os.sep + self.make_export_path('SHD') + \
-                           os.sep + p + os.sep
+                    path = self.make_shader_export_path(p)
                     ec.target_path = path
                     ec.target_name = ""
 
-                    try:
-                        os.makedirs(path)
-                    except:
-                        pass
 
                     # Export sources in Blender's text editor
                     if p == "Text_Editor":
-                        for t in bpy.data.texts:
-                            if t.filepath:
-                                name = os.path.basename(t.filepath)
-                            else:
-                                name = t.name
+                        if self.export_text_editor_shaders():
+                            is_shaders = True
 
-                            ext = os.path.splitext(name)[1]
-
-                            # Only export source code
-                            if ext == ".sl" or ext == ".h":
-                                if purge:
-                                    f = open(path + name, 'w')
-                                    f.write(t.as_string())
-                                    f.close()
-
-                                is_shaders = True
                     # Export sources in XML data
                     else:
-                        for e in rm.pipeline_manager.list_elements(p +
-                                 "/shader_sources"):
-                            xmlp = p + "/shader_sources/" + e
-                            name = rm.pipeline_manager.get_attr(ec, xmlp,
-                                                             "filepath", False)
-                            name = os.path.basename(name)
-
-                            if name:
-                                if purge:
-                                    source = rm.pipeline_manager.get_text(ec,
-                                                                    xmlp)
-                                    f = open(path + name, 'w')
-                                    f.write(source)
-                                    f.close()
-
-                                is_shaders = True
-                            else:
-                                raise rm_error.RibmosaicError("Attribute error"
-                                    " in " + xmlp + ", must specify filepath")
+                        if self.export_xml_shaders(p):
+                            is_shaders = True
 
                     # If no shaders exported remove empty directory
                     if not is_shaders:
@@ -669,60 +771,13 @@ class ExporterManager():
                 # generate command scripts for pipelines with shaders
                 if is_shaders:
                     ec.current_library += 1  # Increment shader library index
-                    ec.current_command = 0  # Reset command index
 
-                    for c in compile_commands:
-                        # Setup command panel context from xmlpath
-                        segs = c.split("/")
-                        ec.context_pipeline = segs[0]
-                        ec.context_category = segs[1]
-                        ec.context_panel = segs[2]
+                    if compile:
+                        self.build_shader_compile_commands(ec)
 
-                        # Only export enabled command panels
-                        if compile and ec._panel_enabled():
-                            ec.current_command += 1
-                            name = ec._resolve_links(
-                                   "COMPILE_S@[EVAL:.current_library:#####]@"
-                                   "_C@[EVAL:.current_command:#####]@")
-                            path = "." + os.sep
+                    if info:
+                        self.build_shader_info_commands(ec)
 
-                            try:
-                                s = ExporterCommand(ec, c, False, path, name)
-                                s.build_code("begin")
-                                s.build_code("middle")
-                                s.build_code("end", True)
-                            except:
-                                s.close_archive()
-                                raise rm_error.RibmosaicError("Failed to"
-                                    " build command " + name, sys.exc_info())
-
-                            self.command_scripts['COMPILE'].append(s)
-
-                    ec.current_command = 0  # Reset command index
-
-                    for c in info_commands:
-                        # Setup command panel context from xmlpath
-                        segs = c.split("/")
-                        ec.context_pipeline = segs[0]
-                        ec.context_category = segs[1]
-                        ec.context_panel = segs[2]
-
-                        # Only export enabled command panels
-                        if info and ec._panel_enabled():
-                            ec.current_command += 1
-                            name = ec._resolve_links(
-                                   "INFO_S@[EVAL:.current_library:#####]@"
-                                   "_C@[EVAL:.current_command:#####]@")
-                            path = "." + os.sep
-
-                            try:
-                                s = ExporterCommand(ec, c, True, path, name)
-                            except:
-                                s.close_archive()
-                                raise rm_error.RibmosaicError("Failed to build"
-                                    "command " + name, sys.exc_info())
-
-                            self.command_scripts['INFO'].append(s)
 
         del ec
 
