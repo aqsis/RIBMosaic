@@ -1398,7 +1398,8 @@ class ExporterArchive(rm_context.ExportContext):
 
         if archive_mode in ['READARCHIVE', 'DELAYEDARCHIVE', 'INSTANCE']:
             # make archive name
-            self.archive_name = self.data_name + '.rib'
+            self.archive_name = (self.data_name + '_' + self._archive_key +
+                '.rib')
             # setup readarchive in parent archive
             # rely on the file pointer still setup for the parent
             self.riReadArchive()
@@ -1765,40 +1766,6 @@ class ExportPass(ExporterArchive):
 
         self.open_archive(gzipped=compress)
 
-    def _export_lights(self, lights):
-        if DEBUG_PRINT:
-            print("ExportPass._export_lights()")
-
-        for idx, light in enumerate(lights):
-            target_name = light.name + ".rib"
-            self.current_lightid = idx
-            try:
-                el = ExportLight(self, light)
-                el.export_rib()
-                del el
-            except:
-                el.close_archive()
-                del el
-                raise rm_error.RibmosaicError("Failed to build light RIB " +
-                                             target_name, sys.exc_info())
-
-    def _export_objects(self, objects):
-        if DEBUG_PRINT:
-            print("ExportPass._export_objects()")
-
-        for ob in objects:
-            target_name = ob.name + ".rib"
-            try:
-                eo = ExportObject(self, ob)
-                eo.export_rib()
-                eo.close_archive()
-                del eo
-            except:
-                eo.close_archive()
-                del eo
-                raise rm_error.RibmosaicError("Failed to build object RIB " +
-                                              target_name, sys.exc_info())
-
     def _export_pass_properties(self):
         if DEBUG_PRINT:
             print("ExportPass._export_pass_properties()")
@@ -1887,18 +1854,8 @@ class ExportPass(ExporterArchive):
         # TODO Setup world shaders
         # TODO Setup insertion point for light archive
 
-        #world = ExportWorld(self)
-        #world.export_rib()
-        #del world
-
-        #objects = ExportObject(self)
-        #objects.export_rib()
-        #del objects
-
         if DEBUG_PRINT:
             print("ExportPass.export_rib()")
-
-        # #### Setup basic test RIB for now
 
         # Push objects attributes
         pipeline = self.context_pipeline
@@ -1906,10 +1863,9 @@ class ExportPass(ExporterArchive):
         panel = self.context_panel
         datablock = self.pointer_datablock
 
-        # Panel object lists
+        # Render and Scene Utility Panel object lists
         scene_utilities = []
         render_utilities = []
-        world_utilities = []
 
         # Initialize objects for enabled panels in render and scene
         for p in rm.pipeline_manager.list_panels("utility_panels",
@@ -1931,20 +1887,6 @@ class ExportPass(ExporterArchive):
 
             if self._panel_enabled():
                 render_utilities.append(ExporterUtility(self, p))
-
-        # Initialize objects for enabled panels in world
-        self.pointer_datablock = datablock.world
-
-        for p in rm.pipeline_manager.list_panels("utility_panels",
-                                                 window='WORLD'):
-            segs = p.split("/")
-            self.context_pipeline = segs[0]
-            self.context_category = segs[1]
-            self.context_panel = segs[2]
-
-            if self._panel_enabled():
-                world_utilities.append(ExporterUtility(self, p))
-
 
         # Pop objects attributes
         self.context_pipeline = pipeline
@@ -1989,14 +1931,117 @@ class ExportPass(ExporterArchive):
 
         self.write_text("Sides 1\n")
 
+        world = ExportWorld(self, datablock.world)
+        world.export_rib()
+        del world
+
+
+        for p in render_utilities:
+            p.current_indent = self.current_indent
+            p.build_code("end")
+
+        if scene.ribmosaic_use_frame:
+            self.riFrameEnd()
+
+        for p in scene_utilities:
+            p.current_indent = self.current_indent
+            p.build_code("end")
+
+        self.close_archive()
+
+
+class ExportWorld(ExporterArchive):
+    """Represents shaders on world data-blocks"""
+
+    def __init__(self, export_object=None, pointer_object=None):
+        """Initialize attributes using export_object and parameters.
+        Automatically create the RIB this object represents.
+
+        export_object = ExportObject subclassed from ExportContext
+       """
+
+        ExporterArchive.__init__(self, export_object, 'WLD')
+        self._set_pointer_datablock(pointer_object)
+        self.open_rib_archive()
+
+    def _export_objects(self, objects):
+        if DEBUG_PRINT:
+            print("ExportPass._export_objects()")
+
+        for ob in objects:
+            target_name = ob.name + ".rib"
+            try:
+                eo = ExportObject(self, ob)
+                eo.export_rib()
+                eo.close_archive()
+                del eo
+            except:
+                eo.close_archive()
+                del eo
+                raise rm_error.RibmosaicError("Failed to build object RIB " +
+                                              target_name, sys.exc_info())
+
+    def _export_lights(self, lights):
+        if DEBUG_PRINT:
+            print("ExportPass._export_lights()")
+
+        for idx, light in enumerate(lights):
+            target_name = light.name + ".rib"
+            self.current_lightid = idx
+            try:
+                el = ExportLight(self, light)
+                el.export_rib()
+                del el
+            except:
+                el.close_archive()
+                del el
+                raise rm_error.RibmosaicError("Failed to build light RIB " +
+                                             target_name, sys.exc_info())
+
+    # #### Public methods
+
+    def export_rib(self):
+        """ """
+
+        print("Exporting world...")
+
+        if self._pointer_file == None:
+            return
+
+        # Push objects attributes
+        pipeline = self.context_pipeline
+        category = self.context_category
+        panel = self.context_panel
+        datablock = self.pointer_datablock
+
+        world_utilities = []
+
+        for p in rm.pipeline_manager.list_panels("utility_panels",
+                                                 window='WORLD'):
+            segs = p.split("/")
+            self.context_pipeline = segs[0]
+            self.context_category = segs[1]
+            self.context_panel = segs[2]
+
+            if self._panel_enabled():
+                world_utilities.append(ExporterUtility(self, p))
+
+        # Pop objects attributes
+        self.context_pipeline = pipeline
+        self.context_category = category
+        self.context_panel = panel
+        self.pointer_datablock = datablock
+
+        self.export_shaders('WORLD')
+
+        scene = self.get_scene()
+
         if scene.ribmosaic_use_world:
             self.riWorldBegin()
 
         for p in world_utilities:
             p.current_indent = self.current_indent
             p.build_code("begin")
-
-        self.export_shaders('WORLD')
 
         # figure out what objects in the scene are renderable
         # build a collection of all renderable objects which includes:
@@ -2016,29 +2061,7 @@ class ExportPass(ExporterArchive):
         if scene.ribmosaic_use_world:
             self.riWorldEnd()
 
-        for p in render_utilities:
-            p.current_indent = self.current_indent
-            p.build_code("end")
-
-        if scene.ribmosaic_use_frame:
-            self.riFrameEnd()
-
-        for p in scene_utilities:
-            p.current_indent = self.current_indent
-            p.build_code("end")
-
         self.close_archive()
-
-
-class ExportWorld(ExporterArchive):
-    """Represents shaders on world data-blocks"""
-
-    # #### Public methods
-
-    def export(self):
-        """ """
-
-        print("Exporting world...")
 
 
 class ExportObject(ExporterArchive):
@@ -2062,17 +2085,7 @@ class ExportObject(ExporterArchive):
 
         ExporterArchive.__init__(self, export_object, 'OBJ')
         self._set_pointer_datablock(pointer_object)
-
-        # TODO open the archive if using ReadArchive mode
-        # for now default to using the parents file pointer
-
-        # Determine if compressed RIB is enabled in the parent
-        #if export_object:
-        #    compress = getattr(export_object, "is_gzip", False)
-        #else:
-        #    compress = False
-
-        #self.open_archive(gzipped=compress)
+        self.open_rib_archive()
 
     def _export_camera_rib(self):
         if DEBUG_PRINT:
@@ -2255,6 +2268,7 @@ class ExportLight(ExporterArchive):
 
         ExporterArchive.__init__(self, export_object, 'LAM')
         self._set_pointer_datablock(pointer_object)
+        self.open_rib_archive()
 
     def _export_lightcolor(self, color=(1, 1, 1)):
         self.write_text('"color lightcolor" [ %s ]\n'
