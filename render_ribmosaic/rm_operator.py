@@ -328,15 +328,17 @@ class WM_OT_ribmosaic_text_addshaderpanel(rm_context.ExportContext,
             index = wm.ribmosaic_pipelines.active_index
             # determine the path to the slmeta file for the shader in the text
             # editor
+            slmetaname = text.name[:-2] + "slmeta"
             slmetapath = (rm.export_manager.export_directory +
                     rm.export_manager.make_shader_export_path() +
-                    text.name[:-2] + "slmeta")
+                    slmetaname)
             # only try to add the shader panel if a pipeline is selected
             # and the slmeta file exists
             if index >= 0 and os.path.isfile(slmetapath):
                 bpy.ops.wm.ribmosaic_library_addpanel('INVOKE_DEFAULT',
                     filepath=slmetapath,
-                    pipeline=wm.ribmosaic_pipelines.collection[index].xmlpath)
+                    pipeline=wm.ribmosaic_pipelines.collection[index].xmlpath,
+                    filename=slmetaname)
 
         except rm_error.RibmosaicError as err:
             err.ReportError(self)
@@ -1238,7 +1240,10 @@ class WM_OT_ribmosaic_library_addpanel(rm_context.ExportContext,
                     self.filepath = lib + "*.slmeta"
                 else:
                     self.library = ""
-                    #self.filepath = "//*.slmeta"
+                    if self.filename != "":
+                        self.files.add().name = self.filename
+                    else:
+                        self.filepath = "//*.slmeta"
             else:
                 raise rm_error.RibmosaicError("Blend must be saved before "
                                               "shaders can be added")
