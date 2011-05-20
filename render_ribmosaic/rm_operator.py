@@ -71,22 +71,6 @@ exec("import " + MODULE + " as rm")
 # GLOBAL OPERATORS
 # #############################################################################
 
-class WM_OT_ribmosaic_modal_sync(bpy.types.Operator):
-    '''Allow user to demand the pipeline manager to execute
-       its sync method.  This operator is temporary until
-       background callbacks are supported
-    '''
-    bl_idname = "wm.ribmosaic_modal_sync"
-    bl_label = "sync pipelines"
-
-    def execute(self, context):
-        print("wm.ribmosaic_modal_sync()")
-
-        # Sync pipeline tree with current .rmp files
-        rm.pipeline_manager.sync()
-
-        return {'FINISHED'}
-
 
 class RibmosaicOperator():
     """Super class for all RIB Mosaic operators providing helper methods"""
@@ -134,9 +118,9 @@ class RibmosaicOperator():
 
     def _refresh_panels(self):
         """Refreshes UI panels by simply toggling Blender's render engine"""
-
-        bpy.context.scene.render.engine = 'BLENDER_RENDER'
-        bpy.context.scene.render.engine = rm.ENGINE
+        if bpy.context.scene is not None:
+            bpy.context.scene.render.engine = 'BLENDER_RENDER'
+            bpy.context.scene.render.engine = rm.ENGINE
 
     def _unique_name(self, name, names):
         """Checks name against names list to build a unique name by appending
@@ -1256,10 +1240,28 @@ class WM_OT_ribmosaic_library_addpanel(rm_context.ExportContext,
         return {'RUNNING_MODAL'}
 
 
-
 # #############################################################################
 # PIPELINE OPERATORS
 # #############################################################################
+
+class WM_OT_ribmosaic_pipeline_sync(rm_context.ExportContext,
+                                    RibmosaicOperator,
+                                    bpy.types.Operator):
+    '''Allow user to demand the pipeline manager to execute
+       its sync method.  This operator is temporary until
+       background callbacks are supported
+    '''
+    bl_idname = "wm.ribmosaic_pipeline_sync"
+    bl_label = "Sync Pipelines"
+
+    def execute(self, context):
+        print("wm.ribmosaic_pipeline_sync()")
+
+        # Sync pipeline tree with current .rmp files
+        rm.pipeline_manager.sync()
+        self._refresh_panels()
+        return {'FINISHED'}
+
 
 class WM_OT_ribmosaic_pipeline_enable(rm_context.ExportContext,
                                       RibmosaicOperator,
