@@ -1386,7 +1386,8 @@ class WM_OT_ribmosaic_pipeline_load(rm_context.ExportContext,
     def execute(self, context):
         wm = context.window_manager
 
-        # If no selections and *.rmp then collect all pipelines in directory
+        # If no selections and *.rmp then collect
+        # all pipelines in directory
         if not len(self.files) and self.filename == "*.rmp":
             for f in os.listdir(self.directory):
                 if os.path.splitext(f)[1].lower() == ".rmp":
@@ -1411,6 +1412,15 @@ class WM_OT_ribmosaic_pipeline_load(rm_context.ExportContext,
 
     def invoke(self, context, event):
         wm = context.window_manager
+        try:
+            if bpy.data.is_saved:
+                pass
+            else:
+                raise rm_error.RibmosaicError("Blend must be saved before "
+                                              "Pipeline can be loaded")
+        except rm_error.RibmosaicError as err:
+            err.ReportError(self)
+            return {'CANCELLED'}
 
         wm.fileselect_add(self)
 
