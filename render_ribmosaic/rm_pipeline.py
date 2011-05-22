@@ -1734,6 +1734,62 @@ class PipelineManager():
 
         self._pipeline_texts = self.list_rmp()
 
+    def fix_pipeline_library(self, pipeline, pipelinepath):
+        """fix the pipeline's library path if it is relative to
+           the pipeline path.
+
+        pipelinepath = full path to pipeline .rmp file including pipeline
+                       filename
+        """
+        try:
+            # if pipeline has a library path then check to see if
+            # it is relative
+            lib = self.get_attr(self, pipeline, "library", False)
+            if lib:
+                # special case for relative shader library:
+                # when loading a pipeline with a library that is relative
+                # assume that the relative path contains a sub directory for
+                # the shaders that are used by the library that is relative
+                # to the directory of where the pipeline was loaded from
+                if lib[:2] == "//":
+                    # build a list of the sub directories that make up the
+                    # library path in reverse order
+                    subdirs = lib[2:].split("/")
+                    subdirs.reverse()
+                    subpath = ""
+                    founddirectory = ""
+                    # build sub directories and test if a valid one is found
+                    # start with the last sub directory and work our way left
+                    # until a valid path can be found
+                    for subd in subdirs:
+                        # don't process empty strings
+                        if subd:
+                            # build up the subpath
+                            subpath = subd + os.sep + subpath
+                            # get the full real path
+                            full_lib_path = os.path.realpath(
+                                os.path.split(pipelinepath)[0] +
+                                os.sep + subpath)
+                            # test if the path exists
+                            if os.path.isdir(full_lib_path):
+                                founddirectory = full_lib_path
+                                break
+
+                    # if a valid pipeline directory was found
+                    # save it in the xml
+                    if founddirectory:
+                        # make the lib path relative to the blend
+                        founddirectory = (bpy.path.relpath(founddirectory) +
+                                         os.sep)
+                        # make the change to the library path
+                        # in the pipeline xml text
+                        self.set_attrs(pipeline, library=founddirectory)
+
+        except rm_error.RibmosaicError as err:
+            err.ReportError()
+            raise rm_error.RibmosaicError(
+                "PipelineManager.fix_pipeline_library: " + self._error_load)
+
     def load_pipeline(self, filepath):
         """Load, parse and register specified pipeline file.
 
@@ -1780,45 +1836,6 @@ class PipelineManager():
             err.ReportError()
             raise rm_error.RibmosaicError("PipelineManager.load_pipeline: " +
                                           self._error_register)
-
-        #if pipeline has a library path then check to see if it is relative
-        lib = self.get_attr(self, pipeline, "library", False)
-        if lib:
-            # special case for relative shader library:
-            # when loading a pipeline with a library that is relative
-            # assume that the relative path contains a sub directory for
-            # the shaders that are used by the library that is relative
-            # to the directory of where the pipeline was loaded from
-            if lib[:2] == "//":
-                # build a list of the sub directories that make up the
-                # library path in reverse order
-                subdirs = lib[2:].split("/")
-                subdirs.reverse()
-                subpath = ""
-                founddirectory = ""
-                # build sub directories and test if a valid one is found
-                # start with the last sub directory and work our way left
-                # until a valid path can be found
-                for subd in subdirs:
-                    # don't process empty strings
-                    if subd:
-                        # build up the subpath
-                        subpath = subd + os.sep + subpath
-                        # get the full real path
-                        full_lib_path = os.path.realpath(
-                            os.path.split(filepath)[0] + os.sep + subpath)
-                        # test if the path exists
-                        if os.path.isdir(full_lib_path):
-                            founddirectory = full_lib_path
-                            break
-
-                #if a valid pipeline directory was found save it in the xml
-                if founddirectory:
-                    #make the lib path relative to the blend
-                    founddirectory = bpy.path.relpath(founddirectory) + os.sep
-                    #make the change to the library path
-                    #in the pipeline xml text
-                    self.set_attrs(pipeline, library=founddirectory)
 
         self.revisions += 1
         return pipeline

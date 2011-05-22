@@ -1398,6 +1398,7 @@ class WM_OT_ribmosaic_pipeline_load(rm_context.ExportContext,
 
             try:
                 self.pipeline = rm.pipeline_manager.load_pipeline(path)
+                rm.pipeline_manager.fix_pipeline_library(self.pipeline, path)
                 message = rm.pipeline_manager.list_help(self.pipeline)
 
                 if message:
