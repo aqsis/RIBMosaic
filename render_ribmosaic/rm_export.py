@@ -97,14 +97,6 @@ def rib_param_val(data_type, val):
         return '"%s"' % val
 
 
-def rib_mat_str(m):
-    return '[ %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f ]' % \
-            (m[0][0], m[0][1], m[0][2], m[0][3],
-            m[1][0], m[1][1], m[1][2], m[1][3],
-            m[2][0], m[2][1], m[2][2], m[2][3],
-            m[3][0], m[3][1], m[3][2], m[3][3])
-
-
 # ------------- Data Access Helpers -------------
 # taken from Matt Ebb's Blender to 3Delight exporter
 
@@ -1506,7 +1498,13 @@ class ExporterArchive(rm_context.ExportContext):
                         color[2]))
 
     def riTransform(self, mat):
-        self.write_text('Transform %s\n' % rib_mat_str(mat))
+        self.write_text('Transform')
+        # set the file pointer for ribify
+        rm.ribify.pointer_file = self._pointer_file
+        # set the indent level of the rib output
+        rm.ribify.indent = self.current_indent
+        rm.ribify.matrix4x4(mat)
+
 
     def riSides(self, useTwoSides=True):
         self.write_text('Sides %s\n' % (2 if useTwoSides else 1))
