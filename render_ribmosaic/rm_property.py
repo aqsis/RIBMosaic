@@ -1219,6 +1219,12 @@ def create_props():
                        ('SHADER', "Shader", "")],
                 default='SHADER')
 
+    bpy.types.Material.ribmosaic_two_sided = bpy.props.BoolProperty(
+                name="Two Sided",
+                description="Export material as two sided",
+                default=True)
+
+
     # #### Particle space properties
 
     bpy.types.ParticleSettings.ribmosaic_primitive = bpy.props.EnumProperty(

@@ -1530,6 +1530,10 @@ class MATERIAL_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
             row.active = mat.ribmosaic_ri_opacity
             row.prop(mat, "alpha", text="Opacity")
 
+            split = layout.split()
+            sub = split.column()
+            sub.prop(mat, "ribmosaic_two_sided")
+
             ### FIXME ###
             # can't modify material data block during draw call
             #if not strand.use_blender_units:

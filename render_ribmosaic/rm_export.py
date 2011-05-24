@@ -1498,13 +1498,12 @@ class ExporterArchive(rm_context.ExportContext):
                         color[2]))
 
     def riTransform(self, mat):
-        self.write_text('Transform')
+        self.write_text('Transform ')
         # set the file pointer for ribify
         rm.ribify.pointer_file = self._pointer_file
         # set the indent level of the rib output
         rm.ribify.indent = self.current_indent
         rm.ribify.matrix4x4(mat)
-
 
     def riSides(self, useTwoSides=True):
         self.write_text('Sides %s\n' % (2 if useTwoSides else 1))
@@ -2283,7 +2282,6 @@ class ExportLight(ExporterArchive):
         if DEBUG_PRINT:
             print("ExportLight.export_rib()")
 
-
         self.riAttributeBegin()
         ob = self.pointer_datablock
         lamp = ob.data
@@ -2427,6 +2425,9 @@ class ExportMaterial(ExporterArchive):
                 ' "string coordinatesystem" ["%s"]\n'
                 % (material.ribmosaic_disp_pad, material.ribmosaic_disp_coor))
 
+        if self.get_scene().ribmosaic_use_sides:
+            self.riSides(material.ribmosaic_two_sided)
+
         self.export_shaders('MATERIAL')
 
         self.close_archive()
@@ -2450,8 +2451,6 @@ class ExportObjdata(ExporterArchive):
         self.blender_object = self.pointer_datablock
         self._set_pointer_datablock(self.pointer_datablock.data)
         self.open_rib_archive()
-
-
 
     def _export_geometry(self):
         if DEBUG_PRINT:
@@ -2532,9 +2531,6 @@ class ExportObjdata(ExporterArchive):
 
         # determine what type of object data needs to be exported
         if self.blender_object.type in ('MESH', 'EMPTY'):
-            if self.get_scene().ribmosaic_use_sides:
-                self.riSides(self.pointer_datablock.show_double_sided)
-
             self. _export_geometry()
 
         self.close_archive()
