@@ -202,8 +202,8 @@ class DummyPass():
     pass_camera_group = False
     pass_camera_persp = 'CAMERA'
     pass_camera_lensadj = 0.0
-    pass_camera_nearclip = 0.005
-    pass_camera_farclip = 500
+    pass_camera_nearclip = 0
+    pass_camera_farclip = 0
     # Pass samples properties
     pass_samples_x = 0
     pass_samples_y = 0
@@ -1921,7 +1921,11 @@ class ExportPass(ExporterArchive):
         # TODO the pass camera overrides the scene's camera
         # make use of ExportObject to do the dirty work
         try:
-            cam = ExportObject(self, scene.camera)
+            if self.pointer_pass.pass_camera:
+                camobj = scene.objects[self.pointer_pass.pass_camera]
+            else:
+                camobj = scene.camera
+            cam = ExportObject(self, camobj, as_camera=True)
             cam.export_rib()
             del cam
         except:
@@ -2073,17 +2077,26 @@ class ExportObject(ExporterArchive):
     automatically handles nesting of CSG through parenting.
     """
 
+    as_camera = False # export the object as a camera if set True
+
     # #### Private methods
 
-    def __init__(self, export_object=None, pointer_object=None):
+    def __init__(self, export_object=None, pointer_object=None,
+                 as_camera=False):
         """Initialize attributes using export_object and parameters.
         Automatically create the RIB this object represents.
 
         export_object = ExportObject subclassed from ExportContext
+        pointer_object = the blender object to be exported
+        as_camera = export the object as a camera
        """
 
         ExporterArchive.__init__(self, export_object, 'OBJ')
         self._set_pointer_datablock(pointer_object)
+        if as_camera:
+            self.as_camera = as_camera
+            # override object type
+            self.data_type = 'CAMERA'
         self.open_rib_archive()
 
     def _export_camera_rib(self):
@@ -2107,7 +2120,9 @@ class ExportObject(ExporterArchive):
             xaspect = 1.0
             yaspect = aspectratio
 
-        if camera.ribmosaic_dof:
+        # only blender camera supports DOF
+        dof = getattr(camera, "ribmosaic_dof", False)
+        if dof:
             # allow an object to be used for dof distance
             if camera.dof_object:
                 dof_distance = (ob.location -
@@ -2126,19 +2141,35 @@ class ExportObject(ExporterArchive):
         #        (rm.shutter_efficiency_open, rm.shutter_efficiency_close))
 
         if scene.ribmosaic_use_clipping:
+            if self.pointer_pass.pass_camera_nearclip > 0.0:
+                near_clip = self.pointer_pass.pass_camera_nearclip
+            else:
+                near_clip = getattr(camera, "clip_start", 0.05)
+
+            if self.pointer_pass.pass_camera_farclip > 0.0:
+                far_clip = self.pointer_pass.pass_camera_farclip
+            else:
+                far_clip = getattr(camera, "clip_end", 500)
+
             self.write_text('Clipping %f %f\n'
-                % (camera.clip_start, camera.clip_end))
+                % (near_clip, far_clip))
 
         if scene.ribmosaic_use_projection:
-            if camera.type == 'PERSP':
-                lens = camera.lens
+            persp = self.pointer_pass.pass_camera_persp
+            if persp == "CAMERA":
+                # use camera perspective setting
+                # note: this only works if the object is a blender camera
+                persp = getattr(camera, "type", "PERSP")
+
+            if persp == 'PERSP':
+                lens = getattr(camera, "lens", 35.0)
                 fov = 360.0 * math.atan(16.0 / lens / aspectratio) / math.pi
                 self.write_text('Projection "perspective" "fov" %f\n' % fov)
             else:
-                lens = camera.ortho_scale
+                lens = getattr(camera, "ortho_scale", 1.0)
                 xaspect = xaspect * lens / (aspectratio * 2.0)
                 yaspect = yaspect * lens / (aspectratio * 2.0)
-                self.write('Projection "orthographic"\n')
+                self.write_text('Projection "orthographic"\n')
 
         if scene.ribmosaic_use_screenwindow:
             self.write_text('ScreenWindow %f %f %f %f\n' %
@@ -2194,8 +2225,8 @@ class ExportObject(ExporterArchive):
 
         ob = self.get_object()
 
-        # if a camera object then do special camera output
-        if ob.type == 'CAMERA':
+        # if defined as a camera object then do special camera output
+        if self.as_camera:
             self._export_camera_rib()
         else:
 
