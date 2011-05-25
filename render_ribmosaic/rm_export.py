@@ -1409,25 +1409,22 @@ class ExporterArchive(rm_context.ExportContext):
             self._pointer_file = None
         # all other modes default to inline
 
-    def export_shaders(self, windows):
+    def build_exporter_list(self, panel_type, exporter, windows):
         """
-        Build a list of shaders and export to RIB.
-
-        windows = string of blender window names to get shader panels from
-
-        returns True if shaders were exported.
+        Build a list of Exporter objects.
+        panel_type = type of panel to build exporter for
+        exporter = exporter class to build
+        windows = string of blender window names to get panels from
+        return = list of Exporter objects.
         """
-
-        # Push objects attributes that will get changed
+        # Push objects attributes
         pipeline = self.context_pipeline
         category = self.context_category
         panel = self.context_panel
 
-        # Shader Panel lists
-        shaders = []
+        exporters = []
 
-        # export all enabled shader panels for this archive
-        for p in rm.pipeline_manager.list_panels("shader_panels",
+        for p in rm.pipeline_manager.list_panels(panel_type,
                                                  window=windows):
             segs = p.split("/")
             self.context_pipeline = segs[0]
@@ -1435,12 +1432,47 @@ class ExporterArchive(rm_context.ExportContext):
             self.context_panel = segs[2]
 
             if self._panel_enabled():
-                shaders.append(ExporterShader(self, p))
+                exporters.append(exporter(self, p))
 
         # Pop objects attributes
         self.context_pipeline = pipeline
         self.context_category = category
         self.context_panel = panel
+
+        return exporters
+
+    def build_export_utilities_list(self, windows):
+        """
+        Build a list of ExporterUtility objects.
+
+        windows = string of blender window names to get utility panels from
+        return = list of ExporterUtility objects.
+        """
+        return self.build_exporter_list('utility_panels', ExporterUtility,
+                                        windows)
+
+    def build_export_commands_list(self, windows):
+        """
+        Build a list of ExporterCommand objects.
+
+        windows = string of blender window names to get utility panels from
+        return = list of ExporterCommand objects.
+        """
+        return self.build_exporter_list('command_panels', ExporterCommand,
+                                        windows)
+
+    def export_shaders(self, windows):
+        """
+        Build a list of shaders and export to RIB.
+
+        windows = string of blender window names to get shader panels from
+
+        return = True if shaders were exported.
+        """
+
+        # Shader Panel lists
+        shaders = self.build_exporter_list('shader_panels', ExporterShader,
+                                        windows)
 
         # output rib code for the shaders
         for p in shaders:
@@ -1858,42 +1890,9 @@ class ExportPass(ExporterArchive):
         if DEBUG_PRINT:
             print("ExportPass.export_rib()")
 
-        # Push objects attributes
-        pipeline = self.context_pipeline
-        category = self.context_category
-        panel = self.context_panel
-        datablock = self.pointer_datablock
-
         # Render and Scene Utility Panel object lists
-        scene_utilities = []
-        render_utilities = []
-
-        # Initialize objects for enabled panels in render and scene
-        for p in rm.pipeline_manager.list_panels("utility_panels",
-                                                 window='SCENE'):
-            segs = p.split("/")
-            self.context_pipeline = segs[0]
-            self.context_category = segs[1]
-            self.context_panel = segs[2]
-
-            if self._panel_enabled():
-                scene_utilities.append(ExporterUtility(self, p))
-
-        for p in rm.pipeline_manager.list_panels("utility_panels",
-                                                 window='RENDER'):
-            segs = p.split("/")
-            self.context_pipeline = segs[0]
-            self.context_category = segs[1]
-            self.context_panel = segs[2]
-
-            if self._panel_enabled():
-                render_utilities.append(ExporterUtility(self, p))
-
-        # Pop objects attributes
-        self.context_pipeline = pipeline
-        self.context_category = category
-        self.context_panel = panel
-        self.pointer_datablock = datablock
+        scene_utilities = self.build_export_utilities_list('SCENE')
+        render_utilities = self.build_export_utilities_list('RENDER')
 
         scene = self.get_scene()
 
@@ -1934,7 +1933,7 @@ class ExportPass(ExporterArchive):
             raise rm_error.RibmosaicError("Failed to build camera " +
                                          sys.exc_info())
 
-        world = ExportWorld(self, datablock.world)
+        world = ExportWorld(self, self.pointer_datablock.world)
         world.export_rib()
         del world
 
@@ -2011,29 +2010,7 @@ class ExportWorld(ExporterArchive):
         if self._pointer_file == None:
             return
 
-        # Push objects attributes
-        pipeline = self.context_pipeline
-        category = self.context_category
-        panel = self.context_panel
-        datablock = self.pointer_datablock
-
-        world_utilities = []
-
-        for p in rm.pipeline_manager.list_panels("utility_panels",
-                                                 window='WORLD'):
-            segs = p.split("/")
-            self.context_pipeline = segs[0]
-            self.context_category = segs[1]
-            self.context_panel = segs[2]
-
-            if self._panel_enabled():
-                world_utilities.append(ExporterUtility(self, p))
-
-        # Pop objects attributes
-        self.context_pipeline = pipeline
-        self.context_category = category
-        self.context_panel = panel
-        self.pointer_datablock = datablock
+        world_utilities = self.build_export_utilities_list('WORLD')
 
         self.export_shaders('WORLD')
 
@@ -2317,32 +2294,11 @@ class ExportLight(ExporterArchive):
         ob = self.pointer_datablock
         lamp = ob.data
 
-        # Push objects attributes
-        pipeline = self.context_pipeline
-        category = self.context_category
-        panel = self.context_panel
-
-        # Panel object lists
-        light_utilities = []
 
         # Initialize objects for enabled panels in light data
         self.pointer_datablock = lamp
-        # Initialize objects for enabled panels in render and scene
-        for p in rm.pipeline_manager.list_panels("utility_panels",
-                                                 window='LAMP'):
-            segs = p.split("/")
-            self.context_pipeline = segs[0]
-            self.context_category = segs[1]
-            self.context_panel = segs[2]
-
-            if self._panel_enabled():
-                light_utilities.append(ExporterUtility(self, p))
-
-        # Pop objects attributes
-        self.context_pipeline = pipeline
-        self.context_category = category
-        self.context_panel = panel
-        #self.pointer_datablock =
+        # build Lamp Utility Panel objects list
+        light_utilities = self.build_export_utilities_list('LAMP')
 
         for p in light_utilities:
             p.current_indent = self.current_indent
@@ -2399,8 +2355,6 @@ class ExportLight(ExporterArchive):
                 self.inc_indent()
                 self._export_intensity(lamp.energy)
                 self._export_lightcolor(lamp.color)
-
-        self.dec_indent()
 
         for p in light_utilities:
             p.current_indent = self.current_indent
