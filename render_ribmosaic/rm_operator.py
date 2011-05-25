@@ -71,22 +71,6 @@ exec("import " + MODULE + " as rm")
 # GLOBAL OPERATORS
 # #############################################################################
 
-class WM_OT_ribmosaic_modal_sync(bpy.types.Operator):
-    '''Allow user to demand the pipeline manager to execute
-       its sync method.  This operator is temporary until
-       background callbacks are supported
-    '''
-    bl_idname = "wm.ribmosaic_modal_sync"
-    bl_label = "sync pipelines"
-
-    def execute(self, context):
-        print("wm.ribmosaic_modal_sync()")
-
-        # Sync pipeline tree with current .rmp files
-        rm.pipeline_manager.sync()
-
-        return {'FINISHED'}
-
 
 class RibmosaicOperator():
     """Super class for all RIB Mosaic operators providing helper methods"""
@@ -134,9 +118,9 @@ class RibmosaicOperator():
 
     def _refresh_panels(self):
         """Refreshes UI panels by simply toggling Blender's render engine"""
-
-        bpy.context.scene.render.engine = 'BLENDER_RENDER'
-        bpy.context.scene.render.engine = rm.ENGINE
+        if bpy.context.scene is not None:
+            bpy.context.scene.render.engine = 'BLENDER_RENDER'
+            bpy.context.scene.render.engine = rm.ENGINE
 
     def _unique_name(self, name, names):
         """Checks name against names list to build a unique name by appending
@@ -301,6 +285,50 @@ class WM_OT_ribmosaic_text_comment(rm_context.ExportContext,
 
         return {'FINISHED'}
 
+
+class WM_OT_ribmosaic_text_addshaderpanel(rm_context.ExportContext,
+                                       RibmosaicOperator,
+                                       bpy.types.Operator):
+
+    """
+      Compile shader in text editor, Build slmeta, and add shader panel
+      to selected pipeline.
+    """
+
+    # ### Public attributes
+
+    bl_idname = "wm.ribmosaic_text_addshaderpanel"
+    bl_label = "Compile and generate shader panel for selected pipeline"
+
+    def execute(self, context):
+        try:
+            text = context.space_data.text
+            # make sure text is saved, compiled, and slmeta is built
+            bpy.ops.wm.ribmosaic_library_compile('EXEC_DEFAULT',
+                pipeline="Text_Editor")
+
+            wm = context.window_manager
+            # get the index of the active pipeline
+            index = wm.ribmosaic_pipelines.active_index
+            # determine the path to the slmeta file for the shader in the text
+            # editor
+            slmetaname = text.name[:-2] + "slmeta"
+            slmetapath = (rm.export_manager.export_directory +
+                    rm.export_manager.make_shader_export_path() +
+                    slmetaname)
+            # only try to add the shader panel if a pipeline is selected
+            # and the slmeta file exists
+            if index >= 0 and os.path.isfile(slmetapath):
+                bpy.ops.wm.ribmosaic_library_addpanel('INVOKE_DEFAULT',
+                    filepath=slmetapath,
+                    pipeline=wm.ribmosaic_pipelines.collection[index].xmlpath,
+                    filename=slmetaname)
+
+        except rm_error.RibmosaicError as err:
+            err.ReportError(self)
+            return {'CANCELLED'}
+
+        return {'FINISHED'}
 
 # #############################################################################
 # XML OPERATORS
@@ -1196,7 +1224,10 @@ class WM_OT_ribmosaic_library_addpanel(rm_context.ExportContext,
                     self.filepath = lib + "*.slmeta"
                 else:
                     self.library = ""
-                    self.filepath = "//*.slmeta"
+                    if self.filename != "":
+                        self.files.add().name = self.filename
+                    else:
+                        self.filepath = "//*.slmeta"
             else:
                 raise rm_error.RibmosaicError("Blend must be saved before "
                                               "shaders can be added")
@@ -1212,6 +1243,25 @@ class WM_OT_ribmosaic_library_addpanel(rm_context.ExportContext,
 # #############################################################################
 # PIPELINE OPERATORS
 # #############################################################################
+
+class WM_OT_ribmosaic_pipeline_sync(rm_context.ExportContext,
+                                    RibmosaicOperator,
+                                    bpy.types.Operator):
+    '''Allow user to demand the pipeline manager to execute
+       its sync method.  This operator is temporary until
+       background callbacks are supported
+    '''
+    bl_idname = "wm.ribmosaic_pipeline_sync"
+    bl_label = "Sync Pipelines"
+
+    def execute(self, context):
+        print("wm.ribmosaic_pipeline_sync()")
+
+        # Sync pipeline tree with current .rmp files
+        rm.pipeline_manager.sync()
+        self._refresh_panels()
+        return {'FINISHED'}
+
 
 class WM_OT_ribmosaic_pipeline_enable(rm_context.ExportContext,
                                       RibmosaicOperator,
@@ -1336,7 +1386,8 @@ class WM_OT_ribmosaic_pipeline_load(rm_context.ExportContext,
     def execute(self, context):
         wm = context.window_manager
 
-        # If no selections and *.rmp then collect all pipelines in directory
+        # If no selections and *.rmp then collect
+        # all pipelines in directory
         if not len(self.files) and self.filename == "*.rmp":
             for f in os.listdir(self.directory):
                 if os.path.splitext(f)[1].lower() == ".rmp":
@@ -1347,6 +1398,7 @@ class WM_OT_ribmosaic_pipeline_load(rm_context.ExportContext,
 
             try:
                 self.pipeline = rm.pipeline_manager.load_pipeline(path)
+                rm.pipeline_manager.fix_pipeline_library(self.pipeline, path)
                 message = rm.pipeline_manager.list_help(self.pipeline)
 
                 if message:
@@ -1361,6 +1413,15 @@ class WM_OT_ribmosaic_pipeline_load(rm_context.ExportContext,
 
     def invoke(self, context, event):
         wm = context.window_manager
+        try:
+            if bpy.data.is_saved:
+                pass
+            else:
+                raise rm_error.RibmosaicError("Blend must be saved before "
+                                              "Pipeline can be loaded")
+        except rm_error.RibmosaicError as err:
+            err.ReportError(self)
+            return {'CANCELLED'}
 
         wm.fileselect_add(self)
 
@@ -1812,7 +1873,7 @@ class RENDER_OT_ribmosaic_pass_del(rm_context.ExportContext,
         active_index = ribmosaic_passes.active_index
         len_passes = len(ribmosaic_passes.collection) - 1
 
-        if len_passes:
+        if len_passes >= 0:
             ribmosaic_passes.collection.remove(active_index)
 
             if active_index == len_passes:

@@ -8,7 +8,7 @@
 	</shader_sources>
 
 	<shader_panels filter="SHADER">
-		<hilltop delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@hilltop.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<hilltop delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@hilltop.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@hilltop"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -125,7 +125,7 @@
 				</freq2_row0>
 			</layout>
 		</hilltop>
-		<sdixon delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@sdixon.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<sdixon delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@sdixon.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@sdixon"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -206,7 +206,7 @@
 				</texturename_row0>
 			</layout>
 		</sdixon>
-		<brushedmetal3 delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@brushedmetal3.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<brushedmetal3 delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@brushedmetal3.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@brushedmetal3"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -278,7 +278,7 @@
 				</basecolor_row0>
 			</layout>
 		</brushedmetal3>
-		<mondometal delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@mondometal.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<mondometal delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@mondometal.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@mondometal"
     "uniform string abColorMap" @[DATA:///properties/abColorMap_prop0:RIB]@
@@ -638,7 +638,7 @@
 				</STMatrix1_row0>
 			</layout>
 		</mondometal>
-		<orennayar delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@orennayar.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<orennayar delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@orennayar.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@orennayar"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -683,7 +683,7 @@
 				</sigma_row0>
 			</layout>
 		</orennayar>
-		<projectionmap_plastic delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@projectionmap_plastic.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<projectionmap_plastic delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@projectionmap_plastic.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@projectionmap_plastic"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -836,7 +836,7 @@
 				</yoffset_row0>
 			</layout>
 		</projectionmap_plastic>
-		<plastic2 delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@plastic2.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<plastic2 delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@plastic2.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@plastic2"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -899,7 +899,7 @@
 				</specularcolor_row0>
 			</layout>
 		</plastic2>
-		<ez delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@ez.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<ez delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@ez.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@ez"
 
@@ -917,7 +917,7 @@
 				</info_row>
 			</layout>
 		</ez>
-		<envsurf delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@envsurf.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<envsurf delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@envsurf.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@envsurf"
     "uniform string envname" @[DATA:///properties/envname_prop0:RIB]@
@@ -953,7 +953,7 @@
 				</envspace_row0>
 			</layout>
 		</envsurf>
-		<eroded delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@eroded.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<eroded delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@eroded.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@eroded"
     "uniform float Ks" @[DATA:///properties/Ks_prop0:RIB]@
@@ -1007,7 +1007,7 @@
 				</roughness_row0>
 			</layout>
 		</eroded>
-		<show_st delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@show_st.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<show_st delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@show_st.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@show_st"
 
@@ -1025,7 +1025,7 @@
 				</info_row>
 			</layout>
 		</show_st>
-		<orange delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@orange.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<orange delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@orange.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@orange"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -1079,7 +1079,7 @@
 				</roughness_row0>
 			</layout>
 		</orange>
-		<gradient_t delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@gradient_t.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<gradient_t delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@gradient_t.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@gradient_t"
     "uniform color start_color" @[DATA:///properties/start_color_prop0:RIB]@
@@ -1124,7 +1124,7 @@
 				</additive_row0>
 			</layout>
 		</gradient_t>
-		<particle delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@particle.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<particle delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@particle.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@particle"
 
@@ -1142,7 +1142,7 @@
 				</info_row>
 			</layout>
 		</particle>
-		<superkagee delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@superkagee.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<superkagee delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@superkagee.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@superkagee"
     "uniform color shadColor" @[DATA:///properties/shadColor_prop0:RIB]@
@@ -1385,7 +1385,7 @@
 				</shadowdensityd_row0>
 			</layout>
 		</superkagee>
-		<filament delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@filament.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<filament delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@filament.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@filament"
     "uniform float frequency" @[DATA:///properties/frequency_prop0:RIB]@
@@ -1430,7 +1430,7 @@
 				</width_row0>
 			</layout>
 		</filament>
-		<crayontoon delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@crayontoon.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<crayontoon delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@crayontoon.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@crayontoon"
     "uniform color colorBase" @[DATA:///properties/colorBase_prop0:RIB]@
@@ -1484,7 +1484,7 @@
 				</Kd_row0>
 			</layout>
 		</crayontoon>
-		<clay delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@clay.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<clay delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@clay.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@clay"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -1529,7 +1529,7 @@
 				</roughness_row0>
 			</layout>
 		</clay>
-		<ruledpaper delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@ruledpaper.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<ruledpaper delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@ruledpaper.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@ruledpaper"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -1736,7 +1736,7 @@
 				</boundr_row0>
 			</layout>
 		</ruledpaper>
-		<fresnelplastic delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@fresnelplastic.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<fresnelplastic delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@fresnelplastic.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@fresnelplastic"
     "uniform color Csurf" @[DATA:///properties/Csurf_prop0:RIB]@
@@ -1898,7 +1898,7 @@
 				</MtorFlip_row0>
 			</layout>
 		</fresnelplastic>
-		<rubber delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@rubber.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<rubber delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@rubber.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@rubber"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -1943,7 +1943,7 @@
 				</txtscale_row0>
 			</layout>
 		</rubber>
-		<urbermap delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@urbermap.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<urbermap delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@urbermap.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@urbermap"
     "uniform string abColorMap" @[DATA:///properties/abColorMap_prop0:RIB]@
@@ -2249,7 +2249,7 @@
 				</STMatrix1_row0>
 			</layout>
 		</urbermap>
-		<decal delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@decal.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<decal delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@decal.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@decal"
     "uniform string texturename" @[DATA:///properties/texturename_prop0:RIB]@
@@ -2312,7 +2312,7 @@
 				</t1_row0>
 			</layout>
 		</decal>
-		<gooch delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@gooch.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<gooch delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@gooch.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@gooch"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -2411,7 +2411,7 @@
 				</specularcolor_row0>
 			</layout>
 		</gooch>
-		<tooledsteel delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@tooledsteel.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<tooledsteel delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@tooledsteel.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@tooledsteel"
     "uniform float mult" @[DATA:///properties/mult_prop0:RIB]@
@@ -2537,7 +2537,7 @@
 				</specularcolor_row0>
 			</layout>
 		</tooledsteel>
-		<roughmetal delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@roughmetal.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<roughmetal delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@roughmetal.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@roughmetal"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -2591,7 +2591,7 @@
 				</roughness_row0>
 			</layout>
 		</roughmetal>
-		<incandplastic delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@incandplastic.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<incandplastic delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@incandplastic.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@incandplastic"
     "uniform color SurfaceColor" @[DATA:///properties/SurfaceColor_prop0:RIB]@
@@ -2681,7 +2681,7 @@
 				</Incandescence_row0>
 			</layout>
 		</incandplastic>
-		<screen delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@screen.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<screen delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@screen.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@screen"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -2762,7 +2762,7 @@
 				</frequency_row0>
 			</layout>
 		</screen>
-		<cs delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@cs.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<cs delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@cs.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@cs"
 
@@ -2780,7 +2780,7 @@
 				</info_row>
 			</layout>
 		</cs>
-		<decalplastic delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@decalplastic.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<decalplastic delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@decalplastic.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@decalplastic"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -2888,7 +2888,7 @@
 				</t1_row0>
 			</layout>
 		</decalplastic>
-		<hair delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@hair.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<hair delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@hair.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@hair"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -2969,7 +2969,7 @@
 				</specularcolor_row0>
 			</layout>
 		</hair>
-		<skin2 delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@skin2.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<skin2 delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@skin2.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@skin2"
     "uniform color Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -3023,7 +3023,7 @@
 				</thickness_row0>
 			</layout>
 		</skin2>
-		<fakesky delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@fakesky.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<fakesky delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@fakesky.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@fakesky"
     "uniform vector up" @[DATA:///properties/up_prop0:RIB]@
@@ -3059,7 +3059,7 @@
 				</skycolor_row0>
 			</layout>
 		</fakesky>
-		<skymetal delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@skymetal.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<skymetal delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@skymetal.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@skymetal"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -3122,7 +3122,7 @@
 				</up_row0>
 			</layout>
 		</skymetal>
-		<funkyglass delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@funkyglass.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<funkyglass delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@funkyglass.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@funkyglass"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -3185,7 +3185,7 @@
 				</specularcolor_row0>
 			</layout>
 		</funkyglass>
-		<paintedplastic_alpha delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@paintedplastic_alpha.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<paintedplastic_alpha delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@paintedplastic_alpha.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@paintedplastic_alpha"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -3293,7 +3293,7 @@
 				</t1_row0>
 			</layout>
 		</paintedplastic_alpha>
-		<supertoon delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@supertoon.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<supertoon delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@supertoon.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@supertoon"
     "uniform float Kd" @[DATA:///properties/Kd_prop0:RIB]@
@@ -3383,7 +3383,7 @@
 				</specColor_row0>
 			</layout>
 		</supertoon>
-		<granite delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@granite.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<granite delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@granite.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@granite"
     "uniform float Kd" @[DATA:///properties/Kd_prop0:RIB]@
@@ -3419,7 +3419,7 @@
 				</Ka_row0>
 			</layout>
 		</granite>
-		<shiny delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@shiny.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<shiny delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@shiny.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@shiny"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -3545,7 +3545,7 @@
 				</twosided_row0>
 			</layout>
 		</shiny>
-		<saturn delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@saturn.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<saturn delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@saturn.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@saturn"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -3617,7 +3617,7 @@
 				</map_exp_row0>
 			</layout>
 		</saturn>
-		<contactshadow delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@contactshadow.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<contactshadow delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@contactshadow.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@contactshadow"
     "uniform string shadowname" @[DATA:///properties/shadowname_prop0:RIB]@
@@ -3680,7 +3680,7 @@
 				</maxdist_row0>
 			</layout>
 		</contactshadow>
-		<matte delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@matte.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<matte delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@matte.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@matte"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -3716,7 +3716,7 @@
 				</Kd_row0>
 			</layout>
 		</matte>
-		<plastic delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@plastic.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<plastic delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@plastic.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@plastic"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -3779,7 +3779,7 @@
 				</specularcolor_row0>
 			</layout>
 		</plastic>
-		<outline delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@outline.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<outline delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@outline.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@outline"
     "uniform float width" @[DATA:///properties/width_prop0:RIB]@
@@ -3806,7 +3806,7 @@
 				</width_row0>
 			</layout>
 		</outline>
-		<map_pattern_1 delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@map_pattern_1.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<map_pattern_1 delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@map_pattern_1.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@map_pattern_1"
     "uniform string map1" @[DATA:///properties/map1_prop0:RIB]@
@@ -3968,7 +3968,7 @@
 				</specularcolor_row0>
 			</layout>
 		</map_pattern_1>
-		<brushedmetal delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@brushedmetal.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<brushedmetal delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@brushedmetal.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@brushedmetal"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -4031,7 +4031,7 @@
 				</vroughness_row0>
 			</layout>
 		</brushedmetal>
-		<superpplastic delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@superpplastic.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<superpplastic delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@superpplastic.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@superpplastic"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -4157,7 +4157,7 @@
 				</Twidth_row0>
 			</layout>
 		</superpplastic>
-		<easysurface delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@easysurface.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<easysurface delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@easysurface.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@easysurface"
     "uniform float Kd" @[DATA:///properties/Kd_prop0:RIB]@
@@ -4202,7 +4202,7 @@
 				</falloff_row0>
 			</layout>
 		</easysurface>
-		<supertexmap delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@supertexmap.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<supertexmap delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@supertexmap.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@supertexmap"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -4937,7 +4937,7 @@
 				</truedisp_row0>
 			</layout>
 		</supertexmap>
-		<srfdeformation delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@srfdeformation.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<srfdeformation delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@srfdeformation.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@srfdeformation"
     "uniform string texname" @[DATA:///properties/texname_prop0:RIB]@
@@ -4991,7 +4991,7 @@
 				</Pref_row0>
 			</layout>
 		</srfdeformation>
-		<fur2 delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@fur2.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<fur2 delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@fur2.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@fur2"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -5216,7 +5216,7 @@
 				</hair_id_row0>
 			</layout>
 		</fur2>
-		<painted_constant delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@painted_constant.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<painted_constant delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@painted_constant.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@painted_constant"
     "uniform string texturename" @[DATA:///properties/texturename_prop0:RIB]@
@@ -5279,7 +5279,7 @@
 				</t1_row0>
 			</layout>
 		</painted_constant>
-		<wood2 delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@wood2.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<wood2 delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@wood2.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@wood2"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -5387,7 +5387,7 @@
 				</grainy_row0>
 			</layout>
 		</wood2>
-		<outlet delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@outlet.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<outlet delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@outlet.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@outlet"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -5441,7 +5441,7 @@
 				</screwKs_row0>
 			</layout>
 		</outlet>
-		<constant delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@constant.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<constant delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@constant.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@constant"
     "uniform float intensity" @[DATA:///properties/intensity_prop0:RIB]@
@@ -5468,7 +5468,7 @@
 				</intensity_row0>
 			</layout>
 		</constant>
-		<imagelayergradient delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@imagelayergradient.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<imagelayergradient delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@imagelayergradient.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@imagelayergradient"
     "uniform color zenith" @[DATA:///properties/zenith_prop0:RIB]@
@@ -5522,7 +5522,7 @@
 				</nadir_row0>
 			</layout>
 		</imagelayergradient>
-		<volcube delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@volcube.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<volcube delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@volcube.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@volcube"
     "uniform float StepSize" @[DATA:///properties/StepSize_prop0:RIB]@
@@ -5639,7 +5639,7 @@
 				</RunShadowPass_row0>
 			</layout>
 		</volcube>
-		<checkerboard_solid delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@checkerboard_solid.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<checkerboard_solid delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@checkerboard_solid.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@checkerboard_solid"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -5747,7 +5747,7 @@
 				</shadingspace_row0>
 			</layout>
 		</checkerboard_solid>
-		<glow delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@glow.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<glow delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@glow.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@glow"
     "uniform float attenuation" @[DATA:///properties/attenuation_prop0:RIB]@
@@ -5792,7 +5792,7 @@
 				</edgecolor_row0>
 			</layout>
 		</glow>
-		<environment_plastic delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@environment_plastic.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<environment_plastic delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@environment_plastic.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@environment_plastic"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -5873,7 +5873,7 @@
 				</blur_row0>
 			</layout>
 		</environment_plastic>
-		<ember delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@ember.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<ember delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@ember.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@ember"
     "uniform float baseSize" @[DATA:///properties/baseSize_prop0:RIB]@
@@ -5918,7 +5918,7 @@
 				</roughness_row0>
 			</layout>
 		</ember>
-		<paintedplastic delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@paintedplastic.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<paintedplastic delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@paintedplastic.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@paintedplastic"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -5990,7 +5990,7 @@
 				</texturename_row0>
 			</layout>
 		</paintedplastic>
-		<mottled_clay delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@mottled_clay.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<mottled_clay delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@mottled_clay.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@mottled_clay"
     "uniform float Ka1" @[DATA:///properties/Ka1_prop0:RIB]@
@@ -6071,7 +6071,7 @@
 				</transp_row0>
 			</layout>
 		</mottled_clay>
-		<fill delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@fill.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<fill delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@fill.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@fill"
     "uniform float Kd" @[DATA:///properties/Kd_prop0:RIB]@
@@ -6125,7 +6125,7 @@
 				</max_row0>
 			</layout>
 		</fill>
-		<metal delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@metal.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<metal delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@metal.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@metal"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -6170,7 +6170,7 @@
 				</roughness_row0>
 			</layout>
 		</metal>
-		<saturnring delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@saturnring.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<saturnring delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@saturnring.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@saturnring"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -6233,7 +6233,7 @@
 				</opacity_row0>
 			</layout>
 		</saturnring>
-		<defaultsurface delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@defaultsurface.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<defaultsurface delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@defaultsurface.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@defaultsurface"
     "uniform float Kd" @[DATA:///properties/Kd_prop0:RIB]@
@@ -6269,7 +6269,7 @@
 				</Ka_row0>
 			</layout>
 		</defaultsurface>
-		<starfield delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@starfield.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<starfield delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@starfield.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@starfield"
     "uniform float intensity" @[DATA:///properties/intensity_prop0:RIB]@
@@ -6323,7 +6323,7 @@
 				</irregularity_row0>
 			</layout>
 		</starfield>
-		<brushedmetal2 delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@brushedmetal2.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<brushedmetal2 delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@brushedmetal2.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@brushedmetal2"
     "uniform float Ks" @[DATA:///properties/Ks_prop0:RIB]@
@@ -6431,7 +6431,7 @@
 				</specularcolor_row0>
 			</layout>
 		</brushedmetal2>
-		<antialiasedchecks delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@antialiasedchecks.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<antialiasedchecks delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@antialiasedchecks.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@antialiasedchecks"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -6494,7 +6494,7 @@
 				</color2_row0>
 			</layout>
 		</antialiasedchecks>
-		<shinymetal delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@shinymetal.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<shinymetal delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@shinymetal.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@shinymetal"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@
@@ -6557,7 +6557,7 @@
 				</texturename_row0>
 			</layout>
 		</shinymetal>
-		<ceramic delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@ceramic.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<ceramic delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@ceramic.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@ceramic"
     "uniform float Ka" @[DATA:///properties/Ka_prop0:RIB]@

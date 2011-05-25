@@ -92,11 +92,11 @@ class Ribify():
     items_per_line = 3  # number of array items per line
 
 
-    def _start_rib_array(self, items_per_line=3):
+    def _start_rib_array(self, items_per_line=3, indent=True):
         self.itemcount = 0
         self.firstline = True
         self.items_per_line = items_per_line
-        self.write_text('[')
+        self.write_text('[', indent)
 
 
     def _write_rib_array_item(self, item):
@@ -425,3 +425,14 @@ class Ribify():
         """ """
 
         print("Creating meta points...")
+
+    def matrix4x4(self, mat):
+        """ Export a blender 4x4 matrix in RIB format"""
+        self.inc_indent()
+        self.inc_indent()
+        self._start_rib_array(4, False)
+        for i in range(4):
+            for j in range(4):
+                self._write_rib_array_item(mat[i][j])
+        self._end_rib_array()
+        self.write_text('\n')

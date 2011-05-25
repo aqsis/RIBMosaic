@@ -107,7 +107,7 @@ Attribute "autoshadows" "string shadowmapname" [@[DATA:///properties/shad_name:R
             <regexes target="">
             </regexes>
             <properties>
-                <shad_res type='INT' description="shadow texture size" default="64" min="1" max="1000" softmin="1" softmax="1000" maxlen="" step="" precision="" items="" size="" link="" />
+                <shad_res type='INT' description="shadow texture size" default="64" min="1" max="10000" softmin="1" softmax="10000" maxlen="" step="" precision="" items="" size="" link="" />
                 <shad_name type='STRING' description="shadow texture name" default="autoshadow.shad" min="" max="" softmin="" softmax="" maxlen="255" step="" precision="" items="" size="" link="" />
             </properties>
             <layout>
@@ -189,14 +189,14 @@ cd @[EVAL:.target_path:STR]@
 
             </begin>
             <middle target="*.slx">
-aqsltell @[EVAL:.target_name:STR]@ &gt; "@[EVAL:.target_name:]@.slmeta"
+aqsltell @[EVAL:.target_name:STR]@ &gt; @[EVAL:.target_name.replace(".slx",".slmeta"):STR]@
 
             </middle>
             <end target="">
 echo "Info complete"
 
             </end>
-            <regexes target="*.slx.slmeta">
+            <regexes target="*.slmeta">
                 <head_name matches="1" regex=" &quot;" replace="&quot; name=&quot;" />
                 <head_ext matches="1" regex=".slx" replace="" />
                 <head_close matches="1" regex="$" replace="&gt;" />

@@ -130,7 +130,9 @@ csg_ops = [('NOCSG', "No CSG", "Disable Constructive Solid Modelling"),
             ('DIFFERENCE', "Difference", "Use difference CSG" + csg_desc)]
 
 # Property lists
-exporter_props = [("Object", "object", archives_object, 'DEFAULT'),
+exporter_props = [
+            ("World", "world", archives_object, 'DEFAULT'),
+            ("Object", "object", archives_object, 'DEFAULT'),
             ("Mesh", "mesh", archives_data, 'DEFAULT'),
             ("Curve", "curve", archives_data, 'DEFAULT'),
             ("MetaBall", "metaball", archives_data, 'DEFAULT'),
@@ -1216,6 +1218,12 @@ def create_props():
                        ('RASTER', "Raster", ""),
                        ('SHADER', "Shader", "")],
                 default='SHADER')
+
+    bpy.types.Material.ribmosaic_two_sided = bpy.props.BoolProperty(
+                name="Two Sided",
+                description="Export material as two sided",
+                default=True)
+
 
     # #### Particle space properties
 

@@ -8,7 +8,7 @@
 	</shader_sources>
 
 	<shader_panels filter="SHADER">
-		<softboxes delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@softboxes.slx.slmeta" type="LIGHT" windows="LAMP">
+		<softboxes delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@softboxes.slmeta" type="LIGHT" windows="LAMP">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@softboxes" @[EVAL:.current_lightid:]@
     "uniform string Comment" @[DATA:///properties/Comment_prop0:RIB]@
@@ -899,7 +899,7 @@
 				</__inShadow_row0>
 			</layout>
 		</softboxes>
-		<uberlight delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@uberlight.slx.slmeta" type="LIGHT" windows="LAMP">
+		<uberlight delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@uberlight.slmeta" type="LIGHT" windows="LAMP">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@uberlight" @[EVAL:.current_lightid:]@
     "uniform string lighttype" @[DATA:///properties/lighttype_prop0:RIB]@
@@ -1286,7 +1286,7 @@
 				</__foglight_row0>
 			</layout>
 		</uberlight>
-		<arealight delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@arealight.slx.slmeta" type="LIGHT" windows="LAMP">
+		<arealight delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@arealight.slmeta" type="LIGHT" windows="LAMP">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@arealight" @[EVAL:.current_lightid:]@
     "uniform float intensity" @[DATA:///properties/intensity_prop0:RIB]@
@@ -1322,7 +1322,7 @@
 				</lightcolor_row0>
 			</layout>
 		</arealight>
-		<causticlight delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@causticlight.slx.slmeta" type="LIGHT" windows="LAMP">
+		<causticlight delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@causticlight.slmeta" type="LIGHT" windows="LAMP">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@causticlight" @[EVAL:.current_lightid:]@
     "uniform float intensity" @[DATA:///properties/intensity_prop0:RIB]@
@@ -1475,7 +1475,7 @@
 				</noisepow_row0>
 			</layout>
 		</causticlight>
-		<hdri1 delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@hdri1.slx.slmeta" type="LIGHT" windows="LAMP">
+		<hdri1 delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@hdri1.slmeta" type="LIGHT" windows="LAMP">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@hdri1" @[EVAL:.current_lightid:]@
     "uniform string envname" @[DATA:///properties/envname_prop0:RIB]@
@@ -1502,7 +1502,7 @@
 				</envname_row0>
 			</layout>
 		</hdri1>
-		<distantlight delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@distantlight.slx.slmeta" type="LIGHT" windows="LAMP">
+		<distantlight delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@distantlight.slmeta" type="LIGHT" windows="LAMP">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@distantlight" @[EVAL:.current_lightid:]@
     "uniform float intensity" @[DATA:///properties/intensity_prop0:RIB]@
@@ -1556,7 +1556,7 @@
 				</to_row0>
 			</layout>
 		</distantlight>
-		<shadowdistant_rim delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@shadowdistant_rim.slx.slmeta" type="LIGHT" windows="LAMP">
+		<shadowdistant_rim delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@shadowdistant_rim.slmeta" type="LIGHT" windows="LAMP">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@shadowdistant_rim" @[EVAL:.current_lightid:]@
     "uniform float intensity" @[DATA:///properties/intensity_prop0:RIB]@
@@ -1664,7 +1664,7 @@
 				</__nondiffuse_row0>
 			</layout>
 		</shadowdistant_rim>
-		<waterlight delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@waterlight.slx.slmeta" type="LIGHT" windows="LAMP">
+		<waterlight delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@waterlight.slmeta" type="LIGHT" windows="LAMP">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@waterlight" @[EVAL:.current_lightid:]@
     "uniform float minimum_intensity" @[DATA:///properties/minimum_intensity_prop0:RIB]@
@@ -1763,7 +1763,7 @@
 				</bias_row0>
 			</layout>
 		</waterlight>
-		<slideprojector delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@slideprojector.slx.slmeta" type="LIGHT" windows="LAMP">
+		<slideprojector delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@slideprojector.slmeta" type="LIGHT" windows="LAMP">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@slideprojector" @[EVAL:.current_lightid:]@
     "uniform float intensity" @[DATA:///properties/intensity_prop0:RIB]@
@@ -1862,7 +1862,7 @@
 				</slidename_row0>
 			</layout>
 		</slideprojector>
-		<distant_shadow delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@distant_shadow.slx.slmeta" type="LIGHT" windows="LAMP">
+		<distant_shadow delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@distant_shadow.slmeta" type="LIGHT" windows="LAMP">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@distant_shadow" @[EVAL:.current_lightid:]@
     "uniform float intensity" @[DATA:///properties/intensity_prop0:RIB]@
@@ -1952,7 +1952,7 @@
 				</bias_row0>
 			</layout>
 		</distant_shadow>
-		<hdri2 delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@hdri2.slx.slmeta" type="LIGHT" windows="LAMP">
+		<hdri2 delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@hdri2.slmeta" type="LIGHT" windows="LAMP">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@hdri2" @[EVAL:.current_lightid:]@
     "uniform float intensity" @[DATA:///properties/intensity_prop0:RIB]@
@@ -2051,7 +2051,7 @@
 				</shadowsamples_row0>
 			</layout>
 		</hdri2>
-		<hdr_surface delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@hdr_surface.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<hdr_surface delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@hdr_surface.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@hdr_surface"
     "uniform float intensity" @[DATA:///properties/intensity_prop0:RIB]@
@@ -2132,7 +2132,7 @@
 				</blur_row0>
 			</layout>
 		</hdr_surface>
-		<shadowspot delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@shadowspot.slx.slmeta" type="LIGHT" windows="LAMP">
+		<shadowspot delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@shadowspot.slmeta" type="LIGHT" windows="LAMP">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@shadowspot" @[EVAL:.current_lightid:]@
     "uniform float intensity" @[DATA:///properties/intensity_prop0:RIB]@
@@ -2249,7 +2249,7 @@
 				</bias_row0>
 			</layout>
 		</shadowspot>
-		<hdr_light delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@hdr_light.slx.slmeta" type="LIGHT" windows="LAMP">
+		<hdr_light delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@hdr_light.slmeta" type="LIGHT" windows="LAMP">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@hdr_light" @[EVAL:.current_lightid:]@
     "uniform float intensity" @[DATA:///properties/intensity_prop0:RIB]@
@@ -2375,7 +2375,7 @@
 				</shadowbias_row0>
 			</layout>
 		</hdr_light>
-		<ambientlight delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@ambientlight.slx.slmeta" type="LIGHT" windows="LAMP">
+		<ambientlight delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@ambientlight.slmeta" type="LIGHT" windows="LAMP">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@ambientlight" @[EVAL:.current_lightid:]@
     "uniform float intensity" @[DATA:///properties/intensity_prop0:RIB]@
@@ -2411,7 +2411,7 @@
 				</lightcolor_row0>
 			</layout>
 		</ambientlight>
-		<spotlight delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@spotlight.slx.slmeta" type="LIGHT" windows="LAMP">
+		<spotlight delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@spotlight.slmeta" type="LIGHT" windows="LAMP">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@spotlight" @[EVAL:.current_lightid:]@
     "uniform float intensity" @[DATA:///properties/intensity_prop0:RIB]@
@@ -2492,7 +2492,7 @@
 				</beamdistribution_row0>
 			</layout>
 		</spotlight>
-		<pointlight delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@pointlight.slx.slmeta" type="LIGHT" windows="LAMP">
+		<pointlight delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@pointlight.slmeta" type="LIGHT" windows="LAMP">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@pointlight" @[EVAL:.current_lightid:]@
     "uniform float intensity" @[DATA:///properties/intensity_prop0:RIB]@

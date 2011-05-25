@@ -132,14 +132,14 @@ cd @[EVAL:.target_path:STR]@
 
             </begin>
             <middle target="*.sdr">
-sdrinfo @[EVAL:.target_name:STR]@ &gt; "@[EVAL:.target_name:]@.slmeta"
+sdrinfo @[EVAL:.target_name:STR]@ &gt; @[EVAL:.target_name.replace(".sdr",".slmeta"):STR]@
 
             </middle>
             <end target="">
 echo "Info complete"
 
             </end>
-            <regexes target="*.sdr.slmeta">
+            <regexes target="*.slmeta">
                 <head_name matches="1" regex=" &quot;" replace="&quot; name=&quot;" />
                 <head_ext matches="1" regex=".sdr" replace="" />
                 <head_close matches="1" regex="$" replace="&gt;" />

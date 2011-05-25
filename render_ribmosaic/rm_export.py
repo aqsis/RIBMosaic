@@ -97,14 +97,6 @@ def rib_param_val(data_type, val):
         return '"%s"' % val
 
 
-def rib_mat_str(m):
-    return '[ %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f ]' % \
-            (m[0][0], m[0][1], m[0][2], m[0][3],
-            m[1][0], m[1][1], m[1][2], m[1][3],
-            m[2][0], m[2][1], m[2][2], m[2][3],
-            m[3][0], m[3][1], m[3][2], m[3][3])
-
-
 # ------------- Data Access Helpers -------------
 # taken from Matt Ebb's Blender to 3Delight exporter
 
@@ -186,30 +178,6 @@ def create_mesh(scene, ob, matrix=None):
     return mesh
 
 
-def render_get_resolution(r):
-    xres = int(r.resolution_x * r.resolution_percentage * 0.01)
-    yres = int(r.resolution_y * r.resolution_percentage * 0.01)
-    return xres, yres
-
-
-def render_get_aspect(r):
-    xres, yres = render_get_resolution(r)
-
-    xratio = xres * r.pixel_aspect_x / 200.0
-    yratio = yres * r.pixel_aspect_y / 200.0
-
-    if xratio > yratio:
-        aspectratio = xratio / yratio
-        xaspect = aspectratio
-        yaspect = 1.0
-    else:
-        aspectratio = yratio / xratio
-        xaspect = 1.0
-        yaspect = aspectratio
-
-    return xaspect, yaspect, aspectratio
-
-
 # The dummy pass class is used to provide default render pass settings
 # if the scene does not provide one.
 # During menu/panel draw/ and rendering context, it is not possible to
@@ -234,8 +202,8 @@ class DummyPass():
     pass_camera_group = False
     pass_camera_persp = 'CAMERA'
     pass_camera_lensadj = 0.0
-    pass_camera_nearclip = 0.005
-    pass_camera_farclip = 500
+    pass_camera_nearclip = 0
+    pass_camera_farclip = 0
     # Pass samples properties
     pass_samples_x = 0
     pass_samples_y = 0
@@ -423,6 +391,23 @@ class ExporterManager():
 
         return sep.join(self.export_paths[exp_key])
 
+    def make_shader_export_path(self, subname="Text_Editor"):
+        """
+          make path for shader exports
+
+          subname = name of shader sub directory, defualts to "Text_Editor"
+          Returns the relative path
+        """
+        path = ("." + os.sep + self.make_export_path('SHD') +
+            os.sep + subname + os.sep)
+        try:
+            os.makedirs(path)
+        except:
+            pass
+
+        return path
+
+
     def get_archive_paths(self, path_sep='/'):
         """
         Returns a list of the archive paths
@@ -544,6 +529,133 @@ class ExporterManager():
             raise rm_error.RibmosaicError("Blend must be saved before "
                                           "it can be exported")
 
+    def export_text_editor_shaders(self):
+        """
+          Export all shaders in the text editor into text files.
+        """
+        is_shaders = False
+
+        for t in bpy.data.texts:
+            if t.filepath:
+                name = os.path.basename(t.filepath)
+            else:
+                name = t.name
+
+            ext = os.path.splitext(name)[1]
+
+            # Only export source code
+            if ext == ".sl" or ext == ".h":
+                if self.export_scene.ribmosaic_purgeshd:
+                    path = self.make_shader_export_path()
+                    f = open(path + name, 'w')
+                    f.write(t.as_string())
+                    f.close()
+
+                is_shaders = True
+
+        return is_shaders
+
+    def export_xml_shaders(self, pipeline):
+        """
+          Export shaders in pipeline xml into a text file.
+
+          pipeline = pipeline name that has shaders.
+        """
+        is_shaders = False
+
+        for e in rm.pipeline_manager.list_elements(pipeline +
+                 "/shader_sources"):
+            xmlp = pipeline + "/shader_sources/" + e
+            name = rm.pipeline_manager.get_attr(ec, xmlp,
+                                             "filepath", False)
+            name = os.path.basename(name)
+
+            if name:
+                if self.export_scene.ribmosaic_purgeshd:
+                    source = rm.pipeline_manager.get_text(ec, xmlp)
+                    path = self.make_shader_export_path(pipeline)
+                    f = open(path + name, 'w')
+                    f.write(source)
+                    f.close()
+
+                is_shaders = True
+            else:
+                raise rm_error.RibmosaicError("Attribute error"
+                    " in " + xmlp + ", must specify filepath")
+
+        return is_shaders
+
+    def build_shader_compile_commands(self, ec):
+        """
+          Build shader compile commands using ExportCommand class.
+
+          ec = export context instance.
+        """
+        ec.current_command = 0  # Reset command index
+        compile_commands = rm.pipeline_manager.list_panels(
+            "command_panels", type='COMPILE')
+        for c in compile_commands:
+            # Setup command panel context from xmlpath
+            segs = c.split("/")
+            ec.context_pipeline = segs[0]
+            ec.context_category = segs[1]
+            ec.context_panel = segs[2]
+
+            # Only export enabled command panels
+            if ec._panel_enabled():
+                ec.current_command += 1
+                name = ec._resolve_links(
+                       "COMPILE_S@[EVAL:.current_library:#####]@"
+                       "_C@[EVAL:.current_command:#####]@")
+                path = "." + os.sep
+
+                try:
+                    s = ExporterCommand(ec, c, False, path, name)
+                    s.build_code("begin")
+                    s.build_code("middle")
+                    s.build_code("end", True)
+                except:
+                    s.close_archive()
+                    raise rm_error.RibmosaicError("Failed to"
+                        " build command " + name, sys.exc_info())
+
+                self.command_scripts['COMPILE'].append(s)
+
+
+    def build_shader_info_commands(self, ec):
+        """
+          Build shader info commands using ExportCommand class.
+
+          ec = export context instance.
+        """
+        ec.current_command = 0  # Reset command index
+        info_commands = rm.pipeline_manager.list_panels(
+            "command_panels", type='INFO')
+        for c in info_commands:
+            # Setup command panel context from xmlpath
+            segs = c.split("/")
+            ec.context_pipeline = segs[0]
+            ec.context_category = segs[1]
+            ec.context_panel = segs[2]
+
+            # Only export enabled command panels
+            if ec._panel_enabled():
+                ec.current_command += 1
+                name = ec._resolve_links(
+                       "INFO_S@[EVAL:.current_library:#####]@"
+                       "_C@[EVAL:.current_command:#####]@")
+                path = "." + os.sep
+
+                try:
+                    s = ExporterCommand(ec, c, True, path, name)
+                except:
+                    s.close_archive()
+                    raise rm_error.RibmosaicError("Failed to build"
+                        "command " + name, sys.exc_info())
+
+                self.command_scripts['INFO'].append(s)
+
+
     def export_shaders(self, render_object=None, shader_library=""):
         """Exports shaders for all pipelines (including Blender's text editor
         shaders as a virtual pipeline). Also generates both compile and info
@@ -555,13 +667,6 @@ class ExporterManager():
         """
         if DEBUG_PRINT:
             print("ExportManager.export_shaders")
-
-        # Gather available command panels
-        purge = self.export_scene.ribmosaic_purgeshd
-        compile_commands = rm.pipeline_manager.list_panels("command_panels",
-                                                           type='COMPILE')
-        info_commands = rm.pipeline_manager.list_panels("command_panels",
-                                                        type='INFO')
 
         # Setup generic export context object
         ec = rm_context.ExportContext(None, self.export_scene,
@@ -590,7 +695,6 @@ class ExporterManager():
                 libraries.append("xml")
             elif p == shader_library:
                 lib = rm.pipeline_manager.get_attr(ec, p, "library", False, "")
-
                 if lib:
                     libraries.append(lib)
             elif eval(rm.pipeline_manager.get_attr(ec, p, "enabled",
@@ -606,59 +710,25 @@ class ExporterManager():
                     compile = True
                     if self.export_scene.name == 'preview':
                         info = rm.rm_panel.RibmosaicRender.preview_compile
+                        compile = info
                     else:
                         info = self.export_scene.ribmosaic_compileshd
 
                     # Setup shader paths to be relative from export directory
-                    path = "." + os.sep + self.make_export_path('SHD') + \
-                           os.sep + p + os.sep
+                    path = self.make_shader_export_path(p)
                     ec.target_path = path
                     ec.target_name = ""
 
-                    try:
-                        os.makedirs(path)
-                    except:
-                        pass
 
                     # Export sources in Blender's text editor
                     if p == "Text_Editor":
-                        for t in bpy.data.texts:
-                            if t.filepath:
-                                name = os.path.basename(t.filepath)
-                            else:
-                                name = t.name
+                        if self.export_text_editor_shaders():
+                            is_shaders = True
 
-                            ext = os.path.splitext(name)[1]
-
-                            # Only export source code
-                            if ext == ".sl" or ext == ".h":
-                                if purge:
-                                    f = open(path + name, 'w')
-                                    f.write(t.as_string())
-                                    f.close()
-
-                                is_shaders = True
                     # Export sources in XML data
                     else:
-                        for e in rm.pipeline_manager.list_elements(p +
-                                 "/shader_sources"):
-                            xmlp = p + "/shader_sources/" + e
-                            name = rm.pipeline_manager.get_attr(ec, xmlp,
-                                                             "filepath", False)
-                            name = os.path.basename(name)
-
-                            if name:
-                                if purge:
-                                    source = rm.pipeline_manager.get_text(ec,
-                                                                    xmlp)
-                                    f = open(path + name, 'w')
-                                    f.write(source)
-                                    f.close()
-
-                                is_shaders = True
-                            else:
-                                raise rm_error.RibmosaicError("Attribute error"
-                                    " in " + xmlp + ", must specify filepath")
+                        if self.export_xml_shaders(p):
+                            is_shaders = True
 
                     # If no shaders exported remove empty directory
                     if not is_shaders:
@@ -693,60 +763,13 @@ class ExporterManager():
                 # generate command scripts for pipelines with shaders
                 if is_shaders:
                     ec.current_library += 1  # Increment shader library index
-                    ec.current_command = 0  # Reset command index
 
-                    for c in compile_commands:
-                        # Setup command panel context from xmlpath
-                        segs = c.split("/")
-                        ec.context_pipeline = segs[0]
-                        ec.context_category = segs[1]
-                        ec.context_panel = segs[2]
+                    if compile:
+                        self.build_shader_compile_commands(ec)
 
-                        # Only export enabled command panels
-                        if compile and ec._panel_enabled():
-                            ec.current_command += 1
-                            name = ec._resolve_links(
-                                   "COMPILE_S@[EVAL:.current_library:#####]@"
-                                   "_C@[EVAL:.current_command:#####]@")
-                            path = "." + os.sep
+                    if info:
+                        self.build_shader_info_commands(ec)
 
-                            try:
-                                s = ExporterCommand(ec, c, False, path, name)
-                                s.build_code("begin")
-                                s.build_code("middle")
-                                s.build_code("end", True)
-                            except:
-                                s.close_archive()
-                                raise rm_error.RibmosaicError("Failed to"
-                                    " build command " + name, sys.exc_info())
-
-                            self.command_scripts['COMPILE'].append(s)
-
-                    ec.current_command = 0  # Reset command index
-
-                    for c in info_commands:
-                        # Setup command panel context from xmlpath
-                        segs = c.split("/")
-                        ec.context_pipeline = segs[0]
-                        ec.context_category = segs[1]
-                        ec.context_panel = segs[2]
-
-                        # Only export enabled command panels
-                        if info and ec._panel_enabled():
-                            ec.current_command += 1
-                            name = ec._resolve_links(
-                                   "INFO_S@[EVAL:.current_library:#####]@"
-                                   "_C@[EVAL:.current_command:#####]@")
-                            path = "." + os.sep
-
-                            try:
-                                s = ExporterCommand(ec, c, True, path, name)
-                            except:
-                                s.close_archive()
-                                raise rm_error.RibmosaicError("Failed to build"
-                                    "command " + name, sys.exc_info())
-
-                            self.command_scripts['INFO'].append(s)
 
         del ec
 
@@ -818,6 +841,11 @@ class ExporterManager():
                 ec.pointer_render = render_object
                 ec.current_pass = i + 1
                 ec.current_frame = f
+                if p.pass_type != 'BEAUTY':
+                    if p.pass_res_x > 0:
+                        x = p.pass_res_x
+                    if p.pass_res_y > 0:
+                        y = p.pass_res_y
                 ec.dims_resx = x
                 ec.dims_resy = y
                 target_name = ec._resolve_links("P@[EVAL:.current_pass:#####]@"
@@ -1352,7 +1380,8 @@ class ExporterArchive(rm_context.ExportContext):
         """
 
         # determine what type of export to do
-        archive_mode = self.pointer_datablock.ribmosaic_rib_archive
+        archive_mode = getattr(self.pointer_datablock, "ribmosaic_rib_archive",
+            'DEFUALT')
         # for now just testing inline and readarchive
         if archive_mode == 'DEFAULT':
             if self.data_type in ['MESH']:
@@ -1362,7 +1391,8 @@ class ExporterArchive(rm_context.ExportContext):
 
         if archive_mode in ['READARCHIVE', 'DELAYEDARCHIVE', 'INSTANCE']:
             # make archive name
-            self.archive_name = self.data_name + '.rib'
+            self.archive_name = (self.data_name + '_' + self._archive_key +
+                '.rib')
             # setup readarchive in parent archive
             # rely on the file pointer still setup for the parent
             self.riReadArchive()
@@ -1468,7 +1498,15 @@ class ExporterArchive(rm_context.ExportContext):
                         color[2]))
 
     def riTransform(self, mat):
-        self.write_text('Transform %s\n' % rib_mat_str(mat))
+        self.write_text('Transform ')
+        # set the file pointer for ribify
+        rm.ribify.pointer_file = self._pointer_file
+        # set the indent level of the rib output
+        rm.ribify.indent = self.current_indent
+        rm.ribify.matrix4x4(mat)
+
+    def riSides(self, useTwoSides=True):
+        self.write_text('Sides %s\n' % (2 if useTwoSides else 1))
 
 
 
@@ -1729,40 +1767,6 @@ class ExportPass(ExporterArchive):
 
         self.open_archive(gzipped=compress)
 
-    def _export_lights(self, lights):
-        if DEBUG_PRINT:
-            print("ExportPass._export_lights()")
-
-        for idx, light in enumerate(lights):
-            target_name = light.name + ".rib"
-            self.current_lightid = idx
-            try:
-                el = ExportLight(self, light)
-                el.export_rib()
-                del el
-            except:
-                el.close_archive()
-                del el
-                raise rm_error.RibmosaicError("Failed to build light RIB " +
-                                             target_name, sys.exc_info())
-
-    def _export_objects(self, objects):
-        if DEBUG_PRINT:
-            print("ExportPass._export_objects()")
-
-        for ob in objects:
-            target_name = ob.name + ".rib"
-            try:
-                eo = ExportObject(self, ob)
-                eo.export_rib()
-                eo.close_archive()
-                del eo
-            except:
-                eo.close_archive()
-                del eo
-                raise rm_error.RibmosaicError("Failed to build object RIB " +
-                                              target_name, sys.exc_info())
-
     def _export_pass_properties(self):
         if DEBUG_PRINT:
             print("ExportPass._export_pass_properties()")
@@ -1851,18 +1855,8 @@ class ExportPass(ExporterArchive):
         # TODO Setup world shaders
         # TODO Setup insertion point for light archive
 
-        #world = ExportWorld(self)
-        #world.export_rib()
-        #del world
-
-        #objects = ExportObject(self)
-        #objects.export_rib()
-        #del objects
-
         if DEBUG_PRINT:
             print("ExportPass.export_rib()")
-
-        # #### Setup basic test RIB for now
 
         # Push objects attributes
         pipeline = self.context_pipeline
@@ -1870,10 +1864,9 @@ class ExportPass(ExporterArchive):
         panel = self.context_panel
         datablock = self.pointer_datablock
 
-        # Panel object lists
+        # Render and Scene Utility Panel object lists
         scene_utilities = []
         render_utilities = []
-        world_utilities = []
 
         # Initialize objects for enabled panels in render and scene
         for p in rm.pipeline_manager.list_panels("utility_panels",
@@ -1895,20 +1888,6 @@ class ExportPass(ExporterArchive):
 
             if self._panel_enabled():
                 render_utilities.append(ExporterUtility(self, p))
-
-        # Initialize objects for enabled panels in world
-        self.pointer_datablock = datablock.world
-
-        for p in rm.pipeline_manager.list_panels("utility_panels",
-                                                 window='WORLD'):
-            segs = p.split("/")
-            self.context_pipeline = segs[0]
-            self.context_category = segs[1]
-            self.context_panel = segs[2]
-
-            if self._panel_enabled():
-                world_utilities.append(ExporterUtility(self, p))
-
 
         # Pop objects attributes
         self.context_pipeline = pipeline
@@ -1942,7 +1921,11 @@ class ExportPass(ExporterArchive):
         # TODO the pass camera overrides the scene's camera
         # make use of ExportObject to do the dirty work
         try:
-            cam = ExportObject(self, scene.camera)
+            if self.pointer_pass.pass_camera:
+                camobj = scene.objects[self.pointer_pass.pass_camera]
+            else:
+                camobj = scene.camera
+            cam = ExportObject(self, camobj, as_camera=True)
             cam.export_rib()
             del cam
         except:
@@ -1951,7 +1934,110 @@ class ExportPass(ExporterArchive):
             raise rm_error.RibmosaicError("Failed to build camera " +
                                          sys.exc_info())
 
-        self.write_text("Sides 1\n")
+        world = ExportWorld(self, datablock.world)
+        world.export_rib()
+        del world
+
+
+        for p in render_utilities:
+            p.current_indent = self.current_indent
+            p.build_code("end")
+
+        if scene.ribmosaic_use_frame:
+            self.riFrameEnd()
+
+        for p in scene_utilities:
+            p.current_indent = self.current_indent
+            p.build_code("end")
+
+        self.close_archive()
+
+
+class ExportWorld(ExporterArchive):
+    """Represents shaders on world data-blocks"""
+
+    def __init__(self, export_object=None, pointer_object=None):
+        """Initialize attributes using export_object and parameters.
+        Automatically create the RIB this object represents.
+
+        export_object = ExportObject subclassed from ExportContext
+       """
+
+        ExporterArchive.__init__(self, export_object, 'WLD')
+        self._set_pointer_datablock(pointer_object)
+        self.open_rib_archive()
+
+    def _export_objects(self, objects):
+        if DEBUG_PRINT:
+            print("ExportPass._export_objects()")
+
+        for ob in objects:
+            target_name = ob.name + ".rib"
+            try:
+                eo = ExportObject(self, ob)
+                eo.export_rib()
+                eo.close_archive()
+                del eo
+            except:
+                eo.close_archive()
+                del eo
+                raise rm_error.RibmosaicError("Failed to build object RIB " +
+                                              target_name, sys.exc_info())
+
+    def _export_lights(self, lights):
+        if DEBUG_PRINT:
+            print("ExportPass._export_lights()")
+
+        for idx, light in enumerate(lights):
+            target_name = light.name + ".rib"
+            self.current_lightid = idx
+            try:
+                el = ExportLight(self, light)
+                el.export_rib()
+                del el
+            except:
+                el.close_archive()
+                del el
+                raise rm_error.RibmosaicError("Failed to build light RIB " +
+                                             target_name, sys.exc_info())
+
+    # #### Public methods
+
+    def export_rib(self):
+        """ """
+
+        print("Exporting world...")
+
+        if self._pointer_file == None:
+            return
+
+        # Push objects attributes
+        pipeline = self.context_pipeline
+        category = self.context_category
+        panel = self.context_panel
+        datablock = self.pointer_datablock
+
+        world_utilities = []
+
+        for p in rm.pipeline_manager.list_panels("utility_panels",
+                                                 window='WORLD'):
+            segs = p.split("/")
+            self.context_pipeline = segs[0]
+            self.context_category = segs[1]
+            self.context_panel = segs[2]
+
+            if self._panel_enabled():
+                world_utilities.append(ExporterUtility(self, p))
+
+        # Pop objects attributes
+        self.context_pipeline = pipeline
+        self.context_category = category
+        self.context_panel = panel
+        self.pointer_datablock = datablock
+
+        self.export_shaders('WORLD')
+
+        scene = self.get_scene()
 
         if scene.ribmosaic_use_world:
             self.riWorldBegin()
@@ -1959,8 +2045,6 @@ class ExportPass(ExporterArchive):
         for p in world_utilities:
             p.current_indent = self.current_indent
             p.build_code("begin")
-
-        self.export_shaders('WORLD')
 
         # figure out what objects in the scene are renderable
         # build a collection of all renderable objects which includes:
@@ -1980,29 +2064,7 @@ class ExportPass(ExporterArchive):
         if scene.ribmosaic_use_world:
             self.riWorldEnd()
 
-        for p in render_utilities:
-            p.current_indent = self.current_indent
-            p.build_code("end")
-
-        if scene.ribmosaic_use_frame:
-            self.riFrameEnd()
-
-        for p in scene_utilities:
-            p.current_indent = self.current_indent
-            p.build_code("end")
-
         self.close_archive()
-
-
-class ExportWorld(ExporterArchive):
-    """Represents shaders on world data-blocks"""
-
-    # #### Public methods
-
-    def export(self):
-        """ """
-
-        print("Exporting world...")
 
 
 class ExportObject(ExporterArchive):
@@ -2015,28 +2077,27 @@ class ExportObject(ExporterArchive):
     automatically handles nesting of CSG through parenting.
     """
 
+    as_camera = False # export the object as a camera if set True
+
     # #### Private methods
 
-    def __init__(self, export_object=None, pointer_object=None):
+    def __init__(self, export_object=None, pointer_object=None,
+                 as_camera=False):
         """Initialize attributes using export_object and parameters.
         Automatically create the RIB this object represents.
 
         export_object = ExportObject subclassed from ExportContext
+        pointer_object = the blender object to be exported
+        as_camera = export the object as a camera
        """
 
         ExporterArchive.__init__(self, export_object, 'OBJ')
         self._set_pointer_datablock(pointer_object)
-
-        # TODO open the archive if using ReadArchive mode
-        # for now default to using the parents file pointer
-
-        # Determine if compressed RIB is enabled in the parent
-        #if export_object:
-        #    compress = getattr(export_object, "is_gzip", False)
-        #else:
-        #    compress = False
-
-        #self.open_archive(gzipped=compress)
+        if as_camera:
+            self.as_camera = as_camera
+            # override object type
+            self.data_type = 'CAMERA'
+        self.open_rib_archive()
 
     def _export_camera_rib(self):
         if DEBUG_PRINT:
@@ -2047,9 +2108,21 @@ class ExportObject(ExporterArchive):
         r = scene.render
         camera = ob.data
 
-        xaspect, yaspect, aspectratio = render_get_aspect(r)
+        xratio = self.dims_resx * r.pixel_aspect_x / 200.0
+        yratio = self.dims_resy * r.pixel_aspect_y / 200.0
 
-        if camera.ribmosaic_dof:
+        if xratio > yratio:
+            aspectratio = xratio / yratio
+            xaspect = aspectratio
+            yaspect = 1.0
+        else:
+            aspectratio = yratio / xratio
+            xaspect = 1.0
+            yaspect = aspectratio
+
+        # only blender camera supports DOF
+        dof = getattr(camera, "ribmosaic_dof", False)
+        if dof:
             # allow an object to be used for dof distance
             if camera.dof_object:
                 dof_distance = (ob.location -
@@ -2068,19 +2141,35 @@ class ExportObject(ExporterArchive):
         #        (rm.shutter_efficiency_open, rm.shutter_efficiency_close))
 
         if scene.ribmosaic_use_clipping:
+            if self.pointer_pass.pass_camera_nearclip > 0.0:
+                near_clip = self.pointer_pass.pass_camera_nearclip
+            else:
+                near_clip = getattr(camera, "clip_start", 0.05)
+
+            if self.pointer_pass.pass_camera_farclip > 0.0:
+                far_clip = self.pointer_pass.pass_camera_farclip
+            else:
+                far_clip = getattr(camera, "clip_end", 500)
+
             self.write_text('Clipping %f %f\n'
-                % (camera.clip_start, camera.clip_end))
+                % (near_clip, far_clip))
 
         if scene.ribmosaic_use_projection:
-            if camera.type == 'PERSP':
-                lens = camera.lens
+            persp = self.pointer_pass.pass_camera_persp
+            if persp == "CAMERA":
+                # use camera perspective setting
+                # note: this only works if the object is a blender camera
+                persp = getattr(camera, "type", "PERSP")
+
+            if persp == 'PERSP':
+                lens = getattr(camera, "lens", 35.0)
                 fov = 360.0 * math.atan(16.0 / lens / aspectratio) / math.pi
                 self.write_text('Projection "perspective" "fov" %f\n' % fov)
             else:
-                lens = camera.ortho_scale
+                lens = getattr(camera, "ortho_scale", 1.0)
                 xaspect = xaspect * lens / (aspectratio * 2.0)
                 yaspect = yaspect * lens / (aspectratio * 2.0)
-                self.write('Projection "orthographic"\n')
+                self.write_text('Projection "orthographic"\n')
 
         if scene.ribmosaic_use_screenwindow:
             self.write_text('ScreenWindow %f %f %f %f\n' %
@@ -2136,11 +2225,12 @@ class ExportObject(ExporterArchive):
 
         ob = self.get_object()
 
-        # if a camera object then do special camera output
-        if ob.type == 'CAMERA':
+        # if defined as a camera object then do special camera output
+        if self.as_camera:
             self._export_camera_rib()
         else:
 
+            self.riAttributeBegin()
             # TODO
             # need to group mesh data with associated material
             # if the mesh uses more than one material then mesh has to be
@@ -2168,7 +2258,6 @@ class ExportObject(ExporterArchive):
                 mat = ob.matrix_world
             #print(mat)
 
-            self.riAttributeBegin()
             self.write_text('Attribute "identifier" "name" [ "%s" ]\n' %
                             self.data_name)
             self.riTransform(mat)
@@ -2209,6 +2298,7 @@ class ExportLight(ExporterArchive):
 
         ExporterArchive.__init__(self, export_object, 'LAM')
         self._set_pointer_datablock(pointer_object)
+        self.open_rib_archive()
 
     def _export_lightcolor(self, color=(1, 1, 1)):
         self.write_text('"color lightcolor" [ %s ]\n'
@@ -2222,7 +2312,6 @@ class ExportLight(ExporterArchive):
     def export_rib(self):
         if DEBUG_PRINT:
             print("ExportLight.export_rib()")
-
 
         self.riAttributeBegin()
         ob = self.pointer_datablock
@@ -2367,6 +2456,9 @@ class ExportMaterial(ExporterArchive):
                 ' "string coordinatesystem" ["%s"]\n'
                 % (material.ribmosaic_disp_pad, material.ribmosaic_disp_coor))
 
+        if self.get_scene().ribmosaic_use_sides:
+            self.riSides(material.ribmosaic_two_sided)
+
         self.export_shaders('MATERIAL')
 
         self.close_archive()
@@ -2390,8 +2482,6 @@ class ExportObjdata(ExporterArchive):
         self.blender_object = self.pointer_datablock
         self._set_pointer_datablock(self.pointer_datablock.data)
         self.open_rib_archive()
-
-
 
     def _export_geometry(self):
         if DEBUG_PRINT:
