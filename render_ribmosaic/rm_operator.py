@@ -1873,7 +1873,7 @@ class RENDER_OT_ribmosaic_pass_del(rm_context.ExportContext,
         active_index = ribmosaic_passes.active_index
         len_passes = len(ribmosaic_passes.collection) - 1
 
-        if len_passes:
+        if len_passes >= 0:
             ribmosaic_passes.collection.remove(active_index)
 
             if active_index == len_passes:
