@@ -64,7 +64,6 @@ Display "+@[EVAL:.pass_output:]@" "exr" "float _z" "string layername" "RenderLay
             <read target="">
             </read>
             <begin target="">
-@[EVAL:"Hider \"hidden\" \"depthfilter\" [\"midpoint\"]" if @[DATA:///properties/multipass:]@ else "":]@
 Option "shadow" "bias" [@[DATA:///properties/shadowbias:RIB]@]
 Option "shadow" "bias0" [@[DATA:///properties/shadowbias0:RIB]@]
 Option "shadow" "bias1" [@[DATA:///properties/shadowbias1:RIB]@]
