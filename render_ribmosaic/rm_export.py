@@ -1061,17 +1061,16 @@ class ExporterArchive(rm_context.ExportContext):
 
     # #### Public methods
 
-    def archive_exists(self):
+    def file_exists(self, name, path):
         """
         check to see if the archive already exists as a file.
-        Sets _archive_exists to True if archive exists as a file.
         Returns True if archive already exits.
         """
 
         exists = False # indicates that the archive already exits
 
         if self.archive_name:
-            filepath = self.archive_path + self.archive_name
+            filepath = path + name
 
             try:
                 exists = os.path.isfile(filepath)
@@ -1132,13 +1131,9 @@ class ExporterArchive(rm_context.ExportContext):
         if DEBUG_PRINT:
             print("ExporterArchive.close_archive()")
 
+        self.close_cache()
         # Only allow root object to close file
         if self.is_root:
-            # Close down any cache pointers
-            if self._pointer_cache:
-                self._pointer_cache.close()
-                self._pointer_cache = None
-
             # Close down any archive pointers
             if self._pointer_file:
                 try:
@@ -1397,7 +1392,7 @@ class ExporterArchive(rm_context.ExportContext):
             # rely on the file pointer still setup for the parent
             self.riReadArchive()
             # if archive does not exist then allow export
-            if not self.archive_exists():
+            if not self.file_exists(self.archive_name, self.archive_path):
                 # Determine if compressed RIB is enabled
                 self.open_archive(
                     gzipped=self.get_scene().ribmosaic_compressrib)
@@ -1408,6 +1403,41 @@ class ExporterArchive(rm_context.ExportContext):
         elif archive_mode == 'NOEXPORT':
             self._pointer_file = None
         # all other modes default to inline
+
+    def open_cache(self):
+        """
+        Determine the open action to be taken with rib cache export.
+
+        return = True if cache did not exist and cache file is set to write
+        """
+        if DEBUG_PRINT:
+            print("ExporterArchive.open_cache()")
+
+        # all caches are placed in the TMP directory
+        cache_path = rm.export_manager.make_export_path('TMP') + os.sep
+
+        # if cache already exists then open cache for reading only else open
+        # for writing new cache
+
+        if self.file_exists(self.archive_name, cache_path):
+            mode = 'r'
+        else:
+            mode = 'w'
+
+        self._pointer_cache = open(cache_path + self.archive_name, mode)
+
+        return mode == 'w'
+
+    def close_cache(self):
+
+        if DEBUG_PRINT:
+            print("ExporterArchive.close_cache()")
+        # Only allow root object to close file
+        if self.is_root:
+            # Close down any cache pointers
+            if self._pointer_cache:
+                self._pointer_cache.close()
+                self._pointer_cache = None
 
     def build_exporter_list(self, panel_type, exporter, windows):
         """
@@ -2437,46 +2467,78 @@ class ExportObjdata(ExporterArchive):
         self._set_pointer_datablock(self.pointer_datablock.data)
         self.open_rib_archive()
 
+    def _cache_mesh(self):
+        """Generate RIB code cache for poly, mesh, points and sds geometry.
+
+        """
+        if DEBUG_PRINT:
+            print("ExportObjdata._cache_mesh")
+
+        # build the mesh cache if it does not exist
+        if self.open_cache():
+            # determine whate type of geometry is to be exported
+            prim = detect_primitive(self.blender_object)
+
+            # create a mesh that has all modifiers applied to mesh data
+            # but make sure subdiv modifier render option is false
+            mesh = create_mesh(self.get_scene(), self.blender_object)
+            # set the file pointer for ribify
+            rm.ribify.pointer_file = self._pointer_cache
+            # set the indent level of the rib output
+            rm.ribify.indent = self.current_indent
+
+            if prim == 'POINTSPOLYGONS':
+                rm.ribify.mesh_pointspolygons(mesh)
+            elif prim == 'SUBDIVISIONMESH':
+                rm.ribify.mesh_subdivisionmesh(mesh)
+            elif prim == 'POINTS':
+                rm.ribify.mesh_points(mesh)
+
+            meshdata = self.pointer_datablock
+            # check if normal primvar is to be exported
+            if meshdata.ribmosaic_n_export:
+                pv_class = meshdata.ribmosaic_n_class
+                if prim in ['POINTS']:
+                    # face class not supported in these primitives
+                    if pv_class[:4] == 'face':
+                        pv_class = pv_class[4:]
+
+                rm.ribify.data_to_primvar(mesh, member="N", define="N",
+                                         ptype="normal", pclass=pv_class)
+            # check if st primvar is to be exported
+            if meshdata.ribmosaic_st_export:
+                rm.ribify.data_to_primvar(mesh, member="UV", define="st",
+                                         ptype="float[2]", pclass=meshdata.ribmosaic_st_class)
+            # don't need the mesh data anymore so tell blender to
+            # get rid of it
+            bpy.data.meshes.remove(mesh)
+            self.close_cache()
+
+    def _ribify_cache(self, material_idx=0):
+        """Assemble RIB code as archive or inline for current open archive
+        handle from a cache RIB generated by the Cache* functions (used to
+        quickly assemble from cache mult-material and motion blur RIBs)
+
+        material_idx = index of blender material that is to be used
+
+        """
+        if DEBUG_PRINT:
+            print("ExportObjdata._ribify_cache")
+
+        # only build rib if file pointer exists and cache can be read
+        if self._pointer_file and not self.open_cache():
+            for l in self._pointer_cache:
+                self.write_text(l)
+            self.close_cache()
+
+
     def _export_geometry(self):
         if DEBUG_PRINT:
             print("ExportObjdata._export_geometry")
 
-        # determine whate type of geometry is to be exported
-        prim = detect_primitive(self.blender_object)
-
-        # create a mesh that has all modifiers applied to mesh data
-        # but make sure subdiv modifier render option is false
-        mesh = create_mesh(self.get_scene(), self.blender_object)
-        # set the file pointer for ribify
-        rm.ribify.pointer_file = self._pointer_file
-        # set the indent level of the rib output
-        rm.ribify.indent = self.current_indent
-
-        if prim == 'POINTSPOLYGONS':
-            rm.ribify.mesh_pointspolygons(mesh)
-        elif prim == 'SUBDIVISIONMESH':
-            rm.ribify.mesh_subdivisionmesh(mesh)
-        elif prim == 'POINTS':
-            rm.ribify.mesh_points(mesh)
-
-        meshdata = self.pointer_datablock
-        # check if normal primvar is to be exported
-        if meshdata.ribmosaic_n_export:
-            pv_class = meshdata.ribmosaic_n_class
-            if prim in ['POINTS']:
-                # face class not supported in these primitives
-                if pv_class[:4] == 'face':
-                    pv_class = pv_class[4:]
-
-            rm.ribify.data_to_primvar(mesh, member="N", define="N",
-                                     ptype="normal", pclass=pv_class)
-        # check if st primvar is to be exported
-        if meshdata.ribmosaic_st_export:
-            rm.ribify.data_to_primvar(mesh, member="UV", define="st",
-                                     ptype="float[2]", pclass=meshdata.ribmosaic_st_class)
-        # don't need the mesh data anymore so tell blender to
-        # get rid of it
-        bpy.data.meshes.remove(mesh)
+        self._cache_mesh()
+        # for now assume mesh has only one material applied to whole mesh
+        self._ribify_cache()
 
     # #### Public methods
 
