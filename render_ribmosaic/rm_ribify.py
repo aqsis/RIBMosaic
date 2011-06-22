@@ -88,7 +88,6 @@ class Ribify():
 
     # vars for tracking array items output
     itemcount = 0  # number of array items that have been outputed
-    firstline = True  # output of array items on first line
     items_per_line = 3  # number of array items per line
 
 
@@ -102,25 +101,24 @@ class Ribify():
     def _write_rib_array_item(self, item):
 
         # if on the first item of the line then indent
-        if self.itemcount == 0 and not self.firstline:
+        if self.itemcount == 0:
             self.write_text('\n', False)
-            self.write_text('  ')
         else:
             # adding another item on the line so just put a space
             #  between items don't use indentation
             self.write_text(' ', False)
-        # output the item in the list but with no indentation
-        self.write_text(str(item), False)
+        # output the item in the list, indent if first item
+        self.write_text(str(item), self.itemcount == 0)
         self.itemcount += 1
 
         # only allow so many items per line
         if self.itemcount == self.items_per_line:
             self.itemcount = 0
-            self.firstline = False
 
     def _end_rib_array(self):
         # end of the RIB array list block
-        self.write_text(' ]\n', False)
+        self.write_text('\n', False)
+        self.write_text(']\n')
 
     def _write_rib_array_list(self, vect):
         for v in vect:
@@ -131,26 +129,23 @@ class Ribify():
 
         self.inc_indent()
         # output the number of vertices for each face
-        self._start_rib_array(10)
+        self._start_rib_array(1)
         for face in mesh.faces:
             self._write_rib_array_item(len(face.vertices))
         self._end_rib_array()
 
         # output the vertex index for each face corner
-        self._start_rib_array(9)
+        self._start_rib_array(1)
         for face in mesh.faces:
-            n = len(face.vertices)
             # iterate through each vertex index in the face
-            for idx in range(0, n):
-                #get the index of the vertiex
-                vi = face.vertices[idx]
+            for vi in face.vertices:
                 # keep track of the highest vertex index used
                 if vi > self.vertcount:
                     self.vertcount = vi
                 # add the index to the verts list of indices
-                self._write_rib_array_item(vi)
+            self._write_rib_array_item(
+                " ".join([str(v) for v in face.vertices]))
         self._end_rib_array()
-        self.write_text('\n')
 
     def _export_creases(self, mesh):
         # export blender mesh edges that have a crease value != 0
@@ -161,7 +156,7 @@ class Ribify():
             self._write_rib_array_item('"crease"')
         self._end_rib_array()
 
-        self._start_rib_array(10)
+        self._start_rib_array(1)
         self._write_rib_array_item("0 0")
         # write out data arrangement for creases:
         # first array set has 2 values for each crease
@@ -172,13 +167,13 @@ class Ribify():
 
         # output first array set:
         # use two vertex indices to define each crease
-        self._start_rib_array(10)
+        self._start_rib_array(1)
         for edge in Creases:
             self._write_rib_array_item('%i %i' % (edge.vertices[0], edge.vertices[1]))
         self._end_rib_array()
 
         # output second array set which is the crease sharpness weight value
-        self._start_rib_array(10)
+        self._start_rib_array(1)
         for edge in Creases:
             #Calculate crease up to 5.5
             #(looks the same as blenders up to that point)
@@ -196,7 +191,7 @@ class Ribify():
             return
 
         self.write_text('"P"\n')
-        self._start_rib_array(6)
+        self._start_rib_array(3)
         for i in range(0, self.vertcount + 1):
             self._write_rib_array_list(mesh.vertices[i].co)
         self._end_rib_array()
@@ -209,24 +204,26 @@ class Ribify():
             return
 
         self.write_text(primvar_rib)
-        self._start_rib_array(6)
         if per_vertex:
+            self._start_rib_array(3)
             for i in range(0, self.vertcount + 1):
                 self._write_rib_array_list(mesh.vertices[i].normal)
         else:
+            self._start_rib_array(1)
             for face in mesh.faces:
-                n = len(face.vertices)
                 # iterate through each vertex index in the face
-                for idx in range(0, n):
+                norm_str =""
+                for vi in face.vertices:
                     # build the normals list
                     # if face is smooth then use the vertex normal
                     if face.use_smooth:
-                        #get the index of the vertex
-                        vi = face.vertices[idx]
-                        self._write_rib_array_list(mesh.vertices[vi].normal)
+                        norm_str += " ".join(
+                            [str(c) for c in mesh.vertices[vi].normal])
                     else:
                         # otherwise the face is flat so use the face normal
-                        self._write_rib_array_list(face.normal)
+                        norm_str += " ".join(
+                            [str(c) for c in face.normal])
+                self._write_rib_array_item(norm_str)
         self._end_rib_array()
 
 
@@ -239,7 +236,7 @@ class Ribify():
 
         if uv_layer:
             self.write_text(primvar_rib)
-            self._start_rib_array(8)
+            self._start_rib_array(2)
             for fi, tf in enumerate(uv_layer):
                 # "1.0 -" because
                 # renderman? expects UVs flipped
@@ -303,8 +300,6 @@ class Ribify():
             print("Creating", primvar['define'], "as", primvar['ptype'],
                   "sorted as", primvar['pclass'], "for", primvar['member'],
                   "in", datablock, "...")
-
-        self.write_text('\n')
 
         member = primvar['member']
         primvar_rib = '"%s %s %s"\n' % (primvar['pclass'], primvar['ptype'], primvar['define'])
