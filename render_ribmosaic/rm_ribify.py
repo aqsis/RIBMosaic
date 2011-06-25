@@ -85,6 +85,7 @@ class Ribify():
     is_gzip = False  # If file gzipped
     indent = 0  # how many tabs to indent from the left
     vertcount = 0 # highest vertex index used by faces
+    materials_used = [] # list of material indexes used by faces
 
     # vars for tracking array items output
     itemcount = 0  # number of array items that have been outputed
@@ -126,12 +127,16 @@ class Ribify():
 
     def _export_faces(self, mesh):
         self.vertcount = 0
+        self.materials_used = []
 
         self.inc_indent()
         # output the number of vertices for each face
         self._start_rib_array(1)
         for face in mesh.faces:
             self._write_rib_array_item(len(face.vertices))
+            # Populate materials_used list with faces material indexes
+            if (not face.material_index in self.materials_used):
+                self.materials_used.append(face.material_index)
         self._end_rib_array()
 
         # output the vertex index for each face corner
