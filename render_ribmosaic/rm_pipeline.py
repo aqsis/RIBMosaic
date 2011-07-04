@@ -69,6 +69,12 @@ exec("import " + MODULE + " as rm")
 # its method name and important vars to console io
 DEBUG_PRINT = False
 
+def refresh_material_preview(self, context):
+    if context.material != None:
+        # force preview render to update
+        context.material.preview_render_type = \
+            context.material.preview_render_type
+
 # #############################################################################
 # PIPELINE MANAGER CLASS
 # #############################################################################
@@ -1591,6 +1597,9 @@ class PipelineManager():
                         p_str += ", items=" + attrs['items']
                     if attrs['size']:
                         p_str += ", size=" + attrs['size']
+                    # add callback to property if it effects material preview
+                    if category_id == "SP":
+                        p_str += ", update=refresh_material_preview"
 
                     # Apply property to class and removal list
                     if p_str:
