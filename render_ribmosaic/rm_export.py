@@ -2236,8 +2236,19 @@ class ExportObject(ExporterArchive):
         if self.as_camera:
             self._export_camera_rib()
         else:
-
+            # assume to be some form of mesh object
             self.riAttributeBegin()
+            self.write_text('Attribute "identifier" "name" [ "%s" ]\n' %
+                            self.data_name)
+            # setup object transform to be exported
+            if ob.parent:
+                mat = ob.parent.matrix_world * ob.matrix_local
+            else:
+                mat = ob.matrix_world
+            #print(mat)
+
+            self.riTransform(mat)
+
             # TODO
             # need to group mesh data with associated material
             # if the mesh uses more than one material then mesh has to be
@@ -2259,15 +2270,6 @@ class ExportObject(ExporterArchive):
                             "Failed to build object material RIB " +
                             self.data_name, sys.exc_info())
 
-            if ob.parent:
-                mat = ob.parent.matrix_world * ob.matrix_local
-            else:
-                mat = ob.matrix_world
-            #print(mat)
-
-            self.write_text('Attribute "identifier" "name" [ "%s" ]\n' %
-                            self.data_name)
-            self.riTransform(mat)
 
             # export object data
             # let the ExportObjdata instance decide how to export
@@ -2617,7 +2619,8 @@ class ExportObjdata(ExporterArchive):
         if self._cache_mesh():
             # export meshes for each material index used in mesh
             # for now assume mesh has only one material applied to whole mesh
-            self._ribify_cache(0)
+            for mi in rm.ribify.materials_used:
+                self._ribify_cache(mi)
         # don't need the mesh data anymore so tell blender to
         # get rid of it
         if self.mesh_exportdata is not None:
