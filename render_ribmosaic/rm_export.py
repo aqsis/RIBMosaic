@@ -566,13 +566,13 @@ class ExporterManager():
         for e in rm.pipeline_manager.list_elements(pipeline +
                  "/shader_sources"):
             xmlp = pipeline + "/shader_sources/" + e
-            name = rm.pipeline_manager.get_attr(ec, xmlp,
+            name = rm.pipeline_manager.get_attr(e, xmlp,
                                              "filepath", False)
             name = os.path.basename(name)
 
             if name:
                 if self.export_scene.ribmosaic_purgeshd:
-                    source = rm.pipeline_manager.get_text(ec, xmlp)
+                    source = rm.pipeline_manager.get_text(e, xmlp)
                     path = self.make_shader_export_path(pipeline)
                     f = open(path + name, 'w')
                     f.write(source)

@@ -131,7 +131,6 @@ def RibPath(path):
 
 from bl_ui import space_text
 
-
 def register():
     """Register Blender classes and setup class properties"""
 
@@ -167,6 +166,7 @@ def register():
         RibmosaicInfo("ribify module not found, using script level exporter")
 
     bpy.utils.register_module(__name__)
+
     bpy.ops.wm.ribmosaic_pipeline_sync()
 
 
