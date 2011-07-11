@@ -1,0 +1,144 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<aqsis_ptc build="True" compile="True" dependecies="aqsis_core" enabled="False" filepath="aqsis_ptc.rmp" filter="AQSIS_PTC" library="" version="0.1.1">
+point cloud generation
+	<python_scripts>
+	</python_scripts>
+
+	<shader_sources>
+        	<bake_ptc_light description="bake into point cloud" filepath="bake_ptc_light.sl">
+light bake_ptc_light (
+  uniform string pointCloudFile = "";
+  uniform string __category = "bakelight";
+) {  
+  bake3d(pointCloudFile, "", Ps, normalize(Ns), "_area", area(Ps), "interpolate", 1);
+}
+
+        	</bake_ptc_light>
+        	<occ_ptc_light description="use point cloud to generate ambient occlusion" filepath="occ_ptc_light.sl">
+/** Provides ambient occlusion lighting from a point cloud file.
+ *
+ *  The shader responds to two attributes, which may be set in a RIB file:
+ *    Attribute "user" "float maxsolidangle" [ 0.05 ]
+ *  If "bake" is set to [ 1 ] then no ambient light will be generated.  The
+ *  "maxsolidangle" parameter is a speed / quality tradeoff control for the
+ *  light, which can be set on a per-surface basis.
+ *
+ *  @param pointCloudFile name of the point cloud file
+ *  @param intensity intensity of the light source 
+ *  @param lightcolor color of the light */
+#ifndef PI
+#define PI 3.14159265359
+#endif
+light occ_ptc_light (
+  uniform string pointCloudFile = "";
+  float intensity = 1;
+  color lightcolor = 1;
+) {
+  uniform float maxsolidangle = 0.04;
+  attribute("user:maxsolidangle", maxsolidangle);
+  
+  /* compute ambient lighting if we're not baking */
+  float aocc = 0;
+  if (pointCloudFile != "") {
+    aocc = 1 - occlusion(Ps, Ns, 0, "filename", pointCloudFile,
+                         "maxsolidangle", maxsolidangle,
+                         "microbufres", 8,
+                         "pointbased", 1);
+  }
+  
+  Cl = intensity * aocc * lightcolor;
+}
+
+    		</occ_ptc_light>        
+	</shader_sources>
+
+	<shader_panels filter="SHADER">
+		<bake_ptc_light delete="True" description="Authors: Jonathan Merritt\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT, PTC_BAKE" library="@[SXML::RIB]@" register="True" slmeta="@[SXML::]@bake_ptc_light.slmeta" type="LIGHT" windows="LAMP">
+			<rib target="">
+@[DATA:///properties/sl_type:]@ "@[SXML::RIB]@bake_ptc_light" @[EVAL:.current_lightid:]@
+    "uniform string pointCloudFile" @[DATA:///properties/pointCloudFile_prop0:RIB]@
+    "uniform string __category" @[DATA:///properties/__category_prop0:RIB]@
+
+			</rib>
+			<regexes target="">
+			</regexes>
+			<properties>
+				<sl_name default="bake_ptc_light" description="Shader's name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+				<sl_type default="LightSource" description="Choose shader type" items="[('LightSource', 'LightSource', ''), ('AreaLightSource', 'AreaLightSource', '')]" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+				<pointCloudFile_prop0 default="" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+				<__category_prop0 default="bakelight" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+			</properties>
+			<layout>
+				<info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
+					<sl_name expand="False" icon="" prop="sl_name" slider="False" text="Name" toggle="False" trigger="" type="PROP" />
+					<sl_type expand="False" icon="" prop="sl_type" slider="False" text="" toggle="False" trigger="" type="PROP" />
+				</info_row>
+				<pointCloudFile_row0 active="@[EVAL:not @[ATTR:///properties/pointCloudFile_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<pointCloudFile_lb0 expand="False" icon="" prop="" slider="False" text="pointCloudFile" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<pointCloudFile_prop0 expand="False" icon="" prop="pointCloudFile_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<pointCloudFile_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/pointCloudFile_prop0:]@" type="LINK" />
+				</pointCloudFile_row0>
+				<__category_row0 active="@[EVAL:not @[ATTR:///properties/__category_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<__category_lb0 expand="False" icon="" prop="" slider="False" text="__category" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<__category_prop0 expand="False" icon="" prop="__category_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<__category_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/__category_prop0:]@" type="LINK" />
+				</__category_row0>
+			</layout>
+		</bake_ptc_light>
+		<occ_ptc_light delete="True" description="Authors: Jonathan Merritt\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SXML::RIB]@" register="True" slmeta="@[SXML::]@occ_ptc_light.slmeta" type="LIGHT" windows="LAMP">
+			<rib target="">
+@[DATA:///properties/sl_type:]@ "@[SXML::RIB]@occ_ptc_light" @[EVAL:.current_lightid:]@
+    "uniform string pointCloudFile" @[DATA:///properties/pointCloudFile_prop0:RIB]@
+    "uniform float intensity" @[DATA:///properties/intensity_prop0:RIB]@
+    "uniform color lightcolor" @[DATA:///properties/lightcolor_prop0:RIB]@
+
+			</rib>
+			<regexes target="">
+			</regexes>
+			<properties>
+				<sl_name default="occ_ptc_light" description="Shader's name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+				<sl_type default="LightSource" description="Choose shader type" items="[('LightSource', 'LightSource', ''), ('AreaLightSource', 'AreaLightSource', '')]" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+				<pointCloudFile_prop0 default="" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+				<intensity_prop0 default="1.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+				<lightcolor_prop0 default="(1, 1, 1)" description="" items="" link="" max="1.0" maxlen="" min="0.0" precision="" size="" softmax="1.0" softmin="0.0" step="" type="COLOR" />
+			</properties>
+			<layout>
+				<info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
+					<sl_name expand="False" icon="" prop="sl_name" slider="False" text="Name" toggle="False" trigger="" type="PROP" />
+					<sl_type expand="False" icon="" prop="sl_type" slider="False" text="" toggle="False" trigger="" type="PROP" />
+				</info_row>
+				<pointCloudFile_row0 active="@[EVAL:not @[ATTR:///properties/pointCloudFile_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<pointCloudFile_lb0 expand="False" icon="" prop="" slider="False" text="pointCloudFile" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<pointCloudFile_prop0 expand="False" icon="" prop="pointCloudFile_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<pointCloudFile_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/pointCloudFile_prop0:]@" type="LINK" />
+				</pointCloudFile_row0>
+				<intensity_row0 active="@[EVAL:not @[ATTR:///properties/intensity_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<intensity_lb0 expand="False" icon="" prop="" slider="False" text="intensity" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<intensity_prop0 expand="False" icon="" prop="intensity_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<intensity_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/intensity_prop0:]@" type="LINK" />
+				</intensity_row0>
+				<lightcolor_row0 active="@[EVAL:not @[ATTR:///properties/lightcolor_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<lightcolor_lb0 expand="False" icon="" prop="" slider="False" text="lightcolor" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<lightcolor_prop0 expand="False" icon="" prop="lightcolor_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<lightcolor_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/lightcolor_prop0:]@" type="LINK" />
+				</lightcolor_row0>
+			</layout>
+		</occ_ptc_light>
+	</shader_panels>
+
+	<utility_panels filter="UTILITY">
+	</utility_panels>
+
+	<command_panels filter="COMMAND">
+	</command_panels>
+</aqsis_ptc>
