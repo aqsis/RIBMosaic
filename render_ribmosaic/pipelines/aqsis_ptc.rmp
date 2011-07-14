@@ -11,6 +11,8 @@ light bake_ptc_light (
   uniform string __category = "bakelight";
 ) {  
   bake3d(pointCloudFile, "", Ps, normalize(Ns), "_area", area(Ps), "interpolate", 1);
+  Cl = 0.3;
+  L = 0;
 }
 
         	</bake_ptc_light>
@@ -33,16 +35,17 @@ light occ_ptc_light (
   uniform string pointCloudFile = "";
   float intensity = 1;
   color lightcolor = 1;
+  uniform float microbufres = 8;
 ) {
   uniform float maxsolidangle = 0.04;
   attribute("user:maxsolidangle", maxsolidangle);
   
   /* compute ambient lighting if we're not baking */
-  float aocc = 0;
+  float aocc = 0.3;
   if (pointCloudFile != "") {
     aocc = 1 - occlusion(Ps, Ns, 0, "filename", pointCloudFile,
                          "maxsolidangle", maxsolidangle,
-                         "microbufres", 8,
+                         "microbufres", microbufres,
                          "pointbased", 1);
   }
   
@@ -53,7 +56,7 @@ light occ_ptc_light (
 	</shader_sources>
 
 	<shader_panels filter="SHADER">
-		<bake_ptc_light delete="True" description="Authors: Jonathan Merritt\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT, PTC_BAKE" library="@[SXML::RIB]@" register="True" slmeta="@[SXML::]@bake_ptc_light.slmeta" type="LIGHT" windows="LAMP">
+		<bake_ptc_light delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT, PTC_BAKE" library="@[SXML::RIB]@" register="True" slmeta="@[SXML::]@bake_ptc_light.slmeta" type="LIGHT" windows="LAMP">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SXML::RIB]@bake_ptc_light" @[EVAL:.current_lightid:]@
     "uniform string pointCloudFile" @[DATA:///properties/pointCloudFile_prop0:RIB]@
@@ -89,12 +92,13 @@ light occ_ptc_light (
 				</__category_row0>
 			</layout>
 		</bake_ptc_light>
-		<occ_ptc_light delete="True" description="Authors: Jonathan Merritt\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SXML::RIB]@" register="True" slmeta="@[SXML::]@occ_ptc_light.slmeta" type="LIGHT" windows="LAMP">
+		<occ_ptc_light delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="LIGHT" library="@[SXML::RIB]@" register="True" slmeta="@[SXML::]@occ_ptc_light.slmeta" type="LIGHT" windows="LAMP">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SXML::RIB]@occ_ptc_light" @[EVAL:.current_lightid:]@
     "uniform string pointCloudFile" @[DATA:///properties/pointCloudFile_prop0:RIB]@
     "uniform float intensity" @[DATA:///properties/intensity_prop0:RIB]@
     "uniform color lightcolor" @[DATA:///properties/lightcolor_prop0:RIB]@
+    "uniform float microbufres" @[DATA:///properties/microbufres_prop0:RIB]@
 
 			</rib>
 			<regexes target="">
@@ -105,6 +109,7 @@ light occ_ptc_light (
 				<pointCloudFile_prop0 default="" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
 				<intensity_prop0 default="1.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
 				<lightcolor_prop0 default="(1, 1, 1)" description="" items="" link="" max="1.0" maxlen="" min="0.0" precision="" size="" softmax="1.0" softmin="0.0" step="" type="COLOR" />
+				<microbufres_prop0 default="8.0" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
 			</properties>
 			<layout>
 				<info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
@@ -132,11 +137,62 @@ light occ_ptc_light (
 					</prop_col>
 					<lightcolor_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/lightcolor_prop0:]@" type="LINK" />
 				</lightcolor_row0>
+				<microbufres_row0 active="@[EVAL:not @[ATTR:///properties/microbufres_prop0.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+					<microbufres_lb0 expand="False" icon="" prop="" slider="False" text="microbufres" toggle="False" trigger="" type="LABEL" />
+					<prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+						<microbufres_prop0 expand="False" icon="" prop="microbufres_prop0" slider="False" text="" toggle="False" trigger="" type="PROP" />
+					</prop_col>
+					<microbufres_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/microbufres_prop0:]@" type="LINK" />
+				</microbufres_row0>
 			</layout>
 		</occ_ptc_light>
 	</shader_panels>
 
 	<utility_panels filter="UTILITY">
+        <PTC_Attributes delete="True" description="Aqsis PTC render Attributes" duplicate="True" enabled="False" filter="" register="True" type="PTC_OPTION" windows="WORLD">
+            <read target="">
+            </read>
+            <begin target="">
+Attribute "cull" "int backfacing" [ @[EVAL:1 if @[DATA:///properties/cull_backfacing:]@ else 0:]@ ]
+Attribute "cull" "int hidden" [ @[EVAL:1 if @[DATA:///properties/cull_hidden:]@ else 0:]@ ]
+Attribute "dice" "int rasterorient" [ @[EVAL:1 if @[DATA:///properties/dice_rasterorient:]@ else 0:]@ ]
+
+            </begin>
+            <end target="">
+            </end>
+            <regexes target="">
+            </regexes>
+            <properties>
+                <cull_backfacing default="False" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="BOOL" />
+                <cull_hidden default="False" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="BOOL" />
+                <dice_rasterorient default="False" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="BOOL" />
+            </properties>
+            <layout>
+                <column active="True" align="False" box="True" enabled="True" type="COLUMN" visible="True">
+		            <attribute_label text="Point Cloud Attributes:" type="LABEL" />
+        	        <cull_backfacing expand="False" icon="" prop="cull_backfacing" slider="False" text="Cull Backfacing" toggle="False" trigger="" type="PROP" />
+        	        <cull_hidden expand="False" icon="" prop="cull_hidden" slider="False" text="Cull Hidden" toggle="False" trigger="" type="PROP" />
+        	        <dice_rasterorient expand="False" icon="" prop="dice_rasterorient" slider="False" text="Dice Rasterorient" toggle="False" trigger="" type="PROP" />
+                </column>
+            </layout>
+        </PTC_Attributes>
+        <PTC_Render_Ops delete="False" description="" duplicate="False" enabled="False" filter="" register="True" type="RENDER" windows="RENDER">
+            <read target="">
+            </read>
+            <begin target="">
+Hider "hidden" "jitter" [ 0 ]
+
+            </begin>
+            <end target="">
+            </end>
+            <regexes target="">
+            </regexes>
+            <properties>
+            </properties>
+            <layout>
+            </layout>
+        </PTC_Render_Ops>
+
 	</utility_panels>
 
 	<command_panels filter="COMMAND">
