@@ -602,7 +602,7 @@ class ExporterManager():
             ec.context_panel = segs[2]
 
             # Only export enabled command panels
-            if ec._panel_enabled():
+            if ec._panel_enabled(True, True):
                 ec.current_command += 1
                 name = ec._resolve_links(
                        "COMPILE_S@[EVAL:.current_library:#####]@"
@@ -639,7 +639,7 @@ class ExporterManager():
             ec.context_panel = segs[2]
 
             # Only export enabled command panels
-            if ec._panel_enabled():
+            if ec._panel_enabled(True, True):
                 ec.current_command += 1
                 name = ec._resolve_links(
                        "INFO_S@[EVAL:.current_library:#####]@"
@@ -882,7 +882,7 @@ class ExporterManager():
                     ec.target_name = target_name
 
                     # Only export enabled command panels
-                    if ec._panel_enabled():
+                    if ec._panel_enabled(True, True):
                         ec.current_command += 1
                         name = ec._resolve_links(
                                 "RENDER_P@[EVAL:.current_pass:#####]@"
@@ -912,7 +912,7 @@ class ExporterManager():
                     ec.target_name = ""
 
                     # Only export enabled command panels
-                    if ec._panel_enabled():
+                    if ec._panel_enabled(True, True):
                         ec.current_command += 1
                         name = ec._resolve_links(
                                 "RENDER_P@[EVAL:.current_pass:#####]@"
@@ -1461,7 +1461,7 @@ class ExporterArchive(rm_context.ExportContext):
             self.context_category = segs[1]
             self.context_panel = segs[2]
 
-            if self._panel_enabled():
+            if self._panel_enabled(True, True):
                 exporters.append(exporter(self, p))
 
         # Pop objects attributes
@@ -2298,15 +2298,20 @@ class ExportObject(ExporterArchive):
 class ExportLight(ExporterArchive):
     """Represents shaders on lamp data-blocks"""
 
+    blender_object = None
+
     def __init__(self, export_object=None, pointer_object=None):
         """Initialize attributes using export_object and parameters.
         Automatically create the RIB this object represents.
 
         export_object = ExportObject subclassed from ExportContext
+        pointer_object = Blender Light Object
        """
 
         ExporterArchive.__init__(self, export_object, 'LAM')
         self._set_pointer_datablock(pointer_object)
+        self.blender_object = self.pointer_datablock
+        self._set_pointer_datablock(self.pointer_datablock.data)
         self.open_rib_archive()
 
     def _export_lightcolor(self, color=(1, 1, 1)):
@@ -2322,13 +2327,15 @@ class ExportLight(ExporterArchive):
         if DEBUG_PRINT:
             print("ExportLight.export_rib()")
 
+        if self._pointer_file == None:
+            return
+
         self.riAttributeBegin()
-        ob = self.pointer_datablock
-        lamp = ob.data
+        ob = self.blender_object
+        lamp = self.pointer_datablock
 
 
         # Initialize objects for enabled panels in light data
-        self.pointer_datablock = lamp
         # build Lamp Utility Panel objects list
         light_utilities = self.build_export_utilities_list('LAMP')
 
@@ -2346,11 +2353,8 @@ class ExportLight(ExporterArchive):
         m *= mathutils.Matrix.Rotation(math.pi, 4, 'X')
         self.riTransform(m)
 
-        # in order to get shaders set pointer_datablock to ob.data
-        self.pointer_datablock = lamp
         # if a shader is attached then don't use auto light export
         shaders_exported = self.export_shaders('LAMP')
-        self.pointer_datablock = ob
 
         if not shaders_exported:
 

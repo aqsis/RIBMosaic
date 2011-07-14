@@ -1397,6 +1397,8 @@ class PipelineManager():
         for w in [w for w in window_list if w in filters.keys() and register]:
             name = w + "_PT_" + pipeline + "_" + category_id + "_" + panel
             e_attr = rm.PropertyHash(pipeline + category + panel + 'enabled')
+            pass_attr = rm.PropertyHash(pipeline + category + panel +
+                        'pass_filter')
 
             prop = []
             head = ["from " + MODULE + " import rm_panel",
@@ -1452,7 +1454,9 @@ class PipelineManager():
                     "\tdef draw(self, context):",
                     "\t\tlayout = self.layout",
                     "\t\tdata = self._context_data(context, "
-                    "self.bl_context)['data']"]
+                    "self.bl_context)['data']",
+                    "\t\trow = layout.row(align=True)",
+                    "\t\trow.prop(data, '" + pass_attr +"' )"]
             tail = ["",
                     "bpy.utils.register_class(" + name + ")",
                     "panel = " + name]
@@ -1485,7 +1489,13 @@ class PipelineManager():
                             " = bpy.props.BoolProperty(" +
                             "name='enabled', default=" + w_attrs['enabled'] +
                             ")")
+                prop.append(props[wt] + "." + pass_attr +
+                            " = bpy.props.StringProperty(" +
+                            "name='pass filter', " +
+                            "default='', " +
+                            "description='pass names seperated by ,'" + ")")
                 properties.append("del " + props[wt] + "." + e_attr)
+                properties.append("del " + props[wt] + "." + pass_attr)
 
             # Generate panel's control properties
             for p in self.list_elements(path + "/properties"):
@@ -2661,7 +2671,9 @@ class PipelineManager():
 
             # Collect meta information
             linkpath = ec._resolve_links(filepath)
+            print("link path:", linkpath)
             abspath = os.path.realpath(bpy.path.abspath(linkpath))
+            print("abs path:", abspath)
             slmeta = ET.ElementTree(file=abspath)
             slinfo = slmeta.find("shaders/shader")
             sldesc = slmeta.find("shaders/shader/description")
