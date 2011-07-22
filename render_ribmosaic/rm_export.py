@@ -1041,8 +1041,8 @@ class ExporterArchive(rm_context.ExportContext):
                                         self._queque_priority)
             self._pointer_file = getattr(export_object, "_pointer_file",
                                         self._pointer_file)
-            self._pointer_cache = getattr(export_object, "_pointer_cache",
-                                        self._pointer_cache)
+            #self._pointer_cache = getattr(export_object, "_pointer_cache",
+            #                            self._pointer_cache)
             self._archive_regexes = getattr(export_object, "_archive_regexes",
                                         self._archive_regexes)
             self._target_regexes = getattr(export_object, "_target_regexes",
@@ -1415,16 +1415,16 @@ class ExporterArchive(rm_context.ExportContext):
 
         # all caches are placed in the TMP directory
         cache_path = rm.export_manager.make_export_path('TMP') + os.sep
-
+        cache_name = self.data_name + '_' + self._archive_key + '.rib'
         # if cache already exists then open cache for reading only else open
         # for writing new cache
 
-        if self.file_exists(self.archive_name, cache_path):
+        if self.file_exists(cache_name, cache_path):
             mode = 'r'
         else:
             mode = 'w'
 
-        self._pointer_cache = open(cache_path + self.archive_name, mode)
+        self._pointer_cache = open(cache_path + cache_name, mode)
 
         return mode == 'w'
 
@@ -1432,12 +1432,10 @@ class ExporterArchive(rm_context.ExportContext):
 
         if DEBUG_PRINT:
             print("ExporterArchive.close_cache()")
-        # Only allow root object to close file
-        if self.is_root:
-            # Close down any cache pointers
-            if self._pointer_cache:
-                self._pointer_cache.close()
-                self._pointer_cache = None
+        # Close down any cache pointers
+        if self._pointer_cache:
+            self._pointer_cache.close()
+            self._pointer_cache = None
 
     def build_exporter_list(self, panel_type, exporter, windows):
         """
@@ -2201,27 +2199,6 @@ class ExportObject(ExporterArchive):
 
     # #### Public methods
 
-    def export(self):
-        """ """
-
-        print("Exporting objects...")
-
-        light = ExportLight(self)
-        light.export_rib()
-        del light
-
-        material = ExportMaterial(self)
-        material.export_rib()
-        del material
-
-        objdata = ExportObjdata(self)
-        objdata.export_rib()
-        del objdata
-
-        particles = ExportParticles(self)
-        particles.export_rib()
-        del particles
-
     def export_rib(self):
         """ """
         if DEBUG_PRINT:
@@ -2249,39 +2226,46 @@ class ExportObject(ExporterArchive):
 
             self.riTransform(mat)
 
-            # TODO
-            # need to group mesh data with associated material
-            # if the mesh uses more than one material then mesh has to be
-            # split up. For now we just spit out the first material only
-            # for testing purposes.
-
-            if len(ob.material_slots) > 0:
-                try:
-                    # There may be a material slot but there may be no
-                    # material so need to check.
-                    if ob.material_slots[0].material is not None:
-                        em = ExportMaterial(self,
-                                            ob.material_slots[0].material)
-                        em.export_rib()
-                        del em
-                except:
-                    em.close_archive()
-                    raise rm_error.RibmosaicError(
-                            "Failed to build object material RIB " +
-                            self.data_name, sys.exc_info())
 
 
             # export object data
             # let the ExportObjdata instance decide how to export
-            # the object data
+            # the mesh object data
             try:
-                eod = ExportObjdata(self)
-                eod.export_rib()
-                del eod
+                emd = ExportMeshdata(self)
+                emd.export_geometry_cache()
+                # TODO
+                # need to group mesh data with associated material
+                # if the mesh uses more than one material then mesh has to be
+                # split up. For now we just spit out the first material only
+                # for testing purposes.
+
+                if len(ob.material_slots) > 0:
+                    for mat_idx, matslot in enumerate(ob.material_slots):
+                        try:
+                            # There may be a material slot but there may be no
+                            # material so need to check.
+                            # Also need to check if there is a submesh that
+                            # uses this material.  Just because the material
+                            # is in the slot does not mean that it is being
+                            # used.
+                            if matslot.material is not None:
+                                if emd.has_submesh(mat_idx):
+                                    em = ExportMaterial(self, matslot.material)
+                                    em.export_rib()
+                                    emd.export_rib(mat_idx)
+                                    del em
+                        except:
+                            em.close_archive()
+                            del em
+                            raise rm_error.RibmosaicError(
+                                    "Failed to build object material RIB " +
+                                    self.data_name, sys.exc_info())
+                del emd
             except:
-                eod.close_archive()
+                emd.close_archive()
                 raise rm_error.RibmosaicError(
-                        "Failed to build object data RIB " +
+                        "Failed to build mesh data RIB " +
                         self.data_name, sys.exc_info())
 
             # create ExportObjectData
@@ -2454,14 +2438,15 @@ class ExportMaterial(ExporterArchive):
         self.close_archive()
 
 
-class ExportObjdata(ExporterArchive):
-    """Represents geometry, lights and cameras using objectdata data-blocks.
+class ExportMeshdata(ExporterArchive):
+    """Represents geometry using objectdata data-blocks.
     Can also handle export of multiple meshes setup in LOD list
     """
 
     blender_object = None
     materials_used = [] # list of material indexes used
     mesh_exportdata = None
+    old_pointer_file = None
 
     def __init__(self, export_object=None):
         """Initialize attributes using export_object and parameters.
@@ -2473,7 +2458,6 @@ class ExportObjdata(ExporterArchive):
         ExporterArchive.__init__(self, export_object, 'GEO')
         self.blender_object = self.pointer_datablock
         self._set_pointer_datablock(self.pointer_datablock.data)
-        self.open_rib_archive()
 
     def _cache_mesh(self):
         """Generate RIB code cache for poly, mesh, points and sds geometry.
@@ -2484,7 +2468,7 @@ class ExportObjdata(ExporterArchive):
 
         """
         if DEBUG_PRINT:
-            print("ExportObjdata._cache_mesh")
+            print("ExportMeshdata._cache_mesh")
 
         # build the mesh cache if it does not exist
         if self.open_cache():
@@ -2527,7 +2511,54 @@ class ExportObjdata(ExporterArchive):
             self.close_cache()
             return True
         else:
+            self.close_cache()
             return False
+
+    def _make_submesh_name(self, material_idx):
+        return self.data_name + '_m'  + str(material_idx) + '_GEO.rib'
+
+    def _open_submesh_file(self, material_idx, mode):
+        """Open a submesh rib file associated with a material index
+
+        material_idx = index of blender material that is to be used
+        mode = w for write, r for read
+
+        return = True if file was successfully opened.
+                 False if mode == 'r' and file does not exist
+
+        """
+        geo_path = rm.export_manager.make_export_path('GEO') + os.sep
+        file_name = self._make_submesh_name(material_idx)
+
+        self.old_pointer_file = self._pointer_file
+
+        # if submesh is to be read then make sure it exists first
+        if mode == 'r':
+            if self.file_exists(file_name, geo_path):
+                self._pointer_file = open(geo_path + file_name, mode)
+            else:
+                self._pointer_file = None
+        else:
+            self._pointer_file = open(geo_path + file_name, mode)
+
+        return self._pointer_file is not None
+
+    def _close_submesh_file(self):
+        if self._pointer_file:
+            self._pointer_file.close()
+        self._pointer_file = self.old_pointer_file
+
+    def _copy_submesh_file(self, material_idx):
+        if self._pointer_file and self._open_submesh_file(material_idx, 'r'):
+            # parent file pointer is in self.old_pointer_file
+            # submesh file pointer is in self._pointer_file
+            # flip the pointer around so we can make writing easier
+            submesh_pointer = self._pointer_file
+            self._pointer_file = self.old_pointer_file
+            # copy submesh file contents into parent rib file
+            for l in submesh_pointer:
+                self.write_text(l)
+            submesh_pointer.close()
 
     def _ribify_cache(self, material_idx=0):
         """Assemble RIB code as archive or inline for current open archive
@@ -2538,8 +2569,10 @@ class ExportObjdata(ExporterArchive):
 
         """
         if DEBUG_PRINT:
-            print("ExportObjdata._ribify_cache")
+            print("ExportMeshdata._ribify_cache")
 
+        # all submesh caches are placed in the GEO directory
+        self._open_submesh_file(material_idx, 'w')
         # only build rib if file pointer exists and cache can be read
         # most of this codes comes from RibMosaic Beta-0.4.7 for Blender
         # 2.49b
@@ -2614,16 +2647,25 @@ class ExportObjdata(ExporterArchive):
             else:
                 for l in self._pointer_cache:
                     self.write_text(l)
+            self._close_submesh_file()
             self.close_cache()
 
 
-    def _export_geometry(self):
+        self._pointer_file = self.old_pointer_file
+
+
+
+    # #### Public methods
+
+    def export_geometry_cache(self):
         if DEBUG_PRINT:
-            print("ExportObjdata._export_geometry")
+            print("ExportObMeshdata.export_geometry_cache")
         if self._cache_mesh():
-            # export meshes for each material index used in mesh
-            # for now assume mesh has only one material applied to whole mesh
+            # export meshes for each material index used in mesh faces
             for mi in rm.ribify.materials_used:
+                # create a unique mesh file for each material/sub-mesh
+                # material index is used in mesh name ie _m0 for material
+                # index 0.
                 self._ribify_cache(mi)
         # don't need the mesh data anymore so tell blender to
         # get rid of it
@@ -2631,45 +2673,41 @@ class ExportObjdata(ExporterArchive):
             bpy.data.meshes.remove(self.mesh_exportdata)
             self.mesh_exportdata = None
 
-    # #### Public methods
+    def has_submesh(self, material_idx):
+        """ Check if a submesh rib file using a specific material index exists
 
-    # TODO just a test method
-    def export(self):
-        """ """
+        material_idx = index of the material used by a submesh
 
-        if DEBUG_PRINT:
-            print("Exporting object data...")
-
-        rm.ribify.mesh_pointspolygons(None)
-        rm.ribify.mesh_subdivisionmesh(None)
-        rm.ribify.mesh_points(None)
-        rm.ribify.mesh_curves(None)
-        rm.ribify.curve_cyclic_poly(None)
-        rm.ribify.curve_cyclic_bezier(None)
-        rm.ribify.curve_cyclic_nurbs(None)
-        rm.ribify.curve_noncyclic_poly(None)
-        rm.ribify.curve_noncyclic_bezier(None)
-        rm.ribify.curve_noncyclic_nurbs(None)
-        rm.ribify.curve_points(None)
-        rm.ribify.surface_nupatch(None)
-        rm.ribify.surface_points(None)
-        rm.ribify.metaball_blobby(None)
-        rm.ribify.metaball_points(None)
-        rm.ribify.data_to_primvar(None, member="N", define="N",
-                                     ptype="normal", pclass="varying")
+        """
+        tmp_path = rm.export_manager.make_export_path('GEO') + os.sep
+        file_name = self._make_submesh_name(material_idx)
+        return self.file_exists(file_name, tmp_path)
 
     # export the blender object data into RIB format
-    def export_rib(self):
+    def export_rib(self, material_index):
         if DEBUG_PRINT:
-            print('ExportObjData.export_rib()')
-
-        # if no file pointer which indicates no export required then exit
-        if self._pointer_file == None:
-            return
-
+            print('ExportMeshData.export_rib()')
         # determine what type of object data needs to be exported
         if self.blender_object.type in ('MESH', 'EMPTY'):
-            self. _export_geometry()
+            # set data name to include material index so that if
+            # using readarchive or some varient then the submesh rib will be
+            # used.
+            self.data_name = getattr(self.pointer_datablock, "name", "") + \
+                 '_m'  + str(material_index)
+            # open_rib_archive will set _pointer_file to None if no archive
+            # but since export_rib could be called multiple times we
+            # need to keep _pointer_file original value intact
+            self.old_pointer_file = self._pointer_file
+            self.open_rib_archive()
+            # set data name back to normal datablock name
+            self.data_name = getattr(self.pointer_datablock, "name", "")
+            # if _pointer_file is set then it means that the mesh is to
+            # be inlined in the parent so must open the submesh file and
+            # copy it into the parent rib.
+            if self._pointer_file:
+                self._copy_submesh_file(material_index)
+            # restore parent file pointer
+            self._pointer_file = self.old_pointer_file
 
         self.close_archive()
 
