@@ -60,6 +60,24 @@ Display "+@[EVAL:.pass_output:]@" "exr" "float _z" "string layername" "RenderLay
             <layout>
             </layout>
         </Multi_Display>
+        <ZFile_Display delete="False" description="" duplicate="False" enabled="False" filter="" register="True" type="DISPLAY" windows="RENDER">
+            <read target="">
+            </read>
+            <begin target="">
+Display "+@[EVAL:.pass_output:]@" "zfile" "z"
+Hider "hidden" "depthfilter" "midpoint"
+
+            </begin>
+            <end target="">
+MakeShadow "@[EVAL:.pass_output:]@" "@[EVAL:.pass_output:]@.shad"
+            </end>
+            <regexes target="">
+            </regexes>
+            <properties>
+            </properties>
+            <layout>
+            </layout>
+        </ZFile_Display>
         <Options delete="False" description="Aqsis render Options" duplicate="False" enabled="True" filter="" register="True" type="OPTION" windows="RENDER">
             <read target="">
             </read>
