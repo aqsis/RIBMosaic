@@ -217,7 +217,7 @@ class Ribify():
             self._start_rib_array(1)
             for face in mesh.faces:
                 # iterate through each vertex index in the face
-                norm_str =""
+                norm_str = ""
                 for vi in face.vertices:
                     # build the normals list
                     # if face is smooth then use the vertex normal
@@ -228,6 +228,7 @@ class Ribify():
                         # otherwise the face is flat so use the face normal
                         norm_str += " ".join(
                             [str(c) for c in face.normal])
+                    norm_str += " "
                 self._write_rib_array_item(norm_str)
         self._end_rib_array()
 
@@ -241,20 +242,23 @@ class Ribify():
 
         if uv_layer:
             self.write_text(primvar_rib)
-            self._start_rib_array(2)
+            self._start_rib_array(1)
             for fi, tf in enumerate(uv_layer):
                 # "1.0 -" because
                 # renderman? expects UVs flipped
                 # vertically from blender
-                self._write_rib_array_item(tf.uv1[0])
-                self._write_rib_array_item(1.0 - tf.uv1[1])
-                self._write_rib_array_item(tf.uv2[0])
-                self._write_rib_array_item(1.0 - tf.uv2[1])
-                self._write_rib_array_item(tf.uv3[0])
-                self._write_rib_array_item(1.0 - tf.uv3[1])
+                # all uv data for a face must be on one line
+                uv_str = ""
+                uv_str += str(tf.uv1[0])
+                uv_str += " " + str(1.0 - tf.uv1[1])
+                uv_str += " " + str(tf.uv2[0])
+                uv_str += " " + str(1.0 - tf.uv2[1])
+                uv_str += " " + str(tf.uv3[0])
+                uv_str += " " + str(1.0 - tf.uv3[1])
                 if len(mesh.faces[fi].vertices) == 4:
-                    self._write_rib_array_item(tf.uv4[0])
-                    self._write_rib_array_item(1.0 - tf.uv4[1])
+                    uv_str += " " + str(tf.uv4[0])
+                    uv_str += " " + str(1.0 - tf.uv4[1])
+                self._write_rib_array_item(uv_str)
             self._end_rib_array()
 
     # ### Public methods
