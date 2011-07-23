@@ -2594,7 +2594,11 @@ class ExportMeshdata(ExporterArchive):
                 fIndex  = 0
                 vIndex  = 0
                 for l in self._pointer_cache:
-                    if ("[" in l):
+                    if ("uniform" in l or "facevarying" in l or
+                      "facevertex" in l):
+                        self.write_text(l)
+                        perFace = 1
+                    elif ("[" in l):
                         self.write_text(l)
                         fIndex  = 0
                         tagMode += 1
@@ -2604,10 +2608,6 @@ class ExportMeshdata(ExporterArchive):
                         self.write_text(l)
                         fIndex  = 0
                         perFace = 0
-                    elif ("uniform" in l or "facevarying" in l or
-                      "facevertex" in l):
-                        self.write_text(l)
-                        perFace = 1
                     # export parameter list item per face
                     elif (perFace):
                         if (fIndex in faces):
