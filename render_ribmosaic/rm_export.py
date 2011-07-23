@@ -1396,10 +1396,10 @@ class ExporterArchive(rm_context.ExportContext):
                 # Determine if compressed RIB is enabled
                 self.open_archive(
                     gzipped=self.get_scene().ribmosaic_compressrib)
+                # since in own archive, start indentation at the left margin
+                self.current_indent = 0
             else:
                 self._pointer_file = None
-            # since in own archive, start indentation at the left margin
-            self.current_indent = 0
         elif archive_mode == 'NOEXPORT':
             self._pointer_file = None
         # all other modes default to inline
