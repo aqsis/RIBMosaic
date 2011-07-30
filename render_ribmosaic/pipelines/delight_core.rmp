@@ -132,14 +132,14 @@ cd @[EVAL:.target_path:STR]@
 
             </begin>
             <middle target="*.sdl">
-shaderinfo @[EVAL:.target_name:STR]@ &gt; "@[EVAL:.target_name:]@.slmeta"
+shaderinfo @[EVAL:.target_name:STR]@ &gt; @[EVAL:.target_name.replace(".sdl",".slmeta"):STR]@
 
             </middle>
             <end target="">
 echo "Info complete"
 
             </end>
-            <regexes target="*.sdl.slmeta">
+            <regexes target="*.slmeta">
                 <head_start matches="1" regex="$\n" replace="" />
                 <head_name matches="1" regex=" &quot;" replace="&quot; name=&quot;" />
                 <head_ext matches="1" regex=".sld" replace="" />

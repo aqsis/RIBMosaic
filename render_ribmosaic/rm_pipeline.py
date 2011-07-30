@@ -2822,10 +2822,14 @@ class PipelineManager():
                     root_layout += "/" + attribs['name'] + "_col"
 
                     # Add array length to RIB
-                    rib.text += " [" + str(array_count) + "]"
+                    rib.text += "[" + str(array_count) + "]"
 
                 # Add parameter name to RIB
                 rib.text += " " + attribs['name'] + "\""
+
+                # arrays need [ ] bracketing
+                if array_count > 1:
+                    rib.text += " ["
 
                 # Generate number of properties according to array count
                 for i in range(array_count):
@@ -2907,6 +2911,8 @@ class PipelineManager():
                     # Add DATA link to RIB to insert buttons value
                     rib.text += " @[DATA:///properties/" + prop_name + ":RIB]@"
                 # Finish RIB parameter
+                if array_count > 1:
+                    rib.text += " ]"
                 rib.text += "\n"
             # Reapply RIB text decoration
             rib.text += "\n" + rib_decoration

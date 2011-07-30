@@ -8,7 +8,7 @@
 	</shader_sources>
 
 	<shader_panels filter="SHADER">
-		<depthcue_surf delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@depthcue_surf.slx.slmeta" type="SURFACE" windows="MATERIAL">
+		<depthcue_surf delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="SURFACE" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@depthcue_surf.slmeta" type="SURFACE" windows="MATERIAL">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@depthcue_surf"
     "uniform float mindistance" @[DATA:///properties/mindistance_prop0:RIB]@
@@ -62,7 +62,7 @@
 				</debug_row0>
 			</layout>
 		</depthcue_surf>
-		<depthcue delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="VOLUME" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@depthcue.slx.slmeta" type="VOLUME" windows="WORLD">
+		<depthcue delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="VOLUME" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@depthcue.slmeta" type="VOLUME" windows="WORLD">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@depthcue"
     "uniform float mindistance" @[DATA:///properties/mindistance_prop0:RIB]@
@@ -107,7 +107,7 @@
 				</background_row0>
 			</layout>
 		</depthcue>
-		<altitude_fog delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="VOLUME" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@altitude_fog.slx.slmeta" type="VOLUME" windows="WORLD">
+		<altitude_fog delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="VOLUME" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@altitude_fog.slmeta" type="VOLUME" windows="WORLD">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@altitude_fog"
     "uniform float max_height" @[DATA:///properties/max_height_prop0:RIB]@
@@ -152,7 +152,7 @@
 				</background_row0>
 			</layout>
 		</altitude_fog>
-		<fog delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="VOLUME" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@fog.slx.slmeta" type="VOLUME" windows="WORLD">
+		<fog delete="True" description="Authors:\nCopyright:\nDescription:\n" duplicate="True" enabled="False" filter="VOLUME" library="@[SLIB::RIB]@" register="False" slmeta="@[SLIB::]@fog.slmeta" type="VOLUME" windows="WORLD">
 			<rib target="">
 @[DATA:///properties/sl_type:]@ "@[SLIB::RIB]@fog"
     "uniform float distance" @[DATA:///properties/distance_prop0:RIB]@

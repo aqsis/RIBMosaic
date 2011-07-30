@@ -186,30 +186,6 @@ def create_mesh(scene, ob, matrix=None):
     return mesh
 
 
-def render_get_resolution(r):
-    xres = int(r.resolution_x * r.resolution_percentage * 0.01)
-    yres = int(r.resolution_y * r.resolution_percentage * 0.01)
-    return xres, yres
-
-
-def render_get_aspect(r):
-    xres, yres = render_get_resolution(r)
-
-    xratio = xres * r.pixel_aspect_x / 200.0
-    yratio = yres * r.pixel_aspect_y / 200.0
-
-    if xratio > yratio:
-        aspectratio = xratio / yratio
-        xaspect = aspectratio
-        yaspect = 1.0
-    else:
-        aspectratio = yratio / xratio
-        xaspect = 1.0
-        yaspect = aspectratio
-
-    return xaspect, yaspect, aspectratio
-
-
 # The dummy pass class is used to provide default render pass settings
 # if the scene does not provide one.
 # During menu/panel draw/ and rendering context, it is not possible to
@@ -818,6 +794,11 @@ class ExporterManager():
                 ec.pointer_render = render_object
                 ec.current_pass = i + 1
                 ec.current_frame = f
+                if p.pass_type != 'BEAUTY':
+                    if p.pass_res_x > 0:
+                        x = p.pass_res_x
+                    if p.pass_res_y > 0:
+                        y = p.pass_res_y
                 ec.dims_resx = x
                 ec.dims_resy = y
                 target_name = ec._resolve_links("P@[EVAL:.current_pass:#####]@"
@@ -2047,7 +2028,17 @@ class ExportObject(ExporterArchive):
         r = scene.render
         camera = ob.data
 
-        xaspect, yaspect, aspectratio = render_get_aspect(r)
+        xratio = self.dims_resx * r.pixel_aspect_x / 200.0
+        yratio = self.dims_resy * r.pixel_aspect_y / 200.0
+
+        if xratio > yratio:
+            aspectratio = xratio / yratio
+            xaspect = aspectratio
+            yaspect = 1.0
+        else:
+            aspectratio = yratio / xratio
+            xaspect = 1.0
+            yaspect = aspectratio
 
         if camera.ribmosaic_dof:
             # allow an object to be used for dof distance
