@@ -66,6 +66,7 @@ Display "+@[EVAL:.pass_output:]@" "exr" "float _z" "string layername" "RenderLay
             <begin target="">
 Display "+@[EVAL:.pass_output:]@" "zfile" "z"
 Hider "hidden" "depthfilter" "midpoint"
+Hider "hidden" "jitter" [ 0 ]
 
             </begin>
             <end target="">
