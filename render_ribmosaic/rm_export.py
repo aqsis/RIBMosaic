@@ -398,8 +398,8 @@ class ExporterManager():
           subname = name of shader sub directory, defualts to "Text_Editor"
           Returns the relative path
         """
-        path = ("." + os.sep + self.make_export_path('SHD') +
-            os.sep + subname + os.sep)
+        path = os.path.join(".", self.make_export_path('SHD'), subname) + \
+                os.sep
         try:
             os.makedirs(path)
         except:
