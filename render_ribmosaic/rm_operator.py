@@ -313,9 +313,8 @@ class WM_OT_ribmosaic_text_addshaderpanel(rm_context.ExportContext,
             # determine the path to the slmeta file for the shader in the text
             # editor
             slmetaname = text.name[:-2] + "slmeta"
-            slmetapath = (rm.export_manager.export_directory +
-                    rm.export_manager.make_shader_export_path() +
-                    slmetaname)
+            slmetapath = os.path.join(rm.export_manager.export_directory,
+                    rm.export_manager.make_shader_export_path(), slmetaname)
             # only try to add the shader panel if a pipeline is selected
             # and the slmeta file exists
             if index >= 0 and os.path.isfile(slmetapath):
@@ -1243,6 +1242,9 @@ class WM_OT_ribmosaic_library_addpanel(rm_context.ExportContext,
 # #############################################################################
 # PIPELINE OPERATORS
 # #############################################################################
+def load_callback(data):
+    print("load callback")
+    bpy.ops.wm.ribmosaic_pipeline_sync()
 
 class WM_OT_ribmosaic_pipeline_sync(rm_context.ExportContext,
                                     RibmosaicOperator,
@@ -1256,6 +1258,10 @@ class WM_OT_ribmosaic_pipeline_sync(rm_context.ExportContext,
 
     def execute(self, context):
         print("wm.ribmosaic_pipeline_sync()")
+        # FIXME : load_post handlers never get executed because blender
+        # clears them on file load
+        if not load_callback in bpy.app.handlers.render_pre:
+            bpy.app.handlers.load_post.append(load_callback)
 
         # Sync pipeline tree with current .rmp files
         rm.pipeline_manager.sync()
