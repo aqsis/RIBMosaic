@@ -302,6 +302,48 @@ class WM_OT_ribmosaic_text_comment(rm_context.ExportContext,
         return {'FINISHED'}
 
 
+class WM_OT_ribmosaic_text_addshaderpanel(rm_context.ExportContext,
+                                       RibmosaicOperator,
+                                       bpy.types.Operator):
+
+    """
+      Compile shader in text editor, Build slmeta, and add shader panel
+      to selected pipeline.
+    """
+
+    # ### Public attributes
+
+    bl_idname = "wm.ribmosaic_text_addshaderpanel"
+    bl_label = "Compile and generate shader panel for selected pipeline"
+
+    def execute(self, context):
+        try:
+            text = context.space_data.text
+            # make sure text is saved, compiled, and slmeta is built
+            bpy.ops.wm.ribmosaic_library_compile('EXEC_DEFAULT',
+                pipeline="Text_Editor")
+
+            wm = context.window_manager
+            # get the index of the active pipeline
+            index = wm.ribmosaic_pipelines.active_index
+            # determine the path to the slmeta file for the shader in the text
+            # editor
+            slmetapath = (rm.export_manager.export_directory +
+                    rm.export_manager.make_shader_export_path() +
+                    text.name[:-2] + "slmeta")
+            # only try to add the shader panel if a pipeline is selected
+            # and the slmeta file exists
+            if index >= 0 and os.path.isfile(slmetapath):
+                bpy.ops.wm.ribmosaic_library_addpanel('INVOKE_DEFAULT',
+                    filepath=slmetapath,
+                    pipeline=wm.ribmosaic_pipelines.collection[index].xmlpath)
+
+        except rm_error.RibmosaicError as err:
+            err.ReportError(self)
+            return {'CANCELLED'}
+
+        return {'FINISHED'}
+
 # #############################################################################
 # XML OPERATORS
 # #############################################################################
@@ -1196,7 +1238,7 @@ class WM_OT_ribmosaic_library_addpanel(rm_context.ExportContext,
                     self.filepath = lib + "*.slmeta"
                 else:
                     self.library = ""
-                    self.filepath = "//*.slmeta"
+                    #self.filepath = "//*.slmeta"
             else:
                 raise rm_error.RibmosaicError("Blend must be saved before "
                                               "shaders can be added")
@@ -1207,6 +1249,7 @@ class WM_OT_ribmosaic_library_addpanel(rm_context.ExportContext,
         context.window_manager.fileselect_add(self)
 
         return {'RUNNING_MODAL'}
+
 
 
 # #############################################################################

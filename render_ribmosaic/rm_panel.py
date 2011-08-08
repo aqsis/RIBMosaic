@@ -192,6 +192,10 @@ def ribmosaic_text_menu(self, context):
                 layout.operator("wm.ribmosaic_library_compile",
                                 text="Build Shaders").pipeline = "Text_Editor"
 
+                layout.operator("wm.ribmosaic_text_addshaderpanel",
+                            icon='ZOOMIN',
+                            text="Add Shader Panels")
+
 
 class WM_MT_ribmosaic_pipeline_menu(bpy.types.Menu):
     """Pipeline options menu"""
