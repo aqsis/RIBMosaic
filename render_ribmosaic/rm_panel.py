@@ -1147,6 +1147,40 @@ class SCENE_PT_ribmosaic_panels(RibmosaicPipelinePanels, bpy.types.Panel):
 # WORLD SPACE CLASSES
 # #############################################################################
 
+class WORLD_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
+    """Pipeline export control panel for worlds"""
+
+    # ### Public attributes
+
+    bl_space_type = 'PROPERTIES'
+    bl_region_type = 'WINDOW'
+    bl_label = "Export Options"
+    bl_context = "world"
+    bl_options = 'DEFAULT_CLOSED'
+
+    # ### Public methods
+
+    def draw(self, context):
+        ob = self._context_data(context, self.bl_context)['data']
+
+        layout = self.layout
+
+        sub = layout.row()
+
+        if ob.ribmosaic_rib_archive != 'NOEXPORT':
+            col = sub.column()
+            col.prop(ob, "ribmosaic_mblur")
+            col = col.column(align=True)
+            col.active = ob.ribmosaic_mblur
+            col.prop(ob, "ribmosaic_mblur_steps")
+            col.prop(ob, "ribmosaic_mblur_start")
+            col.prop(ob, "ribmosaic_mblur_end")
+
+        col = sub.column()
+        col.label(text="RIB Archive:")
+        col.prop(ob, "ribmosaic_rib_archive", text="")
+
+
 class WORLD_PT_ribmosaic_preview(RibmosaicPreviewPanel, bpy.types.Panel):
     """Pipeline shader control panel for worlds"""
 
