@@ -387,7 +387,8 @@ class ExportContext():
                         else:
                             if do_pass_filter and pass_filter_prop:
                                 enabled = self.pointer_pass.name in \
-                                            pass_filter_prop.split(',')
+                                            pass_filter_prop.split(',') and \
+                                            enabled_prop
                             else:
                                 enabled = enabled_prop
                     else:
