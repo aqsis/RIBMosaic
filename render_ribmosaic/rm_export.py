@@ -2040,12 +2040,13 @@ class ExportWorld(ExporterArchive):
 
         world_utilities = self.build_export_utilities_list('WORLD')
 
-        self.export_shaders('WORLD')
 
         scene = self.get_scene()
 
         if scene.ribmosaic_use_world:
             self.riWorldBegin()
+
+        self.export_shaders('WORLD')
 
         for p in world_utilities:
             p.current_indent = self.current_indent
@@ -2196,6 +2197,16 @@ class ExportObject(ExporterArchive):
         m = s * r * l
 
         self.riTransform(m)
+
+        # setup for camera data block
+        self._set_pointer_datablock(camera)
+
+        # export attached shaders that are for CAMERA
+        self.export_shaders('CAMERA')
+        # restore ob
+        self._set_pointer_datablock(ob)
+
+
 
     # #### Public methods
 
