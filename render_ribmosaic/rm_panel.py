@@ -842,7 +842,7 @@ class RENDER_PT_ribmosaic_passes(RibmosaicPropertiesPanel, bpy.types.Panel):
     bl_region_type = 'WINDOW'
     bl_label = "RenderMan Passes"
     bl_context = "render"
-    bl_options = 'DEFAULT_CLOSED'
+    bl_options = {'DEFAULT_CLOSED'}
 
     pass_clipboard = {}
 
@@ -976,7 +976,7 @@ class RENDER_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
     bl_region_type = 'WINDOW'
     bl_label = "Export Options"
     bl_context = "render"
-    bl_options = 'DEFAULT_CLOSED'
+    bl_options = {'DEFAULT_CLOSED'}
 
     # ### Public methods
 
@@ -1042,7 +1042,7 @@ class SCENE_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
     bl_region_type = 'WINDOW'
     bl_label = "Export Options"
     bl_context = "scene"
-    bl_options = 'DEFAULT_CLOSED'
+    bl_options = {'DEFAULT_CLOSED'}
 
     # ### Public methods
 
@@ -1156,7 +1156,7 @@ class WORLD_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
     bl_region_type = 'WINDOW'
     bl_label = "Export Options"
     bl_context = "world"
-    bl_options = 'DEFAULT_CLOSED'
+    bl_options = {'DEFAULT_CLOSED'}
 
     # ### Public methods
 
@@ -1224,7 +1224,7 @@ class OBJECT_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
     bl_region_type = 'WINDOW'
     bl_label = "Export Options"
     bl_context = "object"
-    bl_options = 'DEFAULT_CLOSED'
+    bl_options = {'DEFAULT_CLOSED'}
 
     filter_type = ('MESH', 'CURVE', 'SURFACE', 'META', 'EMPTY', 'LAMP')
     validate_context = "object"
@@ -1331,7 +1331,7 @@ class DATA_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
     bl_region_type = 'WINDOW'
     bl_label = "Export Options"
     bl_context = "data"
-    bl_options = 'DEFAULT_CLOSED'
+    bl_options = {'DEFAULT_CLOSED'}
 
     filter_type = ('MESH', 'CURVE', 'SURFACE', 'META', 'LAMP', 'CAMERA')
 
@@ -1492,7 +1492,7 @@ class MATERIAL_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
     bl_region_type = 'WINDOW'
     bl_label = "Export Options"
     bl_context = "material"
-    bl_options = 'DEFAULT_CLOSED'
+    bl_options = {'DEFAULT_CLOSED'}
 
     validate_context = "material"
 
@@ -1650,7 +1650,7 @@ class PARTICLE_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
     bl_region_type = 'WINDOW'
     bl_label = "Export Options"
     bl_context = "particle"
-    bl_options = 'DEFAULT_CLOSED'
+    bl_options = {'DEFAULT_CLOSED'}
 
     validate_context = "particle_system"
 
