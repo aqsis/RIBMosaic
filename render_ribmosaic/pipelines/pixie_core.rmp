@@ -60,6 +60,25 @@ Display "+@[EVAL:.pass_output:]@" "exr" "float _z" "string layername" "RenderLay
             <layout>
             </layout>
         </Multi_Display>
+        <ZFile_Display delete="False" description="" duplicate="False" enabled="False" filter="" register="True" type="DISPLAY" windows="RENDER">
+            <read target="">
+            </read>
+            <begin target="">
+Display "+@[EVAL:.pass_output:]@" "zfile" "z"
+Hider "hidden" "depthfilter" "midpoint"
+Hider "hidden" "jitter" [ 0 ]
+
+            </begin>
+            <end target="">
+MakeShadow "@[EVAL:.pass_output:]@" "@[EVAL:.pass_output:]@.tx"
+            </end>
+            <regexes target="">
+            </regexes>
+            <properties>
+            </properties>
+            <layout>
+            </layout>
+        </ZFile_Display>
     </utility_panels>
 
     <command_panels filter="COMMAND">
