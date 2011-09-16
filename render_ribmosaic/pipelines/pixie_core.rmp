@@ -71,6 +71,7 @@ Hider "hidden" "jitter" [ 0 ]
             </begin>
             <end target="">
 MakeShadow "@[EVAL:.pass_output:]@" "@[EVAL:.pass_output:]@.tx"
+
             </end>
             <regexes target="">
             </regexes>
