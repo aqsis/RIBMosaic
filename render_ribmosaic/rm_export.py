@@ -841,13 +841,14 @@ class ExporterManager():
                 ec.pointer_render = render_object
                 ec.current_pass = i + 1
                 ec.current_frame = f
-                if p.pass_type != 'BEAUTY':
-                    if p.pass_res_x > 0:
-                        x = p.pass_res_x
-                    if p.pass_res_y > 0:
-                        y = p.pass_res_y
+                # default to using the render dimension settings
                 ec.dims_resx = x
                 ec.dims_resy = y
+                if p.pass_type != 'BEAUTY':
+                    if p.pass_res_x > 0:
+                        ec.dims_resx = p.pass_res_x
+                    if p.pass_res_y > 0:
+                        ec.dims_resy = p.pass_res_y
                 target_name = ec._resolve_links("P@[EVAL:.current_pass:#####]@"
                                          "_F@[EVAL:.current_frame:#####]@.rib")
 
