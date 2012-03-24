@@ -61,8 +61,8 @@ import string
 
 # #### Global variables
 
-MODULE = os.path.dirname(__file__).split(os.sep)[-1]
-exec("import " + MODULE + " as rm")
+#MODULE = os.path.dirname(__file__).split(os.sep)[-1]
+#exec("import " + MODULE + " as rm")
 
 DEBUG_PRINT = False
 
@@ -280,9 +280,9 @@ class Ribify():
                     self.pointer_file.write(text.encode())
                 else:
                     self.pointer_file.write(text)
-            else:
-                raise RibmosaicError("Archive already closed,"
-                                     "cannot write text")
+            #else:
+            #    raise RibmosaicError("Archive already closed,"
+            #                         "cannot write text")
 
     def inc_indent(self):
         self.indent += 1
@@ -437,6 +437,6 @@ class Ribify():
         self._start_rib_array(4, False)
         for i in range(4):
             for j in range(4):
-                self._write_rib_array_item(mat[i][j])
+                self._write_rib_array_item(mat[j][i])
         self._end_rib_array()
         self.write_text('\n')
