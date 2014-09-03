@@ -605,7 +605,7 @@ class RibmosaicPipelinePanels(RibmosaicPropertiesPanel):
             rows = 2
 
         row = layout.row()
-        row.operator("wm.ribmosaic_modal_sync")
+        row.operator("wm.ribmosaic_pipeline_sync")
         row = layout.row()
         row.template_list(wm.ribmosaic_pipelines, "collection",
                           wm.ribmosaic_pipelines, "active_index", rows=rows)

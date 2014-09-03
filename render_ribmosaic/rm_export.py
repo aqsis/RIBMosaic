@@ -1388,7 +1388,8 @@ class ExporterArchive(rm_context.ExportContext):
         """
 
         # determine what type of export to do
-        archive_mode = self.pointer_datablock.ribmosaic_rib_archive
+        archive_mode = getattr(self.pointer_datablock, "ribmosaic_rib_archive",
+            'DEFUALT')
         # for now just testing inline and readarchive
         if archive_mode == 'DEFAULT':
             if self.data_type in ['MESH']:
@@ -1506,6 +1507,9 @@ class ExporterArchive(rm_context.ExportContext):
 
     def riTransform(self, mat):
         self.write_text('Transform %s\n' % rib_mat_str(mat))
+
+    def riSides(self, useTwoSides=True):
+        self.write_text('Sides %s\n' % (2 if useTwoSides else 1))
 
 
 
@@ -1929,8 +1933,6 @@ class ExportPass(ExporterArchive):
             raise rm_error.RibmosaicError("Failed to build camera " +
                                          sys.exc_info())
 
-        self.write_text("Sides 1\n")
-
         world = ExportWorld(self, datablock.world)
         world.export_rib()
         del world
@@ -2200,6 +2202,7 @@ class ExportObject(ExporterArchive):
             self._export_camera_rib()
         else:
 
+            self.riAttributeBegin()
             # TODO
             # need to group mesh data with associated material
             # if the mesh uses more than one material then mesh has to be
@@ -2227,7 +2230,6 @@ class ExportObject(ExporterArchive):
                 mat = ob.matrix_world
             #print(mat)
 
-            self.riAttributeBegin()
             self.write_text('Attribute "identifier" "name" [ "%s" ]\n' %
                             self.data_name)
             self.riTransform(mat)
@@ -2532,6 +2534,9 @@ class ExportObjdata(ExporterArchive):
 
         # determine what type of object data needs to be exported
         if self.blender_object.type in ('MESH', 'EMPTY'):
+            if self.get_scene().ribmosaic_use_sides:
+                self.riSides(self.pointer_datablock.show_double_sided)
+
             self. _export_geometry()
 
         self.close_archive()

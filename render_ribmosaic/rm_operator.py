@@ -71,22 +71,6 @@ exec("import " + MODULE + " as rm")
 # GLOBAL OPERATORS
 # #############################################################################
 
-class WM_OT_ribmosaic_modal_sync(bpy.types.Operator):
-    '''Allow user to demand the pipeline manager to execute
-       its sync method.  This operator is temporary until
-       background callbacks are supported
-    '''
-    bl_idname = "wm.ribmosaic_modal_sync"
-    bl_label = "sync pipelines"
-
-    def execute(self, context):
-        print("wm.ribmosaic_modal_sync()")
-
-        # Sync pipeline tree with current .rmp files
-        rm.pipeline_manager.sync()
-
-        return {'FINISHED'}
-
 
 class RibmosaicOperator():
     """Super class for all RIB Mosaic operators providing helper methods"""
@@ -134,9 +118,9 @@ class RibmosaicOperator():
 
     def _refresh_panels(self):
         """Refreshes UI panels by simply toggling Blender's render engine"""
-
-        bpy.context.scene.render.engine = 'BLENDER_RENDER'
-        bpy.context.scene.render.engine = rm.ENGINE
+        if bpy.context.scene is not None:
+            bpy.context.scene.render.engine = 'BLENDER_RENDER'
+            bpy.context.scene.render.engine = rm.ENGINE
 
     def _unique_name(self, name, names):
         """Checks name against names list to build a unique name by appending
@@ -328,15 +312,17 @@ class WM_OT_ribmosaic_text_addshaderpanel(rm_context.ExportContext,
             index = wm.ribmosaic_pipelines.active_index
             # determine the path to the slmeta file for the shader in the text
             # editor
+            slmetaname = text.name[:-2] + "slmeta"
             slmetapath = (rm.export_manager.export_directory +
                     rm.export_manager.make_shader_export_path() +
-                    text.name[:-2] + "slmeta")
+                    slmetaname)
             # only try to add the shader panel if a pipeline is selected
             # and the slmeta file exists
             if index >= 0 and os.path.isfile(slmetapath):
                 bpy.ops.wm.ribmosaic_library_addpanel('INVOKE_DEFAULT',
                     filepath=slmetapath,
-                    pipeline=wm.ribmosaic_pipelines.collection[index].xmlpath)
+                    pipeline=wm.ribmosaic_pipelines.collection[index].xmlpath,
+                    filename=slmetaname)
 
         except rm_error.RibmosaicError as err:
             err.ReportError(self)
@@ -1238,7 +1224,10 @@ class WM_OT_ribmosaic_library_addpanel(rm_context.ExportContext,
                     self.filepath = lib + "*.slmeta"
                 else:
                     self.library = ""
-                    #self.filepath = "//*.slmeta"
+                    if self.filename != "":
+                        self.files.add().name = self.filename
+                    else:
+                        self.filepath = "//*.slmeta"
             else:
                 raise rm_error.RibmosaicError("Blend must be saved before "
                                               "shaders can be added")
@@ -1251,10 +1240,28 @@ class WM_OT_ribmosaic_library_addpanel(rm_context.ExportContext,
         return {'RUNNING_MODAL'}
 
 
-
 # #############################################################################
 # PIPELINE OPERATORS
 # #############################################################################
+
+class WM_OT_ribmosaic_pipeline_sync(rm_context.ExportContext,
+                                    RibmosaicOperator,
+                                    bpy.types.Operator):
+    '''Allow user to demand the pipeline manager to execute
+       its sync method.  This operator is temporary until
+       background callbacks are supported
+    '''
+    bl_idname = "wm.ribmosaic_pipeline_sync"
+    bl_label = "Sync Pipelines"
+
+    def execute(self, context):
+        print("wm.ribmosaic_pipeline_sync()")
+
+        # Sync pipeline tree with current .rmp files
+        rm.pipeline_manager.sync()
+        self._refresh_panels()
+        return {'FINISHED'}
+
 
 class WM_OT_ribmosaic_pipeline_enable(rm_context.ExportContext,
                                       RibmosaicOperator,
