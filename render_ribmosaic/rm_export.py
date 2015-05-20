@@ -76,7 +76,7 @@ exec("import " + MODULE + " as rm")
 
 # if DEBUG_PRINT set true then each method with print its method name
 # and important vars to console io
-DEBUG_PRINT = False
+DEBUG_PRINT = True
 
 # ------------- RIB formatting Helpers -------------
 # taken from Matt Ebb's Blender to 3Delight exporter
@@ -96,13 +96,13 @@ def rib_param_val(data_type, val):
     elif data_type == 'string':
         return '"%s"' % val
 
-
+# Rendermand saves matrices row major!
 def rib_mat_str(m):
     return '[ %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f ]' % \
-            (m[0][0], m[0][1], m[0][2], m[0][3],
-            m[1][0], m[1][1], m[1][2], m[1][3],
-            m[2][0], m[2][1], m[2][2], m[2][3],
-            m[3][0], m[3][1], m[3][2], m[3][3])
+            (m[0][0], m[1][0], m[2][0], m[3][0],
+            m[0][1], m[1][1], m[2][1], m[3][1],
+            m[0][2], m[1][2], m[2][2], m[3][2],
+            m[0][3], m[1][3], m[2][3], m[3][3])
 
 
 # ------------- Data Access Helpers -------------
@@ -1926,8 +1926,7 @@ class ExportPass(ExporterArchive):
         except:
             cam.close_archive()
             del cam
-            raise rm_error.RibmosaicError("Failed to build camera " +
-                                         sys.exc_info())
+            raise rm_error.RibmosaicError("Failed to build camera " + str(sys.exc_info()))
 
         self.write_text("Sides 1\n")
 
@@ -2147,19 +2146,22 @@ class ExportObject(ExporterArchive):
 
         # build a transform matrix that is looking at the scene
         mat = ob.matrix_world
+        print("Camera Matrix: " , str(mat))
         loc = mat.to_translation()
-        rot = mat.to_euler()
-
+        r = mat.to_quaternion().to_matrix().transposed().to_4x4()
+        
         # setup the look vector which defaults to looking down the Z axis
         s = mathutils.Matrix(([1, 0, 0, 0], [0, 1, 0, 0],
                             [0, 0, -1, 0], [0, 0, 0, 1]))
-        r = mathutils.Matrix.Rotation(-rot[0], 4, 'X')
-        r *= mathutils.Matrix.Rotation(-rot[1], 4, 'Y')
-        r *= mathutils.Matrix.Rotation(-rot[2], 4, 'Z')
+                            
         l = mathutils.Matrix.Translation(-loc)
-
+        
+        # m = R_RC * R_CI^T  |  R_t_RI
+        # s*r = R_RC^T * R_IC  =R_IR =  A_RI
+        #   m = s*r * [ 1 | -(I_t_IR) ]
+        #   m = [ R_RI  |  R_t_RI]
         m = s * r * l
-
+        
         self.riTransform(m)
 
     # #### Public methods

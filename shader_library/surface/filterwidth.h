@@ -45,8 +45,7 @@
  * feature size, and a filter width, fade to the average as we approach
  * the Nyquist limit.
  */
-#define fadeout(g,g_avg,featuresize,fwidth) \
-        mix (g, g_avg, smoothstep(.2,.6,fwidth/featuresize))
+#define fadeout(g,g_avg,featuresize,fwidth) mix (g, g_avg, smoothstep(.2,.6,fwidth/featuresize))
 
 
 #endif /* FILTERWIDTH_H */

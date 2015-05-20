@@ -64,7 +64,7 @@ import string
 MODULE = os.path.dirname(__file__).split(os.sep)[-1]
 exec("import " + MODULE + " as rm")
 
-DEBUG_PRINT = False
+DEBUG_PRINT = True
 
 
 
@@ -127,28 +127,18 @@ class Ribify():
             self._write_rib_array_item(v)
 
     def _export_faces(self, mesh):
-        self.vertcount = 0
-
+        
         self.inc_indent()
         # output the number of vertices for each face
         self._start_rib_array(10)
-        for face in mesh.faces:
-            self._write_rib_array_item(len(face.vertices))
+        for p in mesh.polygons:
+            self._write_rib_array_item(p.loop_total)
         self._end_rib_array()
 
         # output the vertex index for each face corner
         self._start_rib_array(9)
-        for face in mesh.faces:
-            n = len(face.vertices)
-            # iterate through each vertex index in the face
-            for idx in range(0, n):
-                #get the index of the vertiex
-                vi = face.vertices[idx]
-                # keep track of the highest vertex index used
-                if vi > self.vertcount:
-                    self.vertcount = vi
-                # add the index to the verts list of indices
-                self._write_rib_array_item(vi)
+        for p in mesh.polygons:
+            self._write_rib_array_list(p.vertices)
         self._end_rib_array()
         self.write_text('\n')
 
@@ -190,6 +180,7 @@ class Ribify():
         self._end_rib_array()
 
     def _export_vertices(self, mesh):
+
         # rare that these conditions occur but check to make sure
         # there are faces and vertices to export
         if len(mesh.vertices) == 0:
@@ -197,36 +188,36 @@ class Ribify():
 
         self.write_text('"P"\n')
         self._start_rib_array(6)
-        for i in range(0, self.vertcount + 1):
-            self._write_rib_array_list(mesh.vertices[i].co)
+        for v in mesh.vertices:
+            self._write_rib_array_list(v.co)
         self._end_rib_array()
 
 
     def _export_normals(self, primvar_rib, mesh, per_vertex=True):
         # rare that these conditions occur but check to make sure
         # there are faces and vertices to export
-        if len(mesh.vertices) == 0 or len(mesh.faces) == 0:
+        if len(mesh.vertices) == 0 or len(mesh.polygons) == 0:
             return
 
         self.write_text(primvar_rib)
         self._start_rib_array(6)
         if per_vertex:
-            for i in range(0, self.vertcount + 1):
-                self._write_rib_array_list(mesh.vertices[i].normal)
+            for v in mesh.vertices:
+                self._write_rib_array_list(v.normal)
         else:
-            for face in mesh.faces:
-                n = len(face.vertices)
+            for p in mesh.polygons:
+                n = len(p.vertices)
                 # iterate through each vertex index in the face
                 for idx in range(0, n):
                     # build the normals list
                     # if face is smooth then use the vertex normal
-                    if face.use_smooth:
+                    if p.use_smooth:
                         #get the index of the vertex
-                        vi = face.vertices[idx]
+                        vi = p.vertices[idx]
                         self._write_rib_array_list(mesh.vertices[vi].normal)
                     else:
                         # otherwise the face is flat so use the face normal
-                        self._write_rib_array_list(face.normal)
+                        self._write_rib_array_list(p.normal)
         self._end_rib_array()
 
 
@@ -316,8 +307,6 @@ class Ribify():
         elif member == 'UV':
             self._export_uvs(primvar_rib, datablock)
 
-
-
     def mesh_pointspolygons(self, datablock):
         """ """
         if DEBUG_PRINT:
@@ -325,6 +314,7 @@ class Ribify():
 
         self.write_text('PointsPolygons \n')
         self.inc_indent()
+        
         self._export_faces(datablock)
         self._export_vertices(datablock)
 
@@ -353,7 +343,6 @@ class Ribify():
         self.write_text('Points\n')
         self.inc_indent()
         # output vertices
-        self.vertcount = len(datablock.vertices) - 1
         self._export_vertices(datablock)
 
     def mesh_curves(self, datablock):

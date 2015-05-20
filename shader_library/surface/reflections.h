@@ -157,16 +157,11 @@ RayTrace (point P;  vector Rdir;  float Kr, blur, jitter;
 
 
 
-#define ENVPARAMS \
-        envname, envspace, envrad, rayjitter, raysamples
+#define ENVPARAMS envname, envspace, envrad, rayjitter, raysamples
 
-#define DECLARE_ENVPARAMS                           \
-        string envname, envspace;                   \
-        uniform float envrad, rayjitter, raysamples
+#define DECLARE_ENVPARAMS                           string envname, envspace;                   uniform float envrad, rayjitter, raysamples
 
-#define DECLARE_DEFAULTED_ENVPARAMS                                 \
-        string envname = "", envspace = "world";                    \
-        uniform float envrad = 100, rayjitter = 0, raysamples = 1
+#define DECLARE_DEFAULTED_ENVPARAMS                                 string envname = "", envspace = "world";                    uniform float envrad = 100, rayjitter = 0, raysamples = 1
 
 
 

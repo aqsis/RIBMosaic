@@ -169,7 +169,7 @@ geometry_props = ["Mesh",
 from bl_ui import properties_render
 properties_render.RENDER_PT_render.COMPAT_ENGINES.add(rm.ENGINE)
 properties_render.RENDER_PT_dimensions.COMPAT_ENGINES.add(rm.ENGINE)
-properties_render.RENDER_PT_layers.COMPAT_ENGINES.add(rm.ENGINE)
+#properties_render.RENDER_PT_layers.COMPAT_ENGINES.add(rm.ENGINE)
 properties_render.RENDER_PT_output.COMPAT_ENGINES.add(rm.ENGINE)
 properties_render.RENDER_PT_post_processing.COMPAT_ENGINES.add(rm.ENGINE)
 properties_render.RENDER_PT_stamp.COMPAT_ENGINES.add(rm.ENGINE)
