@@ -1112,7 +1112,10 @@ class ExporterArchive(rm_context.ExportContext):
 
         if self.archive_name:
             filepath = self.archive_path + self.archive_name
-
+            
+            if DEBUG_PRINT:
+                print("open archive path: %s" % filepath)
+            
             try:
                 if self.is_gzip:
                     self._pointer_file = gzip.open(filepath, mode)
@@ -1386,7 +1389,10 @@ class ExporterArchive(rm_context.ExportContext):
                        INLINE, READARCHIVE, NOEXPORT, UNREADARCHIVE, INSTANCE,
                        DELAYEDARCHIVE, UNREADARCHIVE
         """
-
+        
+        if DEBUG_PRINT:
+            print("ExportArchive.open_rib_archive()")
+        
         # determine what type of export to do
         archive_mode = self.pointer_datablock.ribmosaic_rib_archive
         # for now just testing inline and readarchive
@@ -1400,6 +1406,10 @@ class ExporterArchive(rm_context.ExportContext):
             # make archive name
             self.archive_name = (self.data_name + '_' + self._archive_key +
                 '.rib')
+                
+            if DEBUG_PRINT:
+                print("open rib archive with name: %s " % self.archive_name)
+                
             # setup readarchive in parent archive
             # rely on the file pointer still setup for the parent
             self.riReadArchive()
@@ -1965,7 +1975,7 @@ class ExportWorld(ExporterArchive):
 
     def _export_objects(self, objects):
         if DEBUG_PRINT:
-            print("ExportPass._export_objects()")
+            print("ExportWorld._export_objects()")
 
         for ob in objects:
             target_name = ob.name + ".rib"
@@ -1982,7 +1992,7 @@ class ExportWorld(ExporterArchive):
 
     def _export_lights(self, lights):
         if DEBUG_PRINT:
-            print("ExportPass._export_lights()")
+            print("ExportWorld._export_lights()")
 
         for idx, light in enumerate(lights):
             target_name = light.name + ".rib"
@@ -2045,8 +2055,14 @@ class ExportWorld(ExporterArchive):
         # figure out what objects in the scene are renderable
         # build a collection of all renderable objects which includes:
         # light, camera, mesh, empty
+        
         objects, lights, cameras = get_renderables(scene)
-
+        if DEBUG_PRINT:
+            print("Objects to export:")
+            print("Objects: ", [o.name for o in objects])
+            print("Lights: ", [o.name for o in lights])
+            print("Cameras: ", [o.name for o in cameras])
+            
         # first export lights to rib
         self._export_lights(lights)
 
@@ -2146,7 +2162,7 @@ class ExportObject(ExporterArchive):
 
         # build a transform matrix that is looking at the scene
         mat = ob.matrix_world
-        print("Camera Matrix: " , str(mat))
+        #print("Camera Matrix: " , str(mat))
         loc = mat.to_translation()
         r = mat.to_quaternion().to_matrix().transposed().to_4x4()
         
@@ -2166,26 +2182,26 @@ class ExportObject(ExporterArchive):
 
     # #### Public methods
 
-    def export(self):
-        """ """
+    #def export(self):
+        #""" """
 
-        print("Exporting objects...")
+        #print("Exporting objects...")
 
-        light = ExportLight(self)
-        light.export_rib()
-        del light
+        #light = ExportLight(self)
+        #light.export_rib()
+        #del light
 
-        material = ExportMaterial(self)
-        material.export_rib()
-        del material
+        #material = ExportMaterial(self)
+        #material.export_rib()
+        #del material
 
-        objdata = ExportObjdata(self)
-        objdata.export_rib()
-        del objdata
+        #objdata = ExportObjdata(self)
+        #objdata.export_rib()
+        #del objdata
 
-        particles = ExportParticles(self)
-        particles.export_rib()
-        del particles
+        #particles = ExportParticles(self)
+        #particles.export_rib()
+        #del particles
 
     def export_rib(self):
         """ """
@@ -2201,13 +2217,15 @@ class ExportObject(ExporterArchive):
         if ob.type == 'CAMERA':
             self._export_camera_rib()
         else:
-
+            
+            self.riAttributeBegin()
+            
             # TODO
             # need to group mesh data with associated material
             # if the mesh uses more than one material then mesh has to be
             # split up. For now we just spit out the first material only
             # for testing purposes.
-
+            
             if len(ob.material_slots) > 0:
                 try:
                     # There may be a material slot but there may be no
@@ -2227,9 +2245,11 @@ class ExportObject(ExporterArchive):
                 mat = ob.parent.matrix_world * ob.matrix_local
             else:
                 mat = ob.matrix_world
-            #print(mat)
+            
+            #if DEBUG_PRINT:
+                #print("Matrix:", mat)
 
-            self.riAttributeBegin()
+            
             self.write_text('Attribute "identifier" "name" [ "%s" ]\n' %
                             self.data_name)
             self.riTransform(mat)

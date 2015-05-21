@@ -272,7 +272,8 @@ class RibmosaicRender(bpy.types.RenderEngine):
             c = scene.frame_current
             i = scene.frame_step
             s = scene.frame_start
-
+            
+            
             # Only prepare export if on start frame of not in a frame sequence
             if c == s or not ((c - i) == rm.export_manager.export_frame):
                 self.update_stats("", rmv + ": Preparing export...")
@@ -862,7 +863,7 @@ class RENDER_PT_ribmosaic_passes(RibmosaicPropertiesPanel, bpy.types.Panel):
 
         layout = self.layout
         row = layout.row()
-        row.template_list(ribmosaic_passes, "collection", ribmosaic_passes,
+        row.template_list("UI_UL_list","ribmosaic_passes",ribmosaic_passes, "collection", ribmosaic_passes,
                         "active_index", rows=5)
 
         col = row.column()
