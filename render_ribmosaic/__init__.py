@@ -55,8 +55,8 @@ bl_info = {
     "name": "RIB Mosaic",
     "author": "Eric Back (WHiTeRaBBiT)",
     "version": (0, 1, 1),
-    "blender": (2, 5, 7),
-    "api": 36103,
+    "blender": (2, 7, 2),
+    "api": 44646,
     "location": "Info Header (engine dropdown)",
     "description": "RenderMan production environment for Blender",
     "warning": "GIT Alpha",
@@ -130,7 +130,6 @@ def RibPath(path):
 # #############################################################################
 
 from bl_ui import space_text
-
 
 def register():
     """Register Blender classes and setup class properties"""

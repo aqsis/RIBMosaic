@@ -69,6 +69,12 @@ exec("import " + MODULE + " as rm")
 # its method name and important vars to console io
 DEBUG_PRINT = False
 
+def refresh_material_preview(self, context):
+    if context.material != None:
+        # force preview render to update
+        context.material.preview_render_type = \
+            context.material.preview_render_type
+
 # #############################################################################
 # PIPELINE MANAGER CLASS
 # #############################################################################
@@ -1391,6 +1397,8 @@ class PipelineManager():
         for w in [w for w in window_list if w in filters.keys() and register]:
             name = w + "_PT_" + pipeline + "_" + category_id + "_" + panel
             e_attr = rm.PropertyHash(pipeline + category + panel + 'enabled')
+            pass_attr = rm.PropertyHash(pipeline + category + panel +
+                        'pass_filter')
 
             prop = []
             head = ["from " + MODULE + " import rm_panel",
@@ -1446,7 +1454,9 @@ class PipelineManager():
                     "\tdef draw(self, context):",
                     "\t\tlayout = self.layout",
                     "\t\tdata = self._context_data(context, "
-                    "self.bl_context)['data']"]
+                    "self.bl_context)['data']",
+                    "\t\trow = layout.row(align=True)",
+                    "\t\trow.prop(data, '" + pass_attr +"' )"]
             tail = ["",
                     "bpy.utils.register_class(" + name + ")",
                     "panel = " + name]
@@ -1479,7 +1489,13 @@ class PipelineManager():
                             " = bpy.props.BoolProperty(" +
                             "name='enabled', default=" + w_attrs['enabled'] +
                             ")")
+                prop.append(props[wt] + "." + pass_attr +
+                            " = bpy.props.StringProperty(" +
+                            "name='pass filter', " +
+                            "default='', " +
+                            "description='pass names seperated by ,'" + ")")
                 properties.append("del " + props[wt] + "." + e_attr)
+                properties.append("del " + props[wt] + "." + pass_attr)
 
             # Generate panel's control properties
             for p in self.list_elements(path + "/properties"):
@@ -1591,6 +1607,9 @@ class PipelineManager():
                         p_str += ", items=" + attrs['items']
                     if attrs['size']:
                         p_str += ", size=" + attrs['size']
+                    # add callback to property if it effects material preview
+                    if category_id == "SP":
+                        p_str += ", update=refresh_material_preview"
 
                     # Apply property to class and removal list
                     if p_str:
@@ -1733,6 +1752,62 @@ class PipelineManager():
                         self._error_con, sys.exc_info())
 
         self._pipeline_texts = self.list_rmp()
+
+    def fix_pipeline_library(self, pipeline, pipelinepath):
+        """fix the pipeline's library path if it is relative to
+           the pipeline path.
+
+        pipelinepath = full path to pipeline .rmp file including pipeline
+                       filename
+        """
+        try:
+            # if pipeline has a library path then check to see if
+            # it is relative
+            lib = self.get_attr(self, pipeline, "library", False)
+            if lib:
+                # special case for relative shader library:
+                # when loading a pipeline with a library that is relative
+                # assume that the relative path contains a sub directory for
+                # the shaders that are used by the library that is relative
+                # to the directory of where the pipeline was loaded from
+                if lib[:2] == "//":
+                    # build a list of the sub directories that make up the
+                    # library path in reverse order
+                    subdirs = lib[2:].split("/")
+                    subdirs.reverse()
+                    subpath = ""
+                    founddirectory = ""
+                    # build sub directories and test if a valid one is found
+                    # start with the last sub directory and work our way left
+                    # until a valid path can be found
+                    for subd in subdirs:
+                        # don't process empty strings
+                        if subd:
+                            # build up the subpath
+                            subpath = subd + os.sep + subpath
+                            # get the full real path
+                            full_lib_path = os.path.realpath(
+                                os.path.split(pipelinepath)[0] +
+                                os.sep + subpath)
+                            # test if the path exists
+                            if os.path.isdir(full_lib_path):
+                                founddirectory = full_lib_path
+                                break
+
+                    # if a valid pipeline directory was found
+                    # save it in the xml
+                    if founddirectory:
+                        # make the lib path relative to the blend
+                        founddirectory = (bpy.path.relpath(founddirectory) +
+                                         os.sep)
+                        # make the change to the library path
+                        # in the pipeline xml text
+                        self.set_attrs(pipeline, library=founddirectory)
+
+        except rm_error.RibmosaicError as err:
+            err.ReportError()
+            raise rm_error.RibmosaicError(
+                "PipelineManager.fix_pipeline_library: " + self._error_load)
 
     def load_pipeline(self, filepath):
         """Load, parse and register specified pipeline file.
@@ -2596,7 +2671,9 @@ class PipelineManager():
 
             # Collect meta information
             linkpath = ec._resolve_links(filepath)
+            print("link path:", linkpath)
             abspath = os.path.realpath(bpy.path.abspath(linkpath))
+            print("abs path:", abspath)
             slmeta = ET.ElementTree(file=abspath)
             slinfo = slmeta.find("shaders/shader")
             sldesc = slmeta.find("shaders/shader/description")

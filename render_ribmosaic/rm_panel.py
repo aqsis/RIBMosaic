@@ -606,7 +606,7 @@ class RibmosaicPipelinePanels(RibmosaicPropertiesPanel):
             rows = 2
 
         row = layout.row()
-        row.operator("wm.ribmosaic_modal_sync")
+        row.operator("wm.ribmosaic_pipeline_sync")
         row = layout.row()
         
         row.template_list("UI_UL_list","wm.ribmosaic_pipelines", wm.ribmosaic_pipelines, "collection",
@@ -1531,6 +1531,10 @@ class MATERIAL_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
             row = sub.row()
             row.active = mat.ribmosaic_ri_opacity
             row.prop(mat, "alpha", text="Opacity")
+
+            split = layout.split()
+            sub = split.column()
+            sub.prop(mat, "ribmosaic_two_sided")
 
             ### FIXME ###
             # can't modify material data block during draw call

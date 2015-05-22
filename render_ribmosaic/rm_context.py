@@ -314,7 +314,7 @@ class ExportContext():
 
         return walk_links(links)
 
-    def _panel_enabled(self, do_filter=True):
+    def _panel_enabled(self, do_filter=True, do_pass_filter=False):
         """Determines if a panel should be enabled or disabled according to
         the ContextExport attributes and panel properties. This is used by both
         the panel classes during draw and export objects during validation.
@@ -351,12 +351,22 @@ class ExportContext():
                                                    self.context_category +
                                                    self.context_panel +
                                                    "enabled")
+                    pass_name = rm.PropertyHash(self.context_pipeline +
+                                                   self.context_category +
+                                                   self.context_panel +
+                                                   "pass_filter")
 
                     try:
                         enabled_prop = eval("self.pointer_datablock." +
                                             enabled_name)
                     except:
                         enabled_prop = True
+
+                    try:
+                        pass_filter_prop = eval("self.pointer_datablock." +
+                                            pass_name)
+                    except:
+                        pass_filter_prop = ""
 
                     # Check if there's an active pass
                     if self.pointer_pass and do_filter:
@@ -375,7 +385,12 @@ class ExportContext():
                                         "Filter expression error",
                                         sys.exc_info())
                         else:
-                            enabled = enabled_prop
+                            if do_pass_filter and pass_filter_prop:
+                                enabled = self.pointer_pass.name in \
+                                            pass_filter_prop.split(',') and \
+                                            enabled_prop
+                            else:
+                                enabled = enabled_prop
                     else:
                         enabled = enabled_prop
                 else:
