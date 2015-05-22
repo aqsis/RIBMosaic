@@ -126,9 +126,9 @@ class Ribify():
             self._write_rib_array_item(v)
 
     def _export_faces(self, mesh):
-    	self.vertcount = 0
-		self.materials_used = []
-		self.inc_indent()
+        self.vertcount = 0
+        self.materials_used = []
+        self.inc_indent()
         # output the number of vertices for each face
         self._start_rib_array(10)
         for p in mesh.polygons:
@@ -143,8 +143,8 @@ class Ribify():
         # output the vertex index for each face corner
         self._start_rib_array(10)
         for p in mesh.polygons:
-			# keep track of the highest vertex index used
-			self.vertcount = max(self.vertcount,max(p.vertices))
+            # keep track of the highest vertex index used
+            self.vertcount = max(self.vertcount,max(p.vertices))
             self._write_rib_array_list(p.vertices)
         self._end_rib_array()
 
@@ -223,7 +223,7 @@ class Ribify():
                             [str(c) for c in mesh.vertices[vi].normal])
                     else:
                         # otherwise the face is flat so use the face normal
-                        norm_str += " ".join([str(c) for c in face.normal])
+                        norm_str += " ".join([str(c) for c in p.normal])
                     norm_str += " "
                 self._write_rib_array_item(norm_str)
         self._end_rib_array()
