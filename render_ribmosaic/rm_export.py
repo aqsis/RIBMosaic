@@ -2614,12 +2614,12 @@ class ExportMeshdata(ExporterArchive):
             # for unused materials
             if ("PointsPolygons" in firstLine):
                 # List all faces using current material
-                solids = [f for f in self.mesh_exportdata.faces if \
-                    f.material_index == material_idx]
+                solids = [p for p in self.mesh_exportdata.polygons if \
+                    p.material_index == material_idx]
                 # make a List of used face indices
-                faces = [f.index for f in solids]
+                faces = [p.index for p in solids]
                 # Find highest used vert index
-                lastV   = max([v for f in solids for v in f.vertices])
+                lastV   = max([v for p in solids for v in p.vertices])
                 tagMode = 0
                 perFace = 0
                 fIndex  = 0
@@ -2654,8 +2654,8 @@ class ExportMeshdata(ExporterArchive):
             # If geometry is SDS then insert hole tags to disable faces
             # for unused materials
             elif ("SubdivisionMesh" in firstLine):
-                holes = [f.index for f in self.mesh_exportdata.faces if \
-                    f.material_index != material_idx]
+                holes = [p.index for p in self.mesh_exportdata.polygons if \
+                    p.material_index != material_idx]
                 tagMode = 0
                 for l in self._pointer_cache:
                     if (tagMode == 3):

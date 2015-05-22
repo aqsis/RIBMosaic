@@ -1242,6 +1242,8 @@ class WM_OT_ribmosaic_library_addpanel(rm_context.ExportContext,
 # #############################################################################
 # PIPELINE OPERATORS
 # #############################################################################
+from bpy.app.handlers import persistent
+@persistent
 def load_callback(data):
     print("load callback")
     bpy.ops.wm.ribmosaic_pipeline_sync()
@@ -1260,7 +1262,8 @@ class WM_OT_ribmosaic_pipeline_sync(rm_context.ExportContext,
         print("wm.ribmosaic_pipeline_sync()")
         # FIXME : load_post handlers never get executed because blender
         # clears them on file load
-        if not load_callback in bpy.app.handlers.render_pre:
+        # make 
+        if not load_callback in bpy.app.handlers.load_post:
             bpy.app.handlers.load_post.append(load_callback)
 
         # Sync pipeline tree with current .rmp files
