@@ -96,6 +96,12 @@ pass_filters = [('box', "Box", ""),
 
 gc = 'DEFAULT'
 gd = "Scene Default"
+
+archive_usepostfix = [('NONE', "No Postfix", ""),
+            ('CUSTOM', "Custom", ""),
+            (gc, gd, "")]
+
+
 archives_material = [('INLINE', "Inline Code", ""),
             ('READARCHIVE', "Read Archive", ""),
             ('UNREADARCHIVE', "Unread Archive", ""),
@@ -131,15 +137,15 @@ csg_ops = [('NOCSG', "No CSG", "Disable Constructive Solid Modelling"),
 
 # Property lists
 exporter_props = [
-            ("World", "world", archives_object, 'DEFAULT'),
-            ("Object", "object", archives_object, 'DEFAULT'),
-            ("Mesh", "mesh", archives_data, 'DEFAULT'),
-            ("Curve", "curve", archives_data, 'DEFAULT'),
-            ("MetaBall", "metaball", archives_data, 'DEFAULT'),
-            ("Lamp", "lamp", archives_inline, 'INLINE'),
-            ("Camera", "camera", archives_inline, 'INLINE'),
-            ("Material", "material", archives_material, 'DEFAULT'),
-            ("ParticleSettings", "particle", archives_data, 'DEFAULT')]
+            ("World", "world", archives_object, gc, archive_usepostfix, gc),
+            ("Object", "object", archives_object, gc, archive_usepostfix, gc),
+            ("Mesh", "mesh", archives_data, gc, archive_usepostfix, gc),
+            ("Curve", "curve", archives_data, gc, archive_usepostfix, gc),
+            ("MetaBall", "metaball", archives_data, gc,archive_usepostfix,gc),
+            ("Lamp", "lamp", archives_object, 'INLINE', archive_usepostfix, gc),
+            ("Camera", "camera", archives_object, 'INLINE', archive_usepostfix, gc),
+            ("Material", "material", archives_material, gc, archive_usepostfix, gc),
+            ("ParticleSettings", "particle", archives_data, gc, archive_usepostfix, gc)]
 
 manager_props = ["WindowManager",
              "Scene",
@@ -169,7 +175,8 @@ geometry_props = ["Mesh",
 from bl_ui import properties_render
 properties_render.RENDER_PT_render.COMPAT_ENGINES.add(rm.ENGINE)
 properties_render.RENDER_PT_dimensions.COMPAT_ENGINES.add(rm.ENGINE)
-#properties_render.RENDER_PT_layers.COMPAT_ENGINES.add(rm.ENGINE)
+from bl_ui import properties_render_layer
+properties_render_layer.RENDERLAYER_PT_layers.COMPAT_ENGINES.add(rm.ENGINE)
 properties_render.RENDER_PT_output.COMPAT_ENGINES.add(rm.ENGINE)
 properties_render.RENDER_PT_post_processing.COMPAT_ENGINES.add(rm.ENGINE)
 properties_render.RENDER_PT_stamp.COMPAT_ENGINES.add(rm.ENGINE)
@@ -306,7 +313,7 @@ class RibmosaicPassProps(bpy.types.PropertyGroup):
     pass_display_file = bpy.props.StringProperty(name="Display File",
                 description="Output path/file.ext used by displays for render",
                 maxlen=512,
-                default="Renders/P@[EVAL:.current_pass:####]@"
+                default="renders/P@[EVAL:.current_pass:####]@"
                         "_F@[EVAL:.current_frame:####]@.tif")
 
     pass_multilayer = bpy.props.BoolProperty(name="MultiLayer Output",
@@ -696,6 +703,19 @@ def create_props():
              " RIBs\","
              "items=p[2],"
              "default=p[3])")
+             
+        exec(data + ".ribmosaic_archive_usenamepostfix = bpy.props.EnumProperty("
+             "name=\"Name PostFix\","
+             "description=\"Enable postfix for " + p[1] +
+             " RIBs\","
+             "items=p[4],"
+             "default=p[5])")
+        
+        exec(data + ".ribmosaic_archive_namepostfix = bpy.props.StringProperty("
+             "name=\"Name PostFix\","
+             "description=\"Enable postfix for " + p[1] +
+             " RIBs\","
+             "default=\"\")")
 
     for p in manager_props:
         data = "bpy.types." + p
@@ -1014,19 +1034,37 @@ def create_props():
                         " object RIBs",
             items=archives_object[:-3],
             default='DELAYEDARCHIVE')
+            
+    bpy.types.Scene.ribmosaic_object_archives_namepostfix = bpy.props.StringProperty(
+            name="Prefix Name",
+            description="""Specify what is added to object archive names (usefull for keyframed objects: '@[EVAL:.current_frame:]@' )""",
+            default="",
+            maxlen=512)
 
-    bpy.types.Scene.ribmosaic_data_archives = bpy.props.EnumProperty(
-            name="Data Archives",
+    bpy.types.Scene.ribmosaic_geometry_archives = bpy.props.EnumProperty(
+            name="Geometry Archives",
             description="Specify archive and linking method for all data RIBs",
             items=archives_data[:-3],
             default='INSTANCE')
-
+    
+    bpy.types.Scene.ribmosaic_geometry_archives_namepostfix = bpy.props.StringProperty(
+            name="Prefix Name",
+            description="""Specify what is added to object archive names (usefull for keyframed objects: '@[EVAL:.current_frame:]@' )""",
+            default="",
+            maxlen=512)
+    
     bpy.types.Scene.ribmosaic_material_archives = bpy.props.EnumProperty(
             name="Material Archives",
             description="Specify archive and linking method for all"
                         " material RIBs",
             items=archives_material[:-3],
             default='READARCHIVE')
+            
+    bpy.types.Scene.ribmosaic_material_archives_namepostfix = bpy.props.StringProperty(
+            name="Prefix Name",
+            description="""Specify what is added to object archive names (usefull for keyframed objects: '@[EVAL:.current_frame:]@' )""",
+            default="",
+            maxlen=512)
 
     # #### Object space properties
 
@@ -1102,11 +1140,49 @@ def create_props():
     bpy.types.Curve.ribmosaic_primitive = bpy.props.EnumProperty(
                 name="Primitive Type",
                 description=primvar_desc,
-                items=[('CURVES', "Curves", ""),
+                items=[('POINTSPOLYGONS', "PointsPolygons", ""),
+                       ('CURVES', "Curves", ""),
                        ('POINTS', "Points", ""),
                        ('AUTOSELECT', "Auto Select", "")],
                 default='AUTOSELECT')
+    
+    bpy.types.Curve.ribmosaic_n_class = bpy.props.EnumProperty(
+                name="N Class",
+                description="Specify what N primitive variable"
+                            " class to export",
+                items=primvar_class,
+                default='facevarying')
 
+    bpy.types.Curve.ribmosaic_cs_class = bpy.props.EnumProperty(
+                name="Cs Class",
+                description="Specify what Cs primitive variable"
+                            " class to export",
+                items=primvar_class,
+                default='facevarying')
+
+    bpy.types.Curve.ribmosaic_st_class = bpy.props.EnumProperty(
+                name="st Class",
+                description="Specify what st primitive variable class"
+                            " to export",
+                items=primvar_class,
+                default='facevarying')
+    
+    bpy.types.Curve.ribmosaic_n_export = bpy.props.BoolProperty(
+                name="Export Normals as N",
+                description="Export normals as N primitive variables",
+                default=True)
+
+    bpy.types.Curve.ribmosaic_cs_export = bpy.props.BoolProperty(
+                name="Export VertCol as Cs",
+                description="Export active vertex color as Cs primitive"
+                            " variables",
+                default=True)
+
+    bpy.types.Curve.ribmosaic_st_export = bpy.props.BoolProperty(
+                name="Export UV as st",
+                description="Export active UV as st primitive variables",
+                default=True)
+    
     # Metaball properties
 
     bpy.types.MetaBall.ribmosaic_primitive = bpy.props.EnumProperty(
@@ -1253,7 +1329,9 @@ def destroy_props():
         exec(data + ".ribmosaic_mblur_start")
         exec(data + ".ribmosaic_mblur_end")
         exec(data + ".ribmosaic_rib_archive")
-
+        exec(data + ".ribmosaic_archive_namepostfix")
+        exec(data + ".ribmosaic_archive_usenamepostfix")
+        
     for p in manager_props:
         data = "del bpy.types." + p
 
@@ -1320,7 +1398,7 @@ def destroy_props():
     del bpy.types.Scene.ribmosaic_procedural_searchpath
     del bpy.types.Scene.ribmosaic_resource_searchpath
     del bpy.types.Scene.ribmosaic_object_archives
-    del bpy.types.Scene.ribmosaic_data_archives
+    del bpy.types.Scene.ribmosaic_geometry_archives
     del bpy.types.Scene.ribmosaic_material_archives
 
     # #### Object space properties

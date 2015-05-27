@@ -54,6 +54,7 @@
 import os
 import traceback
 
+import bpy
 
 # #### Global variables
 
@@ -65,8 +66,8 @@ exec("import " + MODULE + " as rm")
 # ERROR HANDLER CLASS
 # #############################################################################
 
-# #### Define the global error handler class
 
+# #### Define the global error handler class
 class RibmosaicError(Exception):
     """UI and console error messages"""
 
@@ -93,3 +94,4 @@ class RibmosaicError(Exception):
 
         if operator:
             operator.report({'ERROR'}, self._message)
+

@@ -246,6 +246,7 @@ class ExportContext():
             self.pointer_datablock = pointer_datablock
             self.data_name = getattr(pointer_datablock, "name", "")
             self.data_type = getattr(pointer_datablock, "type", self.data_type)
+            print("DataBlock: data_name:" , self.data_name, " data_type: " ,self.data_type, "object:" , self.pointer_datablock)
 
     def _public_attrs(self, *include):
         """Returns list of public attributes plus any defined in include"""
@@ -439,6 +440,10 @@ class ExportContext():
                         data = context.camera
                         search = "cameras"
                         window = 'CAMERA'
+                    elif context.empty:
+                        data = context.empty
+                        search = "empty"
+                        window = 'EMPTY'
                 elif context_type == 'RENDER':
                     data = context.scene
                     search = "renders"

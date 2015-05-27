@@ -66,6 +66,7 @@ import mathutils
 import math
 import time
 
+
 # #### Global variables
 
 MODULE = os.path.dirname(__file__).split(os.sep)[-1]
@@ -119,7 +120,7 @@ def get_renderables(scene):
 
     for ob in scene.objects:
         if is_renderable(scene, ob):
-            if ob.type in ['MESH', 'EMPTY']:
+            if ob.type in ['MESH', 'EMPTY', 'FONT']:
                 objects += [ob]
             elif ob.type in ['LAMP']:
                 lights += [ob]
@@ -147,6 +148,7 @@ def is_subdmesh(ob):
 
 
 def detect_primitive(ob):
+    
     if ob.type == 'MESH':
         # if the rm primitive is auto
         if ob.data.ribmosaic_primitive == 'AUTOSELECT':
@@ -156,8 +158,15 @@ def detect_primitive(ob):
                 return 'POINTSPOLYGONS'
         else:
             return ob.data.ribmosaic_primitive
-#   else:
-#        return rm.primitive
+            
+    if ob.type == 'FONT':
+        # if the rm primitive is auto
+        if ob.data.ribmosaic_primitive == 'AUTOSELECT':
+            return 'POINTSPOLYGONS'
+        else:
+            return ob.data.ribmosaic_primitive
+    
+    return None;
 
 
 def create_mesh(scene, ob, matrix=None):
@@ -188,7 +197,7 @@ class DummyPass():
     pass_enabled = True
     pass_type = 'BEAUTY'
     # Pass output properties
-    pass_display_file = 'Renders/P@[EVAL:.current_pass:####]@' \
+    pass_display_file = 'renders/P@[EVAL:.current_pass:####]@' \
                         '_F@[EVAL:.current_frame:####]@.tif'
     pass_multilayer = False
     pass_shadingrate = 1
@@ -264,17 +273,17 @@ class ExporterManager():
     # Dictionary of all export path combinations
     export_paths = {'DIR': [],
                     'COM': ['.'],
-                    'FRA': ["Archives"],
-                    'WLD': ["Archives", "Worlds"],
-                    'LAM': ["Archives", "Lights"],
-                    'OBJ': ["Archives", "Objects"],
-                    'GEO': ["Archives", "Objects", "Geometry"],
-                    'MAT': ["Archives", "Objects", "Materials"],
-                    'MAP': ["Maps"],
-                    'SHD': ["Shaders"],
-                    'TEX': ["Textures"],
-                    'RND': ["Renders"],
-                    'TMP': ["Cache"]}
+                    'FRA': ["archives"],
+                    'WLD': ["archives", "worlds"],
+                    'LAM': ["archives", "lights"],
+                    'OBJ': ["archives", "objects"],
+                    'GEO': ["archives", "objects", "geometry"],
+                    'MAT': ["archives", "objects", "materials"],
+                    'MAP': ["maps"],
+                    'SHD': ["shaders"],
+                    'TEX': ["textures"],
+                    'RND': ["renders"],
+                    'TMP': ["cache"]}
     # Dictionary of generated command objects
     command_scripts = {'OPTIMIZE': [],
                        'COMPILE': [],
@@ -859,9 +868,11 @@ class ExporterManager():
                         {'file': display_output,
                          'layer': ec.pass_layer,
                          'multilayer': ec.pass_multilayer})
+                
 
                 # Do not build RIB if disabled in export options
                 if export_rib and (not only_active or p == self.active_pass):
+
                     try:
                         pa = ExportPass(ec, target_name)
                         pa.export_rib()
@@ -934,6 +945,8 @@ class ExporterManager():
                         self.command_scripts['POSTRENDER'].append(s)
 
                 del ec
+            else:
+                raise rm_error.RibmosaicError("Frame %i to render not in sequence!" % f, sys.exc_info())
 
         self._exporting_scene = False
 
@@ -950,13 +963,14 @@ class ExporterManager():
         o = self.export_scene.ribmosaic_optimizetex
         r = self.export_scene.ribmosaic_renderrib
 
+        print("RENDERRIB " , r)
         # If in interactive mode ALWAYS render archives
         if self.export_scene.ribmosaic_interactive:
             r = True
 
         # Create one root shell script to rule them all
         root = ExporterCommand(None, "", False, "", "START.sh.bat", 'a')
-
+        print("RENDERRIB " , r)
         try:
             # Cycle through commands of each type and execute
             for t in ['OPTIMIZE', 'COMPILE', 'INFO', 'RENDER', 'POSTRENDER']:
@@ -965,6 +979,7 @@ class ExporterManager():
                     if (((t == 'RENDER' or t == 'POSTRENDER') and r) or
                             ((t == 'COMPILE' or t == 'INFO') and c) or
                             (t == 'OPTIMIZE' and o)):
+                                
                         s.execute_command()
 
                     if t != 'INFO':
@@ -1055,7 +1070,7 @@ class ExporterArchive(rm_context.ExportContext):
 
         self.archive_path = rm.export_manager.make_export_path(
                             self._archive_key) + os.sep
-
+        
         # If archive name specified use it
         if archive_name:
             self.archive_name = archive_name
@@ -1103,6 +1118,7 @@ class ExporterArchive(rm_context.ExportContext):
             self.is_exec = execute
 
         if self.archive_name:
+            print("Archive Name:", self.archive_name)
             filepath = self.archive_path + self.archive_name
             
             if DEBUG_PRINT:
@@ -1183,14 +1199,18 @@ class ExporterArchive(rm_context.ExportContext):
                         self.open_archive(mode='w')
                         self.write_text(text)
                         self._pointer_file.close()
-                        if DEBUG_PRINT:
-                            print(text)
+                        #if DEBUG_PRINT:
+                            #print(text)
                         self._pointer_file = None
                     except:
                         rm_error.RibmosaicError(
                                 "Cannot apply regex to archive",
                                 sys.exc_info())
-
+    
+    def write_comment(self,text="", use_indent=True, close=False):
+        self.write_text("# " + text + "\n", use_indent, close)
+        
+            
     def write_text(self, text="", use_indent=True, close=False):
         """Writes text to this archive's open file handle.
            Also properly writes text as either encoded binary or text
@@ -1200,8 +1220,8 @@ class ExporterArchive(rm_context.ExportContext):
         use_indent = if true then indent the text
         close = If true closes script archive when complete
         """
-        if DEBUG_PRINT:
-            print("ExporterArchive.write_text()")
+        #if DEBUG_PRINT:
+            #print("ExporterArchive.write_text()")
 
         if text:
             # split the text up into lines
@@ -1299,7 +1319,7 @@ class ExporterArchive(rm_context.ExportContext):
             matches = [("", "")]
 
         if DEBUG_PRINT:
-            print(matches)
+            print("Matches: " , matches)
         return matches
 
     def add_regexes(self, xmlpath):
@@ -1366,11 +1386,11 @@ class ExporterArchive(rm_context.ExportContext):
         return rm.export_manager.export_scene
 
     # helper methods for outputting RIB code
-    def open_rib_archive(self, archive_mode='DEFAULT'):
+    def open_rib_archive(self):
         """
         Determine the open action to be taken with rib archive export.  This
         is based on the ribmosaic_rib_archive property and the scene's
-        ribmosaic_object_archives, ribmosaic_data_archives,
+        ribmosaic_object_archives, ribmosaic_geometry_archives,
         ribmosaic_material_archives properties.
 
         archive_mode = the mode in which the archive will be used:
@@ -1384,20 +1404,40 @@ class ExporterArchive(rm_context.ExportContext):
         # determine what type of export to do
         archive_mode = getattr(self.pointer_datablock, "ribmosaic_rib_archive",
             'DEFAULT')
+    
+
+        if DEBUG_PRINT:
+            print("Export mode: ", archive_mode)
+            
+        if DEBUG_PRINT:
+            print("Data Type: " , self.data_type)
+            
         # for now just testing inline and readarchive
         if archive_mode == 'DEFAULT':
-            if self.data_type in ['MESH']:
-                archive_mode = self.get_scene().ribmosaic_data_archives
-            elif self.data_type == 'MATERIAL':
+            if self._archive_key in ['OBJ']:
+                archive_mode = self.get_scene().ribmosaic_object_archives
+            elif self._archive_key == 'GEO':
+                archive_mode = self.get_scene().ribmosaic_geometry_archives
+            elif self._archive_key  == 'MAT':
                 archive_mode = self.get_scene().ribmosaic_material_archives
+                    
 
         if archive_mode in ['READARCHIVE', 'DELAYEDARCHIVE', 'INSTANCE']:
+            
             # make archive name
-            self.archive_name = (self.data_name + '_' + self._archive_key +
-                '.rib')
-                
-            if DEBUG_PRINT:
-                print("open rib archive with name: %s " % self.archive_name)
+            postfix =""
+            useprefix = getattr(self.pointer_datablock, "ribmosaic_archive_usenamepostfix", 'DEFAULT')
+            if useprefix  == 'CUSTOM' :
+                postfix = getattr(self.pointer_datablock, "ribmosaic_archive_namepostfix")
+            elif useprefix  == 'DEFAULT':
+                if self._archive_key  == 'OBJ':
+                    postfix = self.get_scene().ribmosaic_object_archives_namepostfix
+                elif self._archive_key == 'GEO':
+                    postfix = self.get_scene().ribmosaic_geometry_archives_namepostfix
+                elif self._archive_key == 'MAT':
+                    postfix = self.get_scene().ribmosaic_material_archives_namepostfix
+                    
+            self.archive_name = self.data_name + '-' + self._archive_key + self._resolve_links(postfix) + '.rib'
                 
             # setup readarchive in parent archive
             # rely on the file pointer still setup for the parent
@@ -1409,7 +1449,13 @@ class ExporterArchive(rm_context.ExportContext):
                     gzipped=self.get_scene().ribmosaic_compressrib)
                 # since in own archive, start indentation at the left margin
                 self.current_indent = 0
+                
+                if DEBUG_PRINT:
+                    print("open new rib archive with name: %s " % self.archive_name)
+                
             else:
+                if DEBUG_PRINT:
+                    print("archive with name: %s exists!" % self.archive_name)
                 self._pointer_file = None
         elif archive_mode == 'NOEXPORT':
             self._pointer_file = None
@@ -1421,11 +1467,14 @@ class ExporterArchive(rm_context.ExportContext):
 
         return = True if cache did not exist and cache file is set to write
         """
-        if DEBUG_PRINT:
-            print("ExporterArchive.open_cache()")
+        
 
         # all caches are placed in the TMP directory
         cache_path = rm.export_manager.make_export_path('TMP') + os.sep
+        
+        if DEBUG_PRINT:
+            print("ExporterArchive.open_cache() at % s" % cache_path)
+        
         cache_name = self.data_name + '_' + self._archive_key + '.rib'
         # if cache already exists then open cache for reading only else open
         # for writing new cache
@@ -2010,8 +2059,13 @@ class ExportWorld(ExporterArchive):
             print("ExportWorld._export_objects()")
 
         for ob in objects:
+            
             target_name = ob.name + ".rib"
             try:
+                
+                if DEBUG_PRINT:
+                    print("Exporting Object: %s ===============================" % ob.name)
+                    
                 eo = ExportObject(self, ob)
                 eo.export_rib()
                 eo.close_archive()
@@ -2021,6 +2075,9 @@ class ExportWorld(ExporterArchive):
                 del eo
                 raise rm_error.RibmosaicError("Failed to build object RIB " +
                                               target_name, sys.exc_info())
+            if DEBUG_PRINT:
+                    print("=====================================================")
+            
 
     def _export_lights(self, lights):
         if DEBUG_PRINT:
@@ -2244,6 +2301,7 @@ class ExportObject(ExporterArchive):
         if self.as_camera:
             self._export_camera_rib()
         else:
+            
             # assume to be some form of mesh object
             self.riAttributeBegin()
             self.write_text('Attribute "identifier" "name" [ "%s" ]\n' %
@@ -2257,48 +2315,56 @@ class ExportObject(ExporterArchive):
 
             self.riTransform(mat)
 
+            # Export only objects which have some sort of mesh data, EMPTY objects have no data!
+            primType = detect_primitive(ob)
+            if self.data_type != "EMPTY" :
 
+                # export object data
+                # let the ExportObjdata instance decide how to export
+                # the mesh object data
+                try:
+                    emd = ExportMeshdata(self)
+                    emd.export_geometry_cache()
+                    # TODO
+                    # need to group mesh data with associated material
+                    # if the mesh uses more than one material then mesh has to be
+                    # split up. For now we just spit out the first material only
+                    # for testing purposes.
 
-            # export object data
-            # let the ExportObjdata instance decide how to export
-            # the mesh object data
-            try:
-                emd = ExportMeshdata(self)
-                emd.export_geometry_cache()
-                # TODO
-                # need to group mesh data with associated material
-                # if the mesh uses more than one material then mesh has to be
-                # split up. For now we just spit out the first material only
-                # for testing purposes.
-
-                if len(ob.material_slots) > 0:
-                    for mat_idx, matslot in enumerate(ob.material_slots):
-                        try:
-                            # There may be a material slot but there may be no
-                            # material so need to check.
-                            # Also need to check if there is a submesh that
-                            # uses this material.  Just because the material
-                            # is in the slot does not mean that it is being
-                            # used.
-                            if matslot.material is not None:
-                                if emd.has_submesh(mat_idx):
-                                    em = ExportMaterial(self, matslot.material)
-                                    em.export_rib()
-                                    emd.export_rib(mat_idx)
-                                    del em
-                        except:
-                            em.close_archive()
-                            del em
-                            raise rm_error.RibmosaicError(
-                                    "Failed to build object material RIB " +
-                                    self.data_name, sys.exc_info())
-                del emd
-            except:
-                emd.close_archive()
-                raise rm_error.RibmosaicError(
-                        "Failed to build mesh data RIB " +
-                        self.data_name, sys.exc_info())
-
+                    if len(ob.material_slots) > 0:
+                        for mat_idx, matslot in enumerate(ob.material_slots):
+                            try:
+                                # There may be a material slot but there may be no
+                                # material so need to check.
+                                # Also need to check if there is a submesh that
+                                # uses this material.  Just because the material
+                                # is in the slot does not mean that it is being
+                                # used.
+                                if matslot.material is not None:
+                                    if emd.has_submesh(mat_idx):
+                                        em = ExportMaterial(self, matslot.material)
+                                        em.export_rib()
+                                        emd.export_rib(mat_idx)
+                                        del em
+                            except:
+                                em.close_archive()
+                                del em
+                                raise rm_error.RibmosaicError(
+                                        "Failed to build object material RIB " +
+                                        self.data_name, sys.exc_info())
+                    else:
+                        raise rm_error.RibmosaicError(
+                                        "Failed to build object material RIB: trying to export mesh with no material assigned!" +
+                                        self.data_name, sys.exc_info())
+                        
+                    del emd
+                except:
+                    emd.close_archive()
+                    raise rm_error.RibmosaicError(
+                            "Failed to build mesh data RIB " +
+                            self.data_name, sys.exc_info())
+            else:
+                self.write_comment("This is is an empty object")
             
 
             self.riAttributeEnd()
@@ -2505,22 +2571,27 @@ class ExportMeshdata(ExporterArchive):
         if self.open_cache():
             # create a mesh that has all modifiers applied to mesh data
             # but make sure subdiv modifier render option is false
+            
             self.mesh_exportdata = create_mesh(
                 self.get_scene(), self.blender_object)
-            # determine whate type of geometry is to be exported
+                
+            # determine what type of geometry is to be exported
             prim = detect_primitive(self.blender_object)
 
             # set the file pointer for ribify
             rm.ribify.pointer_file = self._pointer_cache
             # set the indent level of the rib output
             rm.ribify.indent = self.current_indent
-
+            if DEBUG_PRINT:
+                print("Primitive: ", prim)
             if prim == 'POINTSPOLYGONS':
                 rm.ribify.mesh_pointspolygons(self.mesh_exportdata)
             elif prim == 'SUBDIVISIONMESH':
                 rm.ribify.mesh_subdivisionmesh(self.mesh_exportdata)
             elif prim == 'POINTS':
                 rm.ribify.mesh_points(self.mesh_exportdata)
+            else:
+                rm.RibmosaicError(" Trying to convert primitive: %s for object %s " % ( prim , self.blender_object) , " which is not supported!" )
 
             meshdata = self.pointer_datablock
             # check if normal primvar is to be exported
@@ -2693,6 +2764,7 @@ class ExportMeshdata(ExporterArchive):
             print("ExportObMeshdata.export_geometry_cache")
         if self._cache_mesh():
             # export meshes for each material index used in mesh faces
+            
             for mi in rm.ribify.materials_used:
                 # create a unique mesh file for each material/sub-mesh
                 # material index is used in mesh name ie _m0 for material
@@ -2716,10 +2788,12 @@ class ExportMeshdata(ExporterArchive):
 
     # export the blender object data into RIB format
     def export_rib(self, material_index):
+        
         if DEBUG_PRINT:
             print('ExportMeshData.export_rib()')
+            
         # determine what type of object data needs to be exported
-        if self.blender_object.type in ('MESH', 'EMPTY'):
+        if self.blender_object.type in ('MESH', 'EMPTY','FONT'):
             # set data name to include material index so that if
             # using readarchive or some varient then the submesh rib will be
             # used.
