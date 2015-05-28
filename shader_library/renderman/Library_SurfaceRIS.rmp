@@ -1,0 +1,181 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Library_RendermanSurfaceRIS build="True" compile="True" 
+                 dependecies="" 
+                 enabled="True" 
+                 filepath="Library_RendermanSurfaceRIS.rmp" 
+                 filter="LIBRARY_SURFACE" 
+                 library="" version="0.1">
+                 
+
+	<python_scripts>
+	</python_scripts>
+
+	<shader_sources>
+    </shader_sources>
+
+
+    <shader_panels filter="SHADER">
+            <PxrDisney delete="True" description="Authors:\nCopyright:\nDescription:\n" 
+                       duplicate="True" 
+                       enabled="False" 
+                       filter="SURFACE" 
+                       library="@[SLIB::RIB]@" 
+                       register="True" 
+                       slmeta="@[SLIB::]@PxrDisney.slmeta" type="SURFACE" windows="MATERIAL">
+                <rib target="">
+                    @[DATA:///properties/sl_type:]@ "PxrDisney"
+                        "color baseColor" @[DATA:///properties/baseColor_prop:RIB]@
+                        "color emitColor" @[DATA:///properties/emitColor_prop:RIB]@
+                        "color subsurfaceColor" @[DATA:///properties/subsurfaceColor_prop:RIB]@
+                        "float subsurface" @[DATA:///properties/subsurface_prop:RIB]@
+                        "float metallic" @[DATA:///properties/metallic_prop:RIB]@
+                        "float specular" @[DATA:///properties/specular_prop:RIB]@
+                        "float specularTint" @[DATA:///properties/specularTint_prop:RIB]@
+                        "float roughness" @[DATA:///properties/roughness_prop:RIB]@
+                        "float anisotropic" @[DATA:///properties/anisotropic_prop:RIB]@
+                        "float sheen"  @[DATA:///properties/sheen_prop:RIB]@
+                        "float sheenTint" @[DATA:///properties/sheenTint_prop:RIB]@
+                        "float clearcoat"  @[DATA:///properties/clearcoat_prop:RIB]@
+                        "float clearcoatGloss" @[DATA:///properties/clearcoatGloss_prop:RIB]@
+
+                </rib>
+                <regexes target="">
+                </regexes>
+                <properties>
+                    <sl_name default="PxrDisney" description="Shader&apos;s name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+                    <sl_type default="Bxdf" description="Choose shader type" items="[(&apos;Bxdf&apos;, &apos;Bxdf&apos;, &apos;&apos;)]" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+                    <baseColor_prop default="(0.5, 0.5, 0.5)" description="" items="" link="" max="1.0" maxlen="" min="0.0" precision="" size="" softmax="1.0" softmin="0.0" step="" type="COLOR" />
+                    <emitColor_prop default="(0.0, 0.0, 0.0)" description="" items="" link="" max="1.0" maxlen="" min="0.0" precision="" size="" softmax="1.0" softmin="0.0" step="" type="COLOR" />
+                    <subsurfaceColor_prop default="(0.0, 0.0, 0.0)" description="" items="" link="" max="1.0" maxlen="" min="0.0" precision="" size="" softmax="1.0" softmin="0.0" step="" type="COLOR" />
+                    <subsurface_prop default="0.0" description="" items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    <metallic_prop default="0.0" description="" items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    <specular_prop default="0.5" description="" items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    <specularTint_prop default="0.0" description="" items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    <roughness_prop default="0.25" description="" items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    <anisotropic_prop default="0.0" description="" items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    <sheen_prop default="0.0" description="" items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    <sheenTint_prop default="0.5" description="" items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    <clearcoat_prop default="0.0" description="" items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    <clearcoatGloss_prop default="1.0" description="" items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                </properties>
+                <layout>
+                    <info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
+                        <sl_name expand="False" icon="" prop="sl_name" slider="False" text="Name" toggle="False" trigger="" type="PROP" />
+                        <sl_type expand="False" icon="" prop="sl_type" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                    </info_row>
+                    
+
+                    <bC_row0 active="@[EVAL:not @[ATTR:///properties/baseColor_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <bC_lb0 expand="False" icon="" prop="" slider="False" text="Base Color" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <baseColor_prop expand="False" icon="" prop="baseColor_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <bC_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/baseColor_prop:]@" type="LINK" />
+                    </bC_row0>
+                    
+                    <emitC_row0 active="@[EVAL:not @[ATTR:///properties/emitColor_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <emitC_lb0 expand="False" icon="" prop="" slider="False" text="Emission Color" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <emitColor_prop expand="False" icon="" prop="emitColor_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <emitC_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/emitColor_prop:]@" type="LINK" />
+                    </emitC_row0>
+                    
+                    <ssC_row0 active="@[EVAL:not @[ATTR:///properties/subsurfaceColor_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <ssC_lb0 expand="False" icon="" prop="" slider="False" text="Subsurface Color" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <emitColor_prop expand="False" icon="" prop="subsurfaceColor_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <ssC_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/subsurfaceColor_prop:]@" type="LINK" />
+                    </ssC_row0>
+                    
+                    <s_row0 active="@[EVAL:not @[ATTR:///properties/subsurface_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <s_lb0 expand="False" icon="" prop="" slider="False" text="Subsurface" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <subsurface_prop expand="False" icon="" prop="subsurface_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <s_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/subsurface_prop:]@" type="LINK" />
+                    </s_row0>
+                    
+                    <m_row0 active="@[EVAL:not @[ATTR:///properties/metallic_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <m_lb0 expand="False" icon="" prop="" slider="False" text="Metallic" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <metallic_prop expand="False" icon="" prop="metallic_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <m_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/metallic_prop:]@" type="LINK" />
+                    </m_row0>
+                    
+                    <sp_row0 active="@[EVAL:not @[ATTR:///properties/specular_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <sp_lb0 expand="False" icon="" prop="" slider="False" text="Specular" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <emitColor_prop expand="False" icon="" prop="specular_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <sp_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/specular_prop:]@" type="LINK" />
+                    </sp_row0>
+                    
+                    <st_row0 active="@[EVAL:not @[ATTR:///properties/specularTint_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <st_lb0 expand="False" icon="" prop="" slider="False" text="Specular Tint" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <specularTint_prop expand="False" icon="" prop="specularTint_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <st_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/specularTint_prop:]@" type="LINK" />
+                    </st_row0>
+                    
+                    <r_row0 active="@[EVAL:not @[ATTR:///properties/roughness_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <r_lb0 expand="False" icon="" prop="" slider="False" text="Roughness" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <roughness_prop expand="False" icon="" prop="roughness_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <r_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/roughness_prop:]@" type="LINK" />
+                    </r_row0>
+                    
+                    <a_row0 active="@[EVAL:not @[ATTR:///properties/anisotropic_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <a_lb0 expand="False" icon="" prop="" slider="False" text="Anistropic" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <anisotropic_prop expand="False" icon="" prop="anisotropic_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <r_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/anisotropic_prop:]@" type="LINK" />
+                    </a_row0>
+                    
+                    <sh_row0 active="@[EVAL:not @[ATTR:///properties/sheen_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <sh_lb0 expand="False" icon="" prop="" slider="False" text="Sheen" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <sheen_prop expand="False" icon="" prop="sheen_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <sh_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/sheen_prop:]@" type="LINK" />
+                    </sh_row0>
+                    
+                    <sht_row0 active="@[EVAL:not @[ATTR:///properties/sheenTint_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <sht_lb0 expand="False" icon="" prop="" slider="False" text="Sheen Tint" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <sheenTint_prop expand="False" icon="" prop="sheenTint_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <sht_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/sheenTint_prop:]@" type="LINK" />
+                    </sht_row0>
+                    
+                    <c_row0 active="@[EVAL:not @[ATTR:///properties/clearcoat_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <c_lb0 expand="False" icon="" prop="" slider="False" text="Clearcoat" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <clearcoat_prop expand="False" icon="" prop="clearcoat_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <c_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/clearcoat_prop:]@" type="LINK" />
+                    </c_row0>
+                    
+                    <cg_row0 active="@[EVAL:not @[ATTR:///properties/clearcoatGloss_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <cg_lb0 expand="False" icon="" prop="" slider="False" text="Clearcoat Gloss" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <clearcoatGloss_prop expand="False" icon="" prop="clearcoatGloss_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <cg_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/clearcoatGloss_prop:]@" type="LINK" />
+                    </cg_row0>
+                    
+                </layout>
+            </PxrDisney>
+    </shader_panels>
+
+    <utility_panels filter="UTILITY">
+    </utility_panels>
+
+    <command_panels filter="COMMAND">
+    </command_panels>
+</Library_RendermanSurfaceRIS>
