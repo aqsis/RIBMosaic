@@ -52,7 +52,7 @@
 # END BLOCKS
 # #############################################################################
 
-import os
+import os,re
 import bpy
 
 
@@ -704,14 +704,14 @@ def create_props():
              "items=p[2],"
              "default=p[3])")
              
-        exec(data + ".ribmosaic_archive_usenamepostfix = bpy.props.EnumProperty("
+        exec(data + ".ribmosaic_archives_usenamepostfix = bpy.props.EnumProperty("
              "name=\"Name PostFix\","
              "description=\"Enable postfix for " + p[1] +
              " RIBs\","
              "items=p[4],"
              "default=p[5])")
         
-        exec(data + ".ribmosaic_archive_namepostfix = bpy.props.StringProperty("
+        exec(data + ".ribmosaic_archives_namepostfix = bpy.props.StringProperty("
              "name=\"Name PostFix\","
              "description=\"Enable postfix for " + p[1] +
              " RIBs\","
@@ -1332,147 +1332,14 @@ def destroy_props():
     """Destroy all addon properties (to be used from __init__.unregister())"""
 
     # #### Global properties
-
-    for p in exporter_props:
-        data = "del bpy.types." + p[0]
-
-        exec(data + ".ribmosaic_mblur")
-        exec(data + ".ribmosaic_mblur_steps")
-        exec(data + ".ribmosaic_mblur_start")
-        exec(data + ".ribmosaic_mblur_end")
-        exec(data + ".ribmosaic_rib_archive")
-        exec(data + ".ribmosaic_archive_namepostfix")
-        exec(data + ".ribmosaic_archive_usenamepostfix")
-        
-    for p in manager_props:
-        data = "del bpy.types." + p
-
-        exec(data + ".ribmosaic_active_script")
-        exec(data + ".ribmosaic_active_source")
-        exec(data + ".ribmosaic_active_shader")
-        exec(data + ".ribmosaic_active_utility")
-        exec(data + ".ribmosaic_active_command")
-
-    for p in geometry_props:
-        data = "del bpy.types." + p
-        seq = ["range", "trans"]
-
-        exec(data + ".ribmosaic_lod")
-
-        for l in range(1, 9):
-            exec(data + ".ribmosaic_lod_data_l" + str(l))
-
-            for s in seq:
-                exec(data + ".ribmosaic_lod_" + s + "_l" + str(l))
-
-    # #### Window manager properties
-
-    del bpy.types.WindowManager.ribmosaic_pipelines
-    del bpy.types.WindowManager.ribmosaic_pipeline_search
-    del bpy.types.WindowManager.ribmosaic_scripts
-    del bpy.types.WindowManager.ribmosaic_sources
-    del bpy.types.WindowManager.ribmosaic_shaders
-    del bpy.types.WindowManager.ribmosaic_utilities
-    del bpy.types.WindowManager.ribmosaic_commands
-    del bpy.types.WindowManager.ribmosaic_preview_samples
-    del bpy.types.WindowManager.ribmosaic_preview_shading
-    del bpy.types.WindowManager.ribmosaic_preview_compile
-    del bpy.types.WindowManager.ribmosaic_preview_optimize
-
-    # #### Render space properties
-
-    del bpy.types.Scene.ribmosaic_interactive
-    del bpy.types.Scene.ribmosaic_activepass
-    del bpy.types.Scene.ribmosaic_purgerib
-    del bpy.types.Scene.ribmosaic_renderrib
-    del bpy.types.Scene.ribmosaic_purgeshd
-    del bpy.types.Scene.ribmosaic_compileshd
-    del bpy.types.Scene.ribmosaic_purgetex
-    del bpy.types.Scene.ribmosaic_optimizetex
-
-    # #### Scene space properties
-
-    del bpy.types.Scene.ribmosaic_passes
-    del bpy.types.Scene.ribmosaic_exportrib
-    del bpy.types.Scene.ribmosaic_activeobj
-    del bpy.types.Scene.ribmosaic_export_threads
-    del bpy.types.Scene.ribmosaic_compressrib
-    del bpy.types.Scene.ribmosaic_use_frame
-    del bpy.types.Scene.ribmosaic_use_world
-    del bpy.types.Scene.ribmosaic_use_screenwindow
-    del bpy.types.Scene.ribmosaic_use_projection
-    del bpy.types.Scene.ribmosaic_use_clipping
-    del bpy.types.Scene.ribmosaic_use_sides
-    del bpy.types.Scene.ribmosaic_use_bound
-    del bpy.types.Scene.ribmosaic_use_attribute
-    del bpy.types.Scene.ribmosaic_export_path
-    del bpy.types.Scene.ribmosaic_archive_searchpath
-    del bpy.types.Scene.ribmosaic_shader_searchpath
-    del bpy.types.Scene.ribmosaic_texture_searchpath
-    del bpy.types.Scene.ribmosaic_display_searchpath
-    del bpy.types.Scene.ribmosaic_procedural_searchpath
-    del bpy.types.Scene.ribmosaic_resource_searchpath
-    del bpy.types.Scene.ribmosaic_object_archives
-    del bpy.types.Scene.ribmosaic_geometry_archives
-    del bpy.types.Scene.ribmosaic_material_archives
-    del bpy.types.Scene.ribmosaic_object_archives_namepostfix
-    del bpy.types.Scene.ribmosaic_geometry_archives_namepostfix
-    del bpy.types.Scene.ribmosaic_material_archives_namepostfix
-    del bpy.types.Scene.ribmosaic_globallightscale
     
-    
-    # #### Object space properties
-
-    del bpy.types.Object.ribmosaic_csg
-    del bpy.types.Object.ribmosaic_transform
-
-    # #### Object data space properties
-
-    # Mesh properties
-
-    del bpy.types.Mesh.ribmosaic_n_class
-    del bpy.types.Mesh.ribmosaic_cs_class
-    del bpy.types.Mesh.ribmosaic_st_class
-    del bpy.types.Mesh.ribmosaic_primitive
-    del bpy.types.Mesh.ribmosaic_n_export
-    del bpy.types.Mesh.ribmosaic_cs_export
-    del bpy.types.Mesh.ribmosaic_st_export
-
-    # Surface curve properties
-
-    del bpy.types.SurfaceCurve.ribmosaic_primitive
-
-    # Curve properties
-
-    del bpy.types.Curve.ribmosaic_primitive
-    del bpy.types.Curve.ribmosaic_n_class
-    del bpy.types.Curve.ribmosaic_cs_class
-    del bpy.types.Curve.ribmosaic_st_class
-    del bpy.types.Curve.ribmosaic_n_export
-    del bpy.types.Curve.ribmosaic_cs_export
-    del bpy.types.Curve.ribmosaic_st_export
-
-    # Metaball properties
-
-    del bpy.types.MetaBall.ribmosaic_primitive
-
-    # Camera properties
-
-    del bpy.types.Camera.ribmosaic_dof
-    del bpy.types.Camera.ribmosaic_f_stop
-    del bpy.types.Camera.ribmosaic_focal_length
-    del bpy.types.Camera.ribmosaic_shutter_min
-    del bpy.types.Camera.ribmosaic_shutter_max
-    del bpy.types.Camera.ribmosaic_relative_detail
-
-    # #### Material space properties
-
-    del bpy.types.Material.ribmosaic_ri_color
-    del bpy.types.Material.ribmosaic_ri_opacity
-    del bpy.types.Material.ribmosaic_disp_pad
-    del bpy.types.Material.ribmosaic_wire_size
-    del bpy.types.Material.ribmosaic_disp_coor
-    del bpy.types.Material.ribmosaic_two_sided
-    # #### Particle space properties
-
-    del bpy.types.ParticleSettings.ribmosaic_primitive
+    # destroy all properties which begin with "ribmosaic_" in this blender types
+    # "ribmosaic_P\w*" properties are deleted by the pipeline manager, these are auto generated
+    destroyList = ["WindowManager", "Scene", "Object", "Mesh","Curve","Camera","Material","ParticleSettings"]
+    l = locals();
+    for d in destroyList:
+        exec( "attrs = dir(bpy.types.%s)" % d, None, l)
+        for a in l["attrs"]:
+            if re.match("ribmosaic_[^P].*", a ):
+                #remove this property!
+                exec( "del bpy.types.%s.%s" % (d,a) )
