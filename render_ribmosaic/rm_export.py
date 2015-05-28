@@ -696,6 +696,9 @@ class ExporterManager():
             pipelines = []
 
         # Create folders, export sources and generate command scripts
+        if DEBUG_PRINT:
+            print("Shader pipelines:" , pipelines)
+            
         for p in pipelines:
             libraries = []
 
@@ -1258,8 +1261,13 @@ class ExporterArchive(rm_context.ExportContext):
             print("ExporterArchive.write_code()")
 
         target = rm.pipeline_manager.get_attr(self, xmlpath, "target", False)
-
+        
+        if DEBUG_PRINT:
+            print("target: ", target)
+            
         for t in self.list_targets(target):
+            if DEBUG_PRINT:
+                print("target: ", target)
             if t[0]:
                 self.target_path = t[0]
 
@@ -1267,7 +1275,10 @@ class ExporterArchive(rm_context.ExportContext):
                 self.target_name = t[1]
 
             text = rm.pipeline_manager.get_text(self, xmlpath)
-
+            
+            if DEBUG_PRINT:
+                print("text: ", text)
+                
             self.write_text(text)
 
         if close:
@@ -1561,7 +1572,9 @@ class ExporterArchive(rm_context.ExportContext):
         # Shader Panel lists
         shaders = self.build_exporter_list('shader_panels', ExporterShader,
                                         windows)
-
+        if DEBUG_PRINT:
+            print("Shader panels:" , shaders)
+            
         # output rib code for the shaders
         for p in shaders:
             p.current_indent = self.current_indent
@@ -1850,11 +1863,10 @@ class ExporterShader(ExporterArchive):
         element = The panels code element to build
         close = If true closes archive when complete
         """
-
+        xml = self.shader_xmlpath + "/" + element;
         if DEBUG_PRINT:
-            print("ExporterShader.build_code()")
-
-        self.write_code(self.shader_xmlpath + "/" + element, close)
+            print("ExporterShader.build_code() for %s" % xml)
+        self.write_code(xml, close)
 
 
 # #### Exporter object sub classes (all derived from ExporterArchive)
@@ -2306,14 +2318,15 @@ class ExportObject(ExporterArchive):
             self.riAttributeBegin()
             self.write_text('Attribute "identifier" "name" [ "%s" ]\n' %
                             self.data_name)
-            # setup object transform to be exported
-            if ob.parent:
-                mat = ob.parent.matrix_world * ob.matrix_local
-            else:
-                mat = ob.matrix_world
-            #print(mat)
+                            
+            if ob.ribmosaic_transform :                
+                # setup object transform to be exported if enabled (default true)
+                if ob.parent:
+                    mat = ob.parent.matrix_world * ob.matrix_local
+                else:
+                    mat = ob.matrix_world
 
-            self.riTransform(mat)
+                self.riTransform(mat)
 
             # Export only objects which have some sort of mesh data, EMPTY objects have no data!
             primType = detect_primitive(ob)
@@ -2400,7 +2413,8 @@ class ExportLight(ExporterArchive):
                         % rib_param_val('float', color))
 
     def _export_intensity(self, energy=1):
-        self.write_text('"float intensity" %s\n' % (energy * 50))
+        
+        self.write_text('"float intensity" %s\n' % (energy * self.get_scene().ribmosaic_globallightscale))
 
     # #### Public methods
 
@@ -2425,14 +2439,15 @@ class ExportLight(ExporterArchive):
             p.build_code("begin")
 
         # TODO add support for all light types
-        if ob.parent:
-            m = ob.parent.matrix_world * ob.matrix_local
-        else:
-            m = ob.matrix_world
+        if ob.ribmosaic_transform :
+            if ob.parent:
+                m = ob.parent.matrix_world * ob.matrix_local
+            else:
+                m = ob.matrix_world
 
-        # Note: up vector for renderman light is opposite of Blender
-        m *= mathutils.Matrix.Rotation(math.pi, 4, 'X')
-        self.riTransform(m)
+            # Note: up vector for renderman light is opposite of Blender
+            m *= mathutils.Matrix.Rotation(math.pi, 4, 'X')
+            self.riTransform(m)
 
         # if a shader is attached then don't use auto light export
         shaders_exported = self.export_shaders('LAMP')
@@ -2446,14 +2461,15 @@ class ExportLight(ExporterArchive):
                 self.inc_indent()
                 self._export_intensity(lamp.energy)
                 self._export_lightcolor(lamp.color)
-
+                self.dec_indent()
+                
             elif lamp.type == 'SUN':
                 self.write_text('LightSource "distantlight" %s\n' %
                                 self.current_lightid)
                 self.inc_indent()
                 self._export_intensity(lamp.energy)
                 self._export_lightcolor(lamp.color)
-
+                self.dec_indent()
             elif lamp.type == 'SPOT':
                 self.write_text('LightSource "spotlight" %s\n' %
                                 self.current_lightid)
@@ -2464,7 +2480,7 @@ class ExportLight(ExporterArchive):
                     coneangle = lamp.spot_size / 2.0
                     self.write_text('"float coneangle" %s\n' %
                                 (rib_param_val('float', coneangle)))
-
+                self.dec_indent()
             else:
                 # default to a pointlight if no lamp type match
                 self.write_text('LightSource "pointlight" %s\n' %
@@ -2472,11 +2488,13 @@ class ExportLight(ExporterArchive):
                 self.inc_indent()
                 self._export_intensity(lamp.energy)
                 self._export_lightcolor(lamp.color)
-
+                self.dec_indent() 
+                   
         for p in light_utilities:
             p.current_indent = self.current_indent
             p.build_code("end")
 
+        
         self.riAttributeEnd()
         self.riIlluminate(self.current_lightid)
         self.write_text('\n', False)
@@ -2529,9 +2547,13 @@ class ExportMaterial(ExporterArchive):
 
         if self.get_scene().ribmosaic_use_sides:
             self.riSides(material.ribmosaic_two_sided)
-
-        self.export_shaders('MATERIAL')
-
+        
+        
+        s = self.export_shaders('MATERIAL')
+        
+        if DEBUG_PRINT:
+            print("Shaders exported: ", s)
+        
         self.close_archive()
 
 

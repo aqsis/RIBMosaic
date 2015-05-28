@@ -2444,7 +2444,9 @@ class PipelineManager():
         except:
             raise rm_error.RibmosaicError("PipelineManager.get_text: " + \
                                           "Invalid path syntax for " + xmlpath)
-
+        
+        print("element: ", element)
+            
         if element is None:
             segs = xmlpath.split("/")
             if segs[0] in self.list_pipelines():

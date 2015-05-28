@@ -1105,7 +1105,6 @@ class SCENE_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
         op.searchpath = "bpy.context.scene.ribmosaic_resource_searchpath"
         layout.separator()
 
-        p=[]
         layout.label(text="RIB Archive Options")
         col = layout.box().column()
         row = col.row()
@@ -1123,8 +1122,12 @@ class SCENE_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
         row.prop(scene, "ribmosaic_material_archives_namepostfix")    
         layout.separator()
         
+        layout.label(text="Light Options")
+        col = layout.box().column()
+        row = col.row()
+        row.prop(scene, "ribmosaic_globallightscale")
         
-
+        
         layout.label(text="Compatibility Options")
         col = layout.box().column()
         row = col.row()
@@ -1256,9 +1259,13 @@ class OBJECT_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
             if ob.type != 'EMPTY':
                 layout.prop(ob, "ribmosaic_csg", expand=True)
                 layout.separator()
-
+        
+        if ob.type not in ['CAMERA']:
+            layout.prop(ob,"ribmosaic_transform")
+        
         sub = layout.row()
-
+        
+            
         if ob.type not in ['LAMP'] and ob.ribmosaic_rib_archive != 'NOEXPORT':
             col = sub.column()
             col.prop(ob, "ribmosaic_mblur")
@@ -1267,7 +1274,7 @@ class OBJECT_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
             col.prop(ob, "ribmosaic_mblur_steps")
             col.prop(ob, "ribmosaic_mblur_start")
             col.prop(ob, "ribmosaic_mblur_end")
-
+        
         col = sub.column()
         col.label(text="RIB Archive:")
         col.prop(ob, "ribmosaic_rib_archive", text="")
@@ -1578,10 +1585,10 @@ class MATERIAL_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
 
         col = sub.column()
         col.label(text="RIB Archive:")
-        col.prop(ob, "ribmosaic_rib_archive", text="")
-        col.prop(ob, "ribmosaic_archive_usenamepostfix")
+        col.prop(mat, "ribmosaic_rib_archive", text="")
+        col.prop(mat, "ribmosaic_archives_usenamepostfix")
         if ob.ribmosaic_archive_usenamepostfix == "CUSTOM":
-            col.prop(ob, "ribmosaic_archive_namepostfix")
+            col.prop(mat, "ribmosaic_archives_namepostfix")
 
 
 class MATERIAL_PT_ribmosaic_panels(RibmosaicPipelinePanels, bpy.types.Panel):

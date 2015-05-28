@@ -113,10 +113,10 @@ def RibmosaicInfo(message, operator=None):
     print(ENGINE + " Info: " + message)
 
 
+import hashlib
 def PropertyHash(name):
     """Converts long property names into a 30 character or less hash"""
-
-    return "P" + str(hash(name))[:30].replace("-", "N")
+    return "ribmosaic_P" + hashlib.md5(name.encode()).hexdigest()
 
 
 def RibPath(path):
@@ -166,10 +166,11 @@ def register():
         RibmosaicInfo("ribify module not found, using script level exporter")
 
     bpy.utils.register_module(__name__)
-    
+
     # FIX ME: What should that do here (does not work with blender since the context is restricted access :
     # http://wiki.blender.org/index.php/Extensions:2.6/Py/API_Changes 
     # ? We want that the pipeline to set up according to the .blend file (all shaders pinned to materials should be loaded as well, can we do this?)
+
     #bpy.ops.wm.ribmosaic_pipeline_sync()
 
 
@@ -182,9 +183,9 @@ def unregister():
     bpy.context.scene.render.engine = 'BLENDER_RENDER'
 
     # Destroy our manager objects
-    pipeline_manager = None
-    export_manager = None
-    ribify = None
+    del pipeline_manager
+    del export_manager
+    del ribify
 
     # Remove draw functions
     space_text.TEXT_MT_toolbox.remove(rm_panel.ribmosaic_text_menu)

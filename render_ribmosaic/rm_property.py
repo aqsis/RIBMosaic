@@ -664,7 +664,7 @@ def create_props():
 
     for p in exporter_props:
         data = "bpy.types." + p[0]
-
+        
         exec(data + ".ribmosaic_mblur = bpy.props.BoolProperty("
              "name=\"Motion Blur\","
              "description=\"Enable " + p[1] + " motion blur\","
@@ -1065,6 +1065,12 @@ def create_props():
             description="""Specify what is added to object archive names (usefull for keyframed objects: '@[EVAL:.current_frame:]@' )""",
             default="",
             maxlen=512)
+            
+    
+    bpy.types.Scene.ribmosaic_globallightscale = bpy.props.FloatProperty(
+            name="Lights Scale",
+            description="""Specify what scale is used to scale all light sources energy values for this scene""",
+            default=50)
 
     # #### Object space properties
 
@@ -1073,6 +1079,12 @@ def create_props():
                 description="Specify CSG operation" + csg_desc,
                 items=csg_ops,
                 default='NOCSG')
+                
+    
+    bpy.types.Object.ribmosaic_transform= bpy.props.BoolProperty(
+             name="Export Transform",
+             description="Export transformation matrix",
+             default=True)
 
     # #### Object data space properties
 
@@ -1356,6 +1368,7 @@ def destroy_props():
     # #### Window manager properties
 
     del bpy.types.WindowManager.ribmosaic_pipelines
+    del bpy.types.WindowManager.ribmosaic_pipeline_search
     del bpy.types.WindowManager.ribmosaic_scripts
     del bpy.types.WindowManager.ribmosaic_sources
     del bpy.types.WindowManager.ribmosaic_shaders
@@ -1380,6 +1393,8 @@ def destroy_props():
     # #### Scene space properties
 
     del bpy.types.Scene.ribmosaic_passes
+    del bpy.types.Scene.ribmosaic_exportrib
+    del bpy.types.Scene.ribmosaic_activeobj
     del bpy.types.Scene.ribmosaic_export_threads
     del bpy.types.Scene.ribmosaic_compressrib
     del bpy.types.Scene.ribmosaic_use_frame
@@ -1400,10 +1415,16 @@ def destroy_props():
     del bpy.types.Scene.ribmosaic_object_archives
     del bpy.types.Scene.ribmosaic_geometry_archives
     del bpy.types.Scene.ribmosaic_material_archives
-
+    del bpy.types.Scene.ribmosaic_object_archives_namepostfix
+    del bpy.types.Scene.ribmosaic_geometry_archives_namepostfix
+    del bpy.types.Scene.ribmosaic_material_archives_namepostfix
+    del bpy.types.Scene.ribmosaic_globallightscale
+    
+    
     # #### Object space properties
 
     del bpy.types.Object.ribmosaic_csg
+    del bpy.types.Object.ribmosaic_transform
 
     # #### Object data space properties
 
@@ -1424,6 +1445,12 @@ def destroy_props():
     # Curve properties
 
     del bpy.types.Curve.ribmosaic_primitive
+    del bpy.types.Curve.ribmosaic_n_class
+    del bpy.types.Curve.ribmosaic_cs_class
+    del bpy.types.Curve.ribmosaic_st_class
+    del bpy.types.Curve.ribmosaic_n_export
+    del bpy.types.Curve.ribmosaic_cs_export
+    del bpy.types.Curve.ribmosaic_st_export
 
     # Metaball properties
 
@@ -1445,7 +1472,7 @@ def destroy_props():
     del bpy.types.Material.ribmosaic_disp_pad
     del bpy.types.Material.ribmosaic_wire_size
     del bpy.types.Material.ribmosaic_disp_coor
-
+    del bpy.types.Material.ribmosaic_two_sided
     # #### Particle space properties
 
     del bpy.types.ParticleSettings.ribmosaic_primitive
