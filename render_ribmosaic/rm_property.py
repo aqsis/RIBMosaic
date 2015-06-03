@@ -310,6 +310,12 @@ class RibmosaicPassProps(bpy.types.PropertyGroup):
                 default='BEAUTY')
 
     # Pass output properties
+    
+    pass_ribfilename = bpy.props.StringProperty(name="RIB Filename",
+                description="Output filename for the RIB file produced by this pass per frame.",
+                maxlen=512,
+                default="P@[EVAL:.current_pass:######]@_F@[EVAL:.current_frame:######]@.rib")
+    
     pass_display_file = bpy.props.StringProperty(name="Display File",
                 description="Output path/file.ext used by displays for render",
                 maxlen=512,
@@ -992,6 +998,7 @@ def create_props():
                         "@[EVAL:.data_name:]@",
                 maxlen=512)
 
+
     bpy.types.Scene.ribmosaic_archive_searchpath = bpy.props.StringProperty(
                 name="Archive Paths",
                 description="Shader search path RIB option, null disables",
@@ -1027,6 +1034,12 @@ def create_props():
                 description="Resource search path RIB option, null disables",
                 default="",
                 maxlen=512)
+                
+    bpy.types.Scene.ribmosaic_export_searchpaths = bpy.props.BoolProperty(
+                name="Export Search Paths",
+                description="If search paths are exportet or not.",
+                default=True)
+
 
     bpy.types.Scene.ribmosaic_object_archives = bpy.props.EnumProperty(
             name="Object Archives",
@@ -1065,6 +1078,11 @@ def create_props():
             description="""Specify what is added to object archive names (usefull for keyframed objects: '@[EVAL:.current_frame:]@' )""",
             default="",
             maxlen=512)
+    
+    #bpy.types.Scene.ribmosaic_readarchive_relpathto = bpy.props.StringProperty(
+                #name="Path to which the read archive path is constructed relatively. If empty, no relative path is used!",
+                #description="If search paths are exportet or not.",
+                #default="//renderman-@[EVAL:.blend_name+os.sep:]@")
             
     
     bpy.types.Scene.ribmosaic_globallightscale = bpy.props.FloatProperty(

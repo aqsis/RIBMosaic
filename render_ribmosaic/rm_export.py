@@ -861,8 +861,7 @@ class ExporterManager():
                         ec.dims_resx = p.pass_res_x
                     if p.pass_res_y > 0:
                         ec.dims_resy = p.pass_res_y
-                target_name = ec._resolve_links("P@[EVAL:.current_pass:#####]@"
-                                         "_F@[EVAL:.current_frame:#####]@.rib")
+                target_name = ec._resolve_links(ec.pass_ribfilename)
 
                 # Add to display list if a beauty pass
                 if ec.pass_type == 'BEAUTY':
@@ -1099,7 +1098,7 @@ class ExporterArchive(rm_context.ExportContext):
                         "Could not check archive " + filepath, sys.exc_info())
         else:
             raise rm_error.RibmosaicError(
-                "archive_exists: Archive's path and name must be specified")
+                "archive_exists: Archive's path and name must be specified, got: %s" % filepath )
 
         return exists
 
@@ -1437,9 +1436,9 @@ class ExporterArchive(rm_context.ExportContext):
             
             # make archive name
             postfix =""
-            useprefix = getattr(self.pointer_datablock, "ribmosaic_archive_usenamepostfix", 'DEFAULT')
+            useprefix = getattr(self.pointer_datablock, "ribmosaic_archives_usenamepostfix", 'DEFAULT')
             if useprefix  == 'CUSTOM' :
-                postfix = getattr(self.pointer_datablock, "ribmosaic_archive_namepostfix")
+                postfix = getattr(self.pointer_datablock, "ribmosaic_archives_namepostfix")
             elif useprefix  == 'DEFAULT':
                 if self._archive_key  == 'OBJ':
                     postfix = self.get_scene().ribmosaic_object_archives_namepostfix
@@ -1522,9 +1521,15 @@ class ExporterArchive(rm_context.ExportContext):
         panel = self.context_panel
 
         exporters = []
-
+        if DEBUG_PRINT:
+            print("build_exporter_list, panel_type:", panel_type)
+            print("build_exporter_list, windows:", windows)
+            
         for p in rm.pipeline_manager.list_panels(panel_type,
                                                  window=windows):
+            
+            if DEBUG_PRINT:
+                print("build_exporter_list, panel:", p)
             segs = p.split("/")
             self.context_pipeline = segs[0]
             self.context_category = segs[1]
@@ -1594,6 +1599,7 @@ class ExporterArchive(rm_context.ExportContext):
         self.write_text("version 3.03\n")
 
     def riReadArchive(self):
+        #relpathto = self.get_scene().ribmosaic_readarchive_relpathto
         self.write_text('ReadArchive "%s"\n' % self.archive_name)
 
     def riFrameBegin(self):
@@ -1993,13 +1999,18 @@ class ExportPass(ExporterArchive):
         # Render and Scene Utility Panel object lists
         scene_utilities = self.build_export_utilities_list('SCENE')
         render_utilities = self.build_export_utilities_list('RENDER')
-
+        
+        if DEBUG_PRINT:
+            print("scene_utilities: ", [ u.utility_xmlpath for u in scene_utilities] )
+            print("render_utilities: ", [ u.utility_xmlpath for u in render_utilities]  )
+        
         scene = self.get_scene()
 
         # output rib header
         self.ribHeader()
 
-        self._export_searchpaths()
+        if scene.ribmosaic_export_searchpaths:
+            self._export_searchpaths()
 
         # Write everything to archive
         for p in scene_utilities:
@@ -2314,10 +2325,22 @@ class ExportObject(ExporterArchive):
             self._export_camera_rib()
         else:
             
+            
+            
             # assume to be some form of mesh object
             self.riAttributeBegin()
             self.write_text('Attribute "identifier" "name" [ "%s" ]\n' %
                             self.data_name)
+                            
+                            
+            # Initialize objects for enabled panels in object
+            # build Object Utility Panel objects list
+            object_utilities = self.build_export_utilities_list('OBJECT')
+            print("Export Utility type:" , type(object_utilities))
+            for p in object_utilities:
+                p.current_indent = self.current_indent
+                p.build_code("begin")                
+            
                             
             if ob.ribmosaic_transform :                
                 # setup object transform to be exported if enabled (default true)
@@ -2379,7 +2402,10 @@ class ExportObject(ExporterArchive):
             else:
                 self.write_comment("This is is an empty object")
             
-
+            for p in object_utilities:
+                p.current_indent = self.current_indent
+                p.build_code("end")
+            
             self.riAttributeEnd()
             self.write_text('\n')
 

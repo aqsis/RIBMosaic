@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<Renderman_Core build="False" compile="False" dependencies="" enabled="False" filepath="renderman_core.rmp" filter="RENDERMAN_CORE" library="" version="0.0">
+<Renderman_Core build="False" compile="False" dependencies="" enabled="True" filepath="renderman_core.rmp" filter="RENDERMAN_CORE" library="" version="0.0">
 
     <python_scripts>
     </python_scripts>
@@ -11,11 +11,12 @@
     </shader_panels>
 
     <utility_panels filter="UTILITY">
-        <Framebuffer_Display delete="False" description="" duplicate="False" enabled="False" filter="" register="True" type="DISPLAY" windows="RENDER">
+        
+        <Quantize delete="False" description="" duplicate="False" enabled="False" filter="" register="True" type="DISPLAY" windows="RENDER">
             <read target="">
             </read>
             <begin target="">
-Display "+@[EVAL:.pass_output:]@" "framebuffer" "rgb"
+Quantize "rgba" 255 0 255 0
 
             </begin>
             <end target="">
@@ -26,7 +27,34 @@ Display "+@[EVAL:.pass_output:]@" "framebuffer" "rgb"
             </properties>
             <layout>
             </layout>
-        </Framebuffer_Display>
+        </Quantize>
+
+        <PixelVariance delete="False" description="" duplicate="False" enabled="False" filter="" register="True" type="DISPLAY" windows="RENDER">
+            <read target="">
+            </read>
+            <begin target="">
+PixelVariance @[DATA:///properties/variance:]@
+
+            </begin>
+            <end target="">
+            </end>
+            <regexes target="">
+            </regexes>
+            <properties>
+                <variance default="0.007" description="The pixel variance." items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+            </properties>
+            <layout>
+                <e_row0 active="@[EVAL:not @[ATTR:///properties/variance.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                            <e_lb0 expand="False" icon="" prop="" slider="False" text="Variance" toggle="False" trigger="" type="LABEL" />
+                            <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                                <variance expand="False" icon="" prop="variance" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                            </prop_col>
+                            <e_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/variance:]@" type="LINK" />
+                </e_row0>
+            </layout>
+        </PixelVariance>
+        
+        
         <File_Display delete="False" description="" duplicate="False" enabled="True" filter="" register="True" type="DISPLAY" windows="RENDER">
             <read target="">
             </read>
@@ -43,6 +71,255 @@ Display "+@[EVAL:.pass_output:]@" "file" "rgb"
             <layout>
             </layout>
         </File_Display>
+        
+        <Framebuffer_Display delete="False" description="" duplicate="False" enabled="False" filter="" register="True" type="DISPLAY" windows="RENDER">
+            <read target="">
+            </read>
+            <begin target="">
+Display "+@[EVAL:.pass_output:]@" "framebuffer" "rgb"
+
+            </begin>
+            <end target="">
+            </end>
+            <regexes target="">
+            </regexes>
+            <properties>
+            </properties>
+            <layout>
+            </layout>
+        </Framebuffer_Display>
+        
+         <Integrator_PxrPathTracer delete="False" description="" duplicate="False" enabled="False" filter="" register="True" type="DISPLAY" windows="RENDER">
+            <read target="">
+            </read>
+            <begin target="">
+Integrator "PxrPathTracer" @[DATA:///properties/int_name:STR]@
+    "int maxPathLength" @[DATA:///properties/maxPathLength_p:RIB]@ 
+    "string sampleMode" @[DATA:///properties/sampleMode_p:RIB]@ 
+    "int numLightSamples" @[DATA:///properties/numLightSamples_p:RIB]@ 
+    "int numBxdfSamples" @[DATA:///properties/numBxdfSamples_p:RIB]@
+    "int numIndirectSamples" @[DATA:///properties/numIndirectSamples_p:RIB]@
+    "int numDiffuseSamples" @[DATA:///properties/numDiffuseSamples_p:RIB]@
+    "int numSpecularSamples" @[DATA:///properties/numSpecularSamples_p:RIB]@
+    "int numSubsurfaceSamples" @[DATA:///properties/numSubsurfaceSamples_p:RIB]@
+    "int numRefractionSamples" @[DATA:///properties/numRefractionSamples_p:RIB]@
+    "int rouletteDepth" @[DATA:///properties/rouletteDepth_p:RIB]@
+    "float rouletteThreshold" @[DATA:///properties/rouletteThreshold_p:RIB]@
+    "int clampDepth" @[DATA:///properties/clampDepth_p:RIB]@
+    "float clampLuminance" @[DATA:///properties/clampLuminance_p:RIB]@
+    "int allowCaustics" @[DATA:///properties/allowCaustics_p:RIB]@
+
+            </begin>
+            <end target="">
+            </end>
+            <regexes target="">
+            </regexes>
+            <properties>
+                <int_name default="spt" description="Pathtracer's name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+                    
+                <maxPathLength_p default="10" description="Controls the absolute upper bound on the maximum ray depth. A value of 1 for this parameter will allow direct illumination only, while a value of 4 will permit up to 3 bounces of global illumination. Default value is 10." items="" link="" max="" maxlen="" min="1" precision="" size="" softmax="" softmin="" step="" type="INT" />
+                
+                <sampleMode_p default="bxdf" description="Controls the strategy for how indirect ray counts are apportioned between diffuse vs. glossy vs. specular Bxdf lobes. Valid values for this parameter are: 'bxdf' or 'manual'. If 'sampleMode' is set to 'bxdf', then the Bxdf is responsible for balancing the number of indirect rays that will be spawned at each camera hit point between the diffuse vs. glossy vs. specular lobes, and the total number of indirect rays spawned at each camera hit point will be controlled by the numIndirectSamples parameter. If 'sampleMode' is set to 'manual' the user is responsible for explicitly specifying the number of indirect rays to spawn per Bxdf lobe at each camera hit point via the numDiffuseSamples, numSpecularSamples, numSubsurfaceSamples, and numRefractionSamples parameters. The default is 'bxdf'." items="[('bxdf', 'Bxdf', ''),                                      ('manual', 'Manual', '')                                      ]" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+                
+                <numLightSamples_p default="1" description="Controls the number of light samples for direct illumination per camera hit point. The default is 1." items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="INT" />
+                
+                <numBxdfSamples_p default="1" description="Controls the number of Bxdf samples for direct illumination per camera hit point. The default is 1." items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="INT" />
+                
+                <numIndirectSamples_p default="1" description="When sampleMode is set to Bxdf this parameter controls the total number of indirect rays to spawn per camera hit point. When sampleMode is set to manual the value of this parameter is ignored. The default is 1." items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="INT" />
+                
+                <numDiffuseSamples_p default="1" description="When sampleMode is set to manual, controls the number of indirect diffuse reflection rays to spawn per camera hit point. Ignored when sampleMode is set to Bxdf. The default is 1." items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="INT" />
+                
+                <numSpecularSamples_p default="1" description="When sampleMode is set to manual, controls the number of indirect specular/glossy reflection rays to spawn per camera hit point. Ignored when sampleMode is set to Bxdf. The default is 1." items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="INT" />
+                
+                <numSubsurfaceSamples_p default="1" description="When sampleMode is set to manual, controls the number of subsurface rays to spawn per camera hit point. Ignored when sampleMode is set to Bxdf. The default is 1." items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="INT" />
+                
+                <numRefractionSamples_p default="1" description="When sampleMode is set to manual, controls the number of refraction/transmission rays to spawn per camera hit point. Ignored when sampleMode is set to 'bxdf'. The default is 1." items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="INT" />
+                
+                <rouletteDepth_p default="4" description="Controls the ray depth to begin performing Russian Roulette. The default is 4." items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="INT" />
+                
+                <rouletteThreshold_p default="0.2" description="Controls the path throughput threshold below which to begin performing Russian Roulette. The default is 0.2." items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                
+                <clampDepth_p default="2" description="If a value for the clampLuminance parameter is specified, then clampDepth controls the ray depth at which to begin clamping based on the per-ray luminance. For example, setting this parameter to 2 and also specifying a value of 4 for clampLuminance will ensure that the luminance of each ray's contribution is no more than 4 for all indirect illumination, without affecting or clamping the direct illumination. The default is 2." items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="INT" />
+                
+                <clampLuminance_p default="10.0" description="By default the PxrPathTracer integrator clamps the luminance of each per-ray contribution to be at most 10.0. However, it is possible to change this behavior by specifying a different value for the clampLuminance parameter. Specifying a relatively low value for the clampLuminance parameter (for example, between 2 and 20) can greatly speed up convergence and, in many cases, will make PxrPathTracer converge more quickly than the more sophisticated PxrVCM integrator. In some cases, indirect illumination lights paths may be noticeably dimmer due to clamping; this may be an acceptable trade-off in certain cases. Setting this parameter to a very large number (such as 1e30) will effectively disable all clamping. The default is 10.0." items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                
+                <allowCaustics_p default="False" description="Controls whether illumination from caustic light paths (that is, specular illumination onto diffuse surfaces) is allowed or disallowed. The default is 0 (off)." items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="BOOL" />
+
+                </properties>
+            <layout>
+
+                    <info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
+                        <sl_name expand="False" icon="" prop="sl_name" slider="False" text="Name" toggle="False" trigger="" type="PROP" />
+                    </info_row>
+
+                    <a_row0 active="@[EVAL:not @[ATTR:///properties/maxPathLength_p.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <a_lb0 expand="False" icon="" prop="" slider="False" text="Max. Path Length" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <maxPathLength_p expand="False" icon="" prop="maxPathLength_p" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <a_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/maxPathLength_p:]@" type="LINK" />
+                    </a_row0>
+                    
+                    <b_row0 active="@[EVAL:not @[ATTR:///properties/sampleMode_p.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <b_lb0 expand="False" icon="" prop="" slider="False" text="Sample Mode" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <sampleMode_p expand="False" icon="" prop="sampleMode_p" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <b_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/sampleMode_p:]@" type="LINK" />
+                    </b_row0>
+                    
+
+                    <c_row0 active="@[EVAL:not @[ATTR:///properties/numLightSamples_p.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <c_lb0 expand="False" icon="" prop="" slider="False" text="Light Samples" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <numLightSamples_p expand="False" icon="" prop="numLightSamples_p" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <c_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/numLightSamples_p:]@" type="LINK" />
+                    </c_row0>
+                    
+                    <d_row0 active="@[EVAL:not @[ATTR:///properties/numBxdfSamples_p.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <d_lb0 expand="False" icon="" prop="" slider="False" text="Bxdf Samples" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <numBxdfSamples_p expand="False" icon="" prop="numBxdfSamples_p" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <d_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/numBxdfSamples_p:]@" type="LINK" />
+                    </d_row0>
+                    
+                     <d2_row0 active="@[EVAL:not @[ATTR:///properties/numIndirectSamples_p.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <d2_lb0 expand="False" icon="" prop="" slider="False" text="Indirect Samples" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <numIndirectSamples_p expand="False" icon="" prop="numIndirectSamples_p" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <d2_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/numIndirectSamples_p:]@" type="LINK" />
+                    </d2_row0>
+                    
+                    <d3_row0 active="@[EVAL:not @[ATTR:///properties/numDiffuseSamples_p.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <d3_lb0 expand="False" icon="" prop="" slider="False" text="Diffuse Samples" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <numDiffuseSamples_p expand="False" icon="" prop="numDiffuseSamples_p" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <d3_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/numDiffuseSamples_p:]@" type="LINK" />
+                    </d3_row0>
+                                                   
+                    <e_row0 active="@[EVAL:not @[ATTR:///properties/numSpecularSamples_p.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <e_lb0 expand="False" icon="" prop="" slider="False" text="Sepcular Samples" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <numSpecularSamples_p expand="False" icon="" prop="numSpecularSamples_p" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <e_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/numSpecularSamples_p:]@" type="LINK" />
+                    </e_row0>
+                                                   
+                    <f_row0 active="@[EVAL:not @[ATTR:///properties/numSubsurfaceSamples_p.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <f_lb0 expand="False" icon="" prop="" slider="False" text="Subsurface Samples" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <numSubsurfaceSamples_p expand="False" icon="" prop="numSubsurfaceSamples_p" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <f_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/numSubsurfaceSamples_p:]@" type="LINK" />
+                    </f_row0>
+                                                   
+                    <g_row0 active="@[EVAL:not @[ATTR:///properties/numRefractionSamples_p.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <g_lb0 expand="False" icon="" prop="" slider="False" text="Refraction Samples" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <numRefractionSamples_p expand="False" icon="" prop="numRefractionSamples_p" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <g_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/numRefractionSamples_p:]@" type="LINK" />
+                    </g_row0>
+                                                   
+                    <h_row0 active="@[EVAL:not @[ATTR:///properties/rouletteDepth_p.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <h_lb0 expand="False" icon="" prop="" slider="False" text="Roulette Depth" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <rouletteDepth_p expand="False" icon="" prop="rouletteDepth_p" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <h_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/rouletteDepth_p:]@" type="LINK" />
+                    </h_row0>
+                                                   
+                    <i_row0 active="@[EVAL:not @[ATTR:///properties/rouletteThreshold_p.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <i_lb0 expand="False" icon="" prop="" slider="False" text="Roulette Threshold" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <rouletteThreshold_p expand="False" icon="" prop="rouletteThreshold_p" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <i_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/rouletteThreshold_p:]@" type="LINK" />
+                    </i_row0>
+                                    
+                                                   
+                    <k_row0 active="@[EVAL:not @[ATTR:///properties/clampDepth_p.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <k_lb0 expand="False" icon="" prop="" slider="False" text="Clamp Depth" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <clampDepth_p expand="False" icon="" prop="clampDepth_p" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <k_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/clampDepth_p:]@" type="LINK" />
+                    </k_row0>
+                                                   
+                    <l_row0 active="@[EVAL:not @[ATTR:///properties/clampLuminance_p.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <l_lb0 expand="False" icon="" prop="" slider="False" text="Clamp Luminance" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <clampLuminance_p expand="False" icon="" prop="clampLuminance_p" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <l_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/clampLuminance_p:]@" type="LINK" />
+                    </l_row0>
+                                                   
+                    
+                    <s_row0 active="@[EVAL:not @[ATTR:///properties/allowCaustics_p.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <s_lb0 expand="False" icon="" prop="" slider="False" text="Allow Caustics" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <allowCaustics_p expand="False" icon="" prop="allowCaustics_p" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <s_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/allowCaustics_p:]@" type="LINK" />
+                    </s_row0>
+
+                    
+            </layout>
+        </Integrator_PxrPathTracer>
+        
+        <Hider_Raytrace delete="False" description="" duplicate="False" enabled="False" filter="" register="True" type="DISPLAY" windows="RENDER">
+            <read target="">
+            </read>
+            <begin target="">
+Hider "raytrace" 
+    "int incremental" @[DATA:///properties/incremental_p:RIB]@
+    "int minsamples" @[DATA:///properties/minsamples_p:RIB]@
+    "int maxsamples" @[DATA:///properties/maxsamples_p:RIB]@ 
+
+            </begin>
+            <end target="">
+            </end>
+            <regexes target="">
+            </regexes>
+            <properties>
+                <incremental_p default="True" description="" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="BOOL" />
+                <minsamples_p default="9" description="" items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="INT" />
+                <maxsamples_p default="64" description="" items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="INT" />
+            </properties>
+            <layout>
+                <a_row0 active="@[EVAL:not @[ATTR:///properties/incremental_p.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                    <a_lb0 expand="False" icon="" prop="" slider="False" text="Incremental" toggle="False" trigger="" type="LABEL" />
+                    <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                        <incremental_p expand="False" icon="" prop="incremental_p" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                    </prop_col>
+                    <a_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/incremental_p:]@" type="LINK" />
+                </a_row0>
+                
+                <b_row0 active="@[EVAL:not @[ATTR:///properties/minsamples_p.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                    <b_lb0 expand="False" icon="" prop="" slider="False" text="Min. Samples" toggle="False" trigger="" type="LABEL" />
+                    <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                        <minsamples_p expand="False" icon="" prop="minsamples_p" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                    </prop_col>
+                    <b_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/minsamples_p:]@" type="LINK" />
+                </b_row0>
+                
+
+                <c_row0 active="@[EVAL:not @[ATTR:///properties/maxsamples_p.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                    <c_lb0 expand="False" icon="" prop="" slider="False" text="Max. Samples" toggle="False" trigger="" type="LABEL" />
+                    <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                        <maxsamples_p expand="False" icon="" prop="maxsamples_p" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                    </prop_col>
+                    <c_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/maxsamples_p:]@" type="LINK" />
+                </c_row0>
+                 
+            </layout>
+        </Hider_Raytrace>
+        
+        
     </utility_panels>
 
     <command_panels filter="COMMAND">

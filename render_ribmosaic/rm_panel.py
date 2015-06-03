@@ -896,6 +896,12 @@ class RENDER_PT_ribmosaic_passes(RibmosaicPropertiesPanel, bpy.types.Panel):
 
             split = grp.split()
             sub = split.column()
+            
+            sub.label(text="Output RIB:")
+            row = sub.row(align=True)
+            row.prop(active_pass, "pass_ribfilename", text="")
+            sub.separator()
+            
             sub.label(text="Output:")
             row = sub.row(align=True)
             row.prop(active_pass, "pass_display_file", text="")
@@ -1103,6 +1109,10 @@ class SCENE_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
                            icon='FILESEL', text="")
         op.filepath = "//"
         op.searchpath = "bpy.context.scene.ribmosaic_resource_searchpath"
+        
+        row = col.row(align=True)
+        row.prop(scene, "ribmosaic_export_searchpaths")
+        
         layout.separator()
 
         layout.label(text="RIB Archive Options")
@@ -1195,9 +1205,11 @@ class WORLD_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
         col = sub.column()
         col.label(text="RIB Archive:")
         col.prop(ob, "ribmosaic_rib_archive", text="")
-        col.prop(ob, "ribmosaic_archive_usenamepostfix")
-        if ob.ribmosaic_archive_usenamepostfix == "CUSTOM":
-            col.prop(ob, "ribmosaic_archive_namepostfix")
+        if ob.ribmosaic_rib_archive not in ["INLINE","NOEXPORT"]:
+            col = col.column(align=True)
+            col.prop(ob, "ribmosaic_archives_usenamepostfix")
+            if ob.ribmosaic_archives_usenamepostfix == "CUSTOM":
+                col.prop(ob, "ribmosaic_archives_namepostfix")
 
 
 class WORLD_PT_ribmosaic_preview(RibmosaicPreviewPanel, bpy.types.Panel):
@@ -1278,9 +1290,11 @@ class OBJECT_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
         col = sub.column()
         col.label(text="RIB Archive:")
         col.prop(ob, "ribmosaic_rib_archive", text="")
-        col.prop(ob, "ribmosaic_archive_usenamepostfix")
-        if ob.ribmosaic_archive_usenamepostfix == "CUSTOM":
-            col.prop(ob, "ribmosaic_archive_namepostfix")
+        if ob.ribmosaic_rib_archive not in ["INLINE","NOEXPORT"]:
+            col = col.column(align=True)
+            col.prop(ob, "ribmosaic_archives_usenamepostfix")
+            if ob.ribmosaic_archives_usenamepostfix == "CUSTOM":
+                col.prop(ob, "ribmosaic_archives_namepostfix")
 
 
 class OBJECT_PT_ribmosaic_panels(RibmosaicPipelinePanels, bpy.types.Panel):
@@ -1292,7 +1306,7 @@ class OBJECT_PT_ribmosaic_panels(RibmosaicPipelinePanels, bpy.types.Panel):
     bl_region_type = 'WINDOW'
     bl_context = "object"
 
-    filter_type = ('MESH', 'CURVE', 'SURFACE', 'META', 'EMPTY')
+    filter_type = ('MESH', 'CURVE', 'SURFACE', 'META', 'EMPTY','LAMP','CAMERA')
     validate_context = "object"
     shader_panels = True
     utility_panels = True
@@ -1449,9 +1463,11 @@ class DATA_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
             col = sub.column()
             col.label(text="RIB Archive:")
             col.prop(ob, "ribmosaic_rib_archive", text="")
-            col.prop(ob, "ribmosaic_archive_usenamepostfix")
-            if ob.ribmosaic_archive_usenamepostfix == "CUSTOM":
-                col.prop(ob, "ribmosaic_archive_namepostfix")
+            if ob.ribmosaic_rib_archive not in ["INLINE","NOEXPORT"]:
+                col = col.column(align=True)
+                col.prop(ob, "ribmosaic_archives_usenamepostfix")
+                if ob.ribmosaic_archives_usenamepostfix == "CUSTOM":
+                    col.prop(ob, "ribmosaic_archives_namepostfix")
 
 class DATA_PT_ribmosaic_panels(RibmosaicPipelinePanels, bpy.types.Panel):
     """Pipeline shader and utility control panel for object data"""
@@ -1587,7 +1603,7 @@ class MATERIAL_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
         col.label(text="RIB Archive:")
         col.prop(mat, "ribmosaic_rib_archive", text="")
         col.prop(mat, "ribmosaic_archives_usenamepostfix")
-        if ob.ribmosaic_archive_usenamepostfix == "CUSTOM":
+        if mat.ribmosaic_archives_usenamepostfix == "CUSTOM":
             col.prop(mat, "ribmosaic_archives_namepostfix")
 
 

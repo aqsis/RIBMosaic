@@ -65,6 +65,8 @@ exec("from " + MODULE + " import rm_error")
 exec("import " + MODULE + " as rm")
 
 
+DEBUG_PRINT = True
+
 # #############################################################################
 # EXPORT CONTEXT CLASS
 # #############################################################################
@@ -140,6 +142,7 @@ class ExportContext():
     pass_sequence = 0  # Sequence index number
     pass_userid = 0  # User defined pass id
     pass_output = ""  # Display output string
+    pass_ribfilename = "P@[EVAL:.current_pass:######]@_F@[EVAL:.current_frame:######]@.rib"  # Rib filename for this pass and frame
     pass_layer = ""  # Assigned Blender layer
     pass_multilayer = False  # Multilayer output pass
     pass_ribstr = ""  # User defined rib string
@@ -203,6 +206,7 @@ class ExportContext():
             self.pass_sequence = export_object.pass_sequence
             self.pass_userid = export_object.pass_userid
             self.pass_output = export_object.pass_output
+            self.pass_ribfilename = export_object.pass_ribfilename
             self.pass_layer = export_object.pass_layer
             self.pass_multilayer = export_object.pass_multilayer
             self.pass_ribstr = export_object.pass_ribstr
@@ -230,8 +234,13 @@ class ExportContext():
                                          self.pass_sequence)
             self.pass_userid = getattr(p, "pass_passid",
                                         self.pass_userid)
+            
+            self.pass_ribfilename = getattr(p, "pass_ribfilename",
+                                        self.pass_ribfilename)                            
+                                        
             self.pass_output = getattr(p, "pass_display_file",
                                         self.pass_output)
+                                        
             self.pass_layer = getattr(p, "pass_layerfilter",
                                         self.pass_layer)
             self.pass_multilayer = getattr(p, "pass_multilayer",
@@ -290,7 +299,7 @@ class ExportContext():
 
             try:
                 for i, l in enumerate(link_list):
-                    if type(l) == list:
+                    if isinstance(l,list):
                         link = walk_links(l)
 
                         pl = rm_link.PipelineLink(self, link)
@@ -306,13 +315,62 @@ class ExportContext():
             return string
 
         # Convert start/end tokens into multidimensional list
-        t = repr(text)
-        q = t[0]
-        links = eval("[" + q + t[1:-1]
-                     .replace("@[", q + ", [" + q)
-                     .replace("]@", q + "], " + q) +
-                     q + "]")
+        
+        
+        def makeLinkHierachy(text):
+                        
+            oBs = r'@['
+            cBs = r']@'
+            lB = len(oBs)
+            oIdx = 0
+            escape = '\\'
+            l = []
+            currlevel = l;
+            listStack = [currlevel]
+            idx = 0
+            try:
+                while idx < len(text):
+                    brackets = text[idx:idx + lB]
+                    if brackets == oBs:
+                        # push so far read to this level
+                        currlevel.append( text[oIdx:idx] )
+                        # skip tag
+                        idx += lB
+                        oIdx = idx # open index
+                        currlevel.append([])
+                        listStack.append(currlevel[-1])
+                        currlevel = currlevel[-1]
+                    elif brackets == cBs:
+                        # finish level 
+                        currlevel.append( text[oIdx:idx] )
+                        # skip tag
+                        idx +=lB
+                        oIdx=idx # set new open index
+                        listStack.pop()
+                        currlevel = listStack[-1]
+                    elif text[idx] == escape:
 
+                        #escape interval begins, check if we skip!
+                        if text[idx+1:idx+1 + lB] in [oBs,cBs]:
+                            #replace string
+                            text = text[:idx] + text[idx+1:]
+                            #ignore -> skip
+                            idx +=lB
+                        idx+=1
+                    else:
+                        idx+=1
+                # push last
+                currlevel.append( text[oIdx:idx] )
+
+            except:
+                rm_error.RibmosaicError("Wrong bracketing at index: %i , string: %s"%( idx, text[idx:]), sys.exc_info())
+            
+            return l        
+
+        #links = eval("[" + q + t[1:-1].replace("\@", q + "@" ).replace("@[", q + ", [" + q).replace("]@", q + "], " + q) + q + "]")
+        links = makeLinkHierachy(text)
+        
+        print("links:",links)
         return walk_links(links)
 
     def _panel_enabled(self, do_filter=True, do_pass_filter=False):
@@ -410,9 +468,8 @@ class ExportContext():
         context_type = type of context to get data from (can pass bl_context)
         return = dictionary with data-block, search type and window type
         """
-
+            
         context_type = context_type.upper()
-
         try:
             if context:
                 if context_type == 'TEXT':

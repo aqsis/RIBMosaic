@@ -144,6 +144,7 @@ class Ribify():
         self._start_rib_array(10)
         for p in mesh.polygons:
             # keep track of the highest vertex index used
+            print("leng vertices: " , len(p.vertices))
             self.vertcount = max(self.vertcount,max(p.vertices))
             self._write_rib_array_list(p.vertices)
         self._end_rib_array()
@@ -219,8 +220,7 @@ class Ribify():
                     # build the normals list
                     # if face is smooth then use the vertex normal
                     if p.use_smooth:
-                        norm_str += " ".join(
-                            [str(c) for c in mesh.vertices[vi].normal])
+                        norm_str += " ".join([str(c) for c in mesh.vertices[vi].normal])
                     else:
                         # otherwise the face is flat so use the face normal
                         norm_str += " ".join([str(c) for c in p.normal])

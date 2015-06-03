@@ -1160,7 +1160,7 @@ class PipelineManager():
         category = sub element containing panel elements
         panel = name of element containing panel layout
         """
-
+        
         def unfold_layout(xmlpath, prefix="", layout="layout", depth=0):
             """Generates layout code for each layout element in xmlpath
             and appends them to specified layout object. Returns a list
@@ -1321,6 +1321,7 @@ class PipelineManager():
 
         register = eval(w_attrs['register'])  # Will we are registering panel?
         windows = [w.strip() for w in w_attrs['windows'].split(",")]
+        print("WINDOWS", windows)
         window_list = [w for w in windows if w and w not in data_types]
         data_list = [w for w in windows if w and w in data_types]
         scene_only = ('SCENE' in window_list and 'RENDER' in window_list)
@@ -2369,7 +2370,7 @@ class PipelineManager():
             if export_object is None:
                 export_object = rm_context.ExportContext()
 
-            elif type(export_object) == dict:
+            elif isinstance(export_object,dict):
                 attrs = dict(export_object)
                 export_object = rm_context.ExportContext()
 
@@ -2476,7 +2477,7 @@ class PipelineManager():
         if resolve and "@[" in text:
             if export_object is None:
                 export_object = rm_context.ExportContext()
-            elif type(export_object) == dict:
+            elif isinstance(export_object,dict):
                 attrs = dict(export_object)
                 export_object = rm_context.ExportContext()
 
@@ -2862,7 +2863,7 @@ class PipelineManager():
                                  .replace(" ", ",") + ")")
 
                     # Verify we have the correct number of elements
-                    if type(d) == tuple:
+                    if isinstance(d,tuple):
                         if attribs['type'] == 'matrix':
                             test = d[15]
                         else:
@@ -2879,7 +2880,7 @@ class PipelineManager():
                         d = "(0, 0, 0)"
 
                 # Expand single entry defaults into list for arrays
-                if type(d) != list:
+                if not isinstance(d,list):
                     d = [d for i in range(array_count)]
 
                 # Setup for array parameters

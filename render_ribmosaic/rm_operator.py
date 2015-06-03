@@ -67,6 +67,8 @@ exec("from " + MODULE + " import rm_panel")
 exec("import " + MODULE + " as rm")
 
 
+DEBUG_PRINT = True
+
 # #############################################################################
 # GLOBAL OPERATORS
 # #############################################################################
@@ -696,10 +698,16 @@ class WM_OT_ribmosaic_panel_enable(rm_context.ExportContext,
     def execute(self, context):
         try:
             if self.context and self.xmlpath:
+                
                 d = self._context_data(context, self.context)['data']
                 e = rm.PropertyHash(self.xmlpath.replace("/", "") + 'enabled')
-
+                
+                #if DEBUG_PRINT:
+                print("self.context:", self.context)
+                print("Pin this panel",  d, self.xmlpath)
                 exec("d." + e + " = True")
+                exec("print(d." + e +")")
+                    
                 self._refresh_panels()
         except rm_error.RibmosaicError as err:
             err.ReportError(self)
@@ -1940,7 +1948,7 @@ class RENDER_OT_ribmosaic_pass_paste(rm_context.ExportContext,
 
         for p in pass_clipboard.items():
             v = p[1]
-            if type(v) == str:
+            if isinstance(v,str):
                 exec("active_pass." + p[0] + " = '" + str(p[1]) + "'")
             else:
                 exec("active_pass." + p[0] + " = " + str(p[1]))

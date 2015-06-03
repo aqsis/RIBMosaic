@@ -23,26 +23,26 @@
                        register="True" 
                        slmeta="@[SLIB::]@PxrDisney.slmeta" type="SURFACE" windows="MATERIAL">
                 <rib target="">
-                    @[DATA:///properties/sl_type:]@ "PxrDisney"
-                        "color baseColor" @[DATA:///properties/baseColor_prop:RIB]@
-                        "color emitColor" @[DATA:///properties/emitColor_prop:RIB]@
-                        "color subsurfaceColor" @[DATA:///properties/subsurfaceColor_prop:RIB]@
-                        "float subsurface" @[DATA:///properties/subsurface_prop:RIB]@
-                        "float metallic" @[DATA:///properties/metallic_prop:RIB]@
-                        "float specular" @[DATA:///properties/specular_prop:RIB]@
-                        "float specularTint" @[DATA:///properties/specularTint_prop:RIB]@
-                        "float roughness" @[DATA:///properties/roughness_prop:RIB]@
-                        "float anisotropic" @[DATA:///properties/anisotropic_prop:RIB]@
-                        "float sheen"  @[DATA:///properties/sheen_prop:RIB]@
-                        "float sheenTint" @[DATA:///properties/sheenTint_prop:RIB]@
-                        "float clearcoat"  @[DATA:///properties/clearcoat_prop:RIB]@
-                        "float clearcoatGloss" @[DATA:///properties/clearcoatGloss_prop:RIB]@
+@[DATA:///properties/sl_type:]@ "PxrDisney" @[DATA:///properties/sl_name:STR]@
+    "color baseColor" @[DATA:///properties/baseColor_prop:RIB]@
+    "color emitColor" @[DATA:///properties/emitColor_prop:RIB]@
+    "color subsurfaceColor" @[DATA:///properties/subsurfaceColor_prop:RIB]@
+    "float subsurface" @[DATA:///properties/subsurface_prop:RIB]@
+    "float metallic" @[DATA:///properties/metallic_prop:RIB]@
+    "float specular" @[DATA:///properties/specular_prop:RIB]@
+    "float specularTint" @[DATA:///properties/specularTint_prop:RIB]@
+    "float roughness" @[DATA:///properties/roughness_prop:RIB]@
+    "float anisotropic" @[DATA:///properties/anisotropic_prop:RIB]@
+    "float sheen"  @[DATA:///properties/sheen_prop:RIB]@
+    "float sheenTint" @[DATA:///properties/sheenTint_prop:RIB]@
+    "float clearcoat"  @[DATA:///properties/clearcoat_prop:RIB]@
+    "float clearcoatGloss" @[DATA:///properties/clearcoatGloss_prop:RIB]@
 
                 </rib>
                 <regexes target="">
                 </regexes>
                 <properties>
-                    <sl_name default="PxrDisney" description="Shader&apos;s name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+                    <sl_name default="\@[EVAL:.data_name:\]@-bxdf" description="Bxdf&apos;s name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
                     <sl_type default="Bxdf" description="Choose shader type" items="[(&apos;Bxdf&apos;, &apos;Bxdf&apos;, &apos;&apos;)]" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
                     <baseColor_prop default="(0.5, 0.5, 0.5)" description="" items="" link="" max="1.0" maxlen="" min="0.0" precision="" size="" softmax="1.0" softmin="0.0" step="" type="COLOR" />
                     <emitColor_prop default="(0.0, 0.0, 0.0)" description="" items="" link="" max="1.0" maxlen="" min="0.0" precision="" size="" softmax="1.0" softmin="0.0" step="" type="COLOR" />
@@ -60,7 +60,7 @@
                 </properties>
                 <layout>
                     <info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
-                        <sl_name expand="False" icon="" prop="sl_name" slider="False" text="Name" toggle="False" trigger="" type="PROP" />
+                        <sl_name expand="False" icon="" prop="sl_name" slider="False" text="" toggle="False" trigger="" type="PROP" />
                         <sl_type expand="False" icon="" prop="sl_type" slider="False" text="" toggle="False" trigger="" type="PROP" />
                     </info_row>
                     
