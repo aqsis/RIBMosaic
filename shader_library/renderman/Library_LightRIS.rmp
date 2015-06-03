@@ -1,0 +1,703 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Library_RendermanLightRIS build="True" compile="True" 
+                 dependecies="" 
+                 enabled="True" 
+                 filepath="Library_RendermanLightRIS.rmp" 
+                 filter="LIBRARY_LIGHT" 
+                 library="" version="0.1">
+                 
+
+	<python_scripts>
+	</python_scripts>
+
+	<shader_sources>
+    </shader_sources>
+
+
+    <shader_panels filter="SHADER">
+            <PxrAreaLight delete="True" description="Authors: Pixar Renderman\nCopyright: Pixar\nDescription:\n" 
+                       duplicate="True" 
+                       enabled="False" 
+                       filter="LIGHT" 
+                       library="@[SLIB::RIB]@" 
+                       register="True" 
+                       slmeta="@[SLIB::]@PxrAreaLight.slmeta" type="LIGHT" windows="LAMP">
+                <rib target="">
+@[DATA:///properties/sl_type:]@ "PxrAreaLight" @[EVAL:.current_lightid:]@
+    "string shape" @[DATA:///properties/shape_prop:RIB]@
+    "color lightcolor" @[DATA:///properties/color_prop:RIB]@
+    "string emissionmap" @[DATA:///properties/emitmap_prop:RIB]@
+    "float temperature" @[DATA:///properties/colortemp_prop:RIB]@
+    "float intensity" @[DATA:///properties/intensity_prop:RIB]@
+    "float exposure" @[DATA:///properties/exposure_prop:RIB]@
+    "float areaNormalize" @[DATA:///properties/normalize_prop:RIB]@
+    "color specAmount" @[DATA:///properties/specularCont_prop:RIB]@
+    "color diffAmount" @[DATA:///properties/diffuseCont_prop:RIB]@
+    "string __group" @[DATA:///properties/lightgroup_prop:RIB]@
+    #"shaders[] __boundcoshaders" @[DATA:///properties/blockers_prop:STR]@
+    "float coneangle" @[DATA:///properties/coneAngle_prop:RIB]@
+    "float penumbraangle" @[DATA:///properties/penAngle_prop:RIB]@
+    "float penumbraexponent" @[DATA:///properties/penExp_prop:RIB]@
+    "string profilemap" @[DATA:///properties/profMap_prop:RIB]@
+    "string iesprofile" @[DATA:///properties/iesMap_prop:RIB]@
+    "float profilerange" @[DATA:///properties/profRange_prop:RIB]@
+    "float cosinepower" @[DATA:///properties/distAng_prop:RIB]@
+    "float angularVisibility" @[DATA:///properties/angVis_prop:RIB]@
+    
+    "color shadowColor" @[DATA:///properties/shadowColor:RIB]@
+    "float traceShadows" @[DATA:///properties/traceShad_prop:RIB]@
+    "float adaptiveShadows" [ @[DATA:///properties/adapShadow_prop:]@ ]
+    "string shadowSubset" @[DATA:///properties/traceSub_prop:RIB]@
+    "string shadowExcludeSubset" @[DATA:///properties/donttraceSub_prop:RIB]@
+    "string shadowMap" @[DATA:///properties/shadowMap_prop:RIB]@
+    "float shadowSampleBase" @[DATA:///properties/shadowJit_prop:RIB]@
+    "float shadowTraceBias" @[DATA:///properties/shadowTraceBias_prop:RIB]@
+    "float shadowMapBias" @[DATA:///properties/shadowMapBias_prop:RIB]@
+    "float shadowMapBias2" @[DATA:///properties/shadowMapBias2_prop:RIB]@
+
+                </rib>
+                <regexes target="">
+                </regexes>
+                <properties>
+                    
+                    <sl_name default="Light" description="Shader&apos;s name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+                    
+                    <sl_type default="AreaLightSource" description="Choose light type" 
+                            items="[(&apos;AreaLightSource&apos;, &apos;AreaLightSource&apos;, &apos;&apos;)]" 
+                            link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+                    
+                    <shape_prop default="rect" description="Specifies the shape of the area light emitter." 
+                            items="[(&apos;rect&apos;, &apos;Rectangle&apos;, &apos;&apos;), 
+                                    (&apos;disk&apos;, &apos;Disk&apos;, &apos;&apos;),
+                                    (&apos;sphere&apos;, &apos;Sphere&apos;, &apos;&apos;),
+                                    (&apos;cylinder&apos;, &apos;Cylinder&apos;, &apos;&apos;),
+                                    (&apos;distant&apos;, &apos;Distant&apos;, &apos;&apos;),
+                                    (&apos;spot&apos;, &apos;Spot&apos;, &apos;&apos;)
+                                     ]" 
+                            link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+                            
+                    <color_prop default="(1.0, 1.0, 1.0)" description="The color of the emitted light." items="" link="" max="1.0" maxlen="" min="0.0" precision="" size="" softmax="1.0" softmin="0.0" step="" type="COLOR" />
+                    
+                    <emitmap_prop default="" description="An optional color map for emitted light." items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+                    
+                    <colortemp_prop default="-1.0" description="Allows you choose the color temperature of the light. Unlike the basic light color this allows you to easily pick plausible light colors based on standard scientific temperature measurements. Typical color temperatures lie in the range 5000 through 8000. When -1, no color temperature correction is applied." items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    
+                    <intensity_prop default="1.0" description="Scale the total energy emitted by the light source." items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    
+                    <exposure_prop default="0.0" description="Specifies the intensity of the area light as a power of 2. Increasing the intensity by 1 will double the energy emitted by the light source. A value of 0 produces an intensity of 1, -1 produces .5." items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    
+                    <normalize_prop default="0.0" description="When normalize is enabled, the amount of light contributed to the scene will not change as you scale the light source. This makes it easier to adjust highlight size without changing scene lighting drastically." items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    
+                    <specularCont_prop default="(1.0, 1.0, 1.0)" description="Scale the specular contribution of this light." items="" link="" max="1.0" maxlen="" min="0.0" precision="" size="" softmax="1.0" softmin="0.0" step="" type="COLOR" />
+                    
+                    <diffuseCont_prop default="(1.0, 1.0, 1.0)" description="Scale the diffuse contribution of this light." items="" link="" max="1.0" maxlen="" min="0.0" precision="" size="" softmax="1.0" softmin="0.0" step="" type="COLOR" />
+                    
+                    <lightgroup_prop default="" description="The name of the group this light belongs to. The group is a special type of attribute which allows you to provide light category support for geometric area lights, as well as per group AOVs for the lighting on the surface." items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+                    
+                    <blockers_prop default="[]" description="Binds light blockers to the light." items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+                                        
+                    <coneAngle_prop default="2.0" description="Spot cone angle." items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    <penAngle_prop default="5.0" description="Spot cone angle." items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    <penExp_prop default="0.0" description="Change the falloff of the penumbra." items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    
+                    <profMap_prop default="" description="Name of the emission color map." items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+                    <iesMap_prop default="" description="Name of the IES emission map." items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+                    <profRange_prop default="18.0" description="Rescales the angular distribution of the IES profiles. Values less than one will make the profile smaller, greater than 1 will inscrease its coverage." items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    <distAng_prop default="9.0" description="Focusing power of the geometric area lights. Range is 0 to 90" items="" link="" max="90.0" maxlen="" min="0.0" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    
+                    <angVis_prop default="1.0" description="Specifies the size of the highlight as a angle. Only valid when &apos;Shape&apos; is set to distant." items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    
+                    <shadowColor default="(0.0, 0.0, 0.0)" description="The color of the shadows cast by emitted light." items="" link="" max="1.0" maxlen="" min="0.0" precision="" size="" softmax="1.0" softmin="0.0" step="" type="COLOR" />
+                    <traceShad_prop default="True" description="Enable raytraced shadows." link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="BOOL" />
+                    <adapShadow_prop default="1.0" description="Adaptively sample the lights shadows. Conservative mode will trace a larger percentage of the shadow rays, which will result in less acceleration, but potentially better quality shadows. Aggressive will trace fewer rays which can result in more significant speedups." 
+                            items="[(&apos;0.0&apos;, &apos;None&apos;, &apos;&apos;), 
+                                    (&apos;1.0&apos;, &apos;Conservative&apos;, &apos;&apos;),
+                                    (&apos;2.0&apos;, &apos;Aggressive&apos;, &apos;&apos;)
+                                     ]" 
+                            link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+                    <traceSub_prop default="" description="Set of geometry to consider for traced shadow intersection." items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+                    <donttraceSub_prop default="" description="Set of geometry to ignore for traced shadow intersection." items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+                    <shadowMap_prop default="" description="Name of the area shadow map." items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+                    <shadowJit_prop default="0.5" description="This parameter controls the &apos;samplebase&apos; parameter for area shadows. If you are having issues with dark lines at the concave junction of polygon faces, lower the value of this parameter." items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    <shadowTraceBias_prop default="-1.0" description="Raytracing bias for shadow computations. -1 uses automatically computed value value." items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    <shadowMapBias_prop default="1.0" description="Area shadow map bias. See documentation on area shadow for more information." items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    <shadowMapBias2_prop default="1.0" description="Second area shadow map bias. See documentation on area shadow for more information." items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+
+                </properties>
+                <layout>
+                    <info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
+                        <sl_name expand="False" icon="" prop="sl_name" slider="False" text="Name" toggle="False" trigger="" type="PROP" />
+                        <sl_type expand="False" icon="" prop="sl_type" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                    </info_row>
+                    
+
+                    <a_row0 active="@[EVAL:not @[ATTR:///properties/shape_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <a_lb0 expand="False" icon="" prop="" slider="False" text="Shape" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <shape_prop expand="False" icon="" prop="shape_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <a_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/shape_prop:]@" type="LINK" />
+                    </a_row0>
+                    
+                    <b_row0 active="@[EVAL:not @[ATTR:///properties/color_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <b_lb0 expand="False" icon="" prop="" slider="False" text="Color" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <color_prop expand="False" icon="" prop="color_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <b_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/color_prop:]@" type="LINK" />
+                    </b_row0>
+                    
+
+                    <c_row0 active="@[EVAL:not @[ATTR:///properties/emitmap_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <c_lb0 expand="False" icon="" prop="" slider="False" text="Emission Map" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <emitmap_prop expand="False" icon="" prop="emitmap_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <c_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/emitmap_prop:]@" type="LINK" />
+                    </c_row0>
+                    
+                    <d_row0 active="@[EVAL:not @[ATTR:///properties/colortemp_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <d_lb0 expand="False" icon="" prop="" slider="False" text="Color Temperatur" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <colortemp_prop expand="False" icon="" prop="colortemp_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <d_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/colortemp_prop:]@" type="LINK" />
+                    </d_row0>
+                                                   
+                    <e_row0 active="@[EVAL:not @[ATTR:///properties/intensity_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <e_lb0 expand="False" icon="" prop="" slider="False" text="Intensity" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <intensity_prop expand="False" icon="" prop="intensity_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <e_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/intensity_prop:]@" type="LINK" />
+                    </e_row0>
+                                                   
+                    <f_row0 active="@[EVAL:not @[ATTR:///properties/exposure_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <f_lb0 expand="False" icon="" prop="" slider="False" text="Exposure" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <exposure_prop expand="False" icon="" prop="exposure_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <f_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/exposure_prop:]@" type="LINK" />
+                    </f_row0>
+                                                   
+                    <g_row0 active="@[EVAL:not @[ATTR:///properties/normalize_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <g_lb0 expand="False" icon="" prop="" slider="False" text="Normalize" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <normalize_prop expand="False" icon="" prop="normalize_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <g_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/normalize_prop:]@" type="LINK" />
+                    </g_row0>
+                                                   
+                    <h_row0 active="@[EVAL:not @[ATTR:///properties/specularCont_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <h_lb0 expand="False" icon="" prop="" slider="False" text="Specular" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <specularCont_prop expand="False" icon="" prop="specularCont_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <h_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/specularCont_prop:]@" type="LINK" />
+                    </h_row0>
+                                                   
+                    <i_row0 active="@[EVAL:not @[ATTR:///properties/diffuseCont_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <i_lb0 expand="False" icon="" prop="" slider="False" text="Diffuse" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <diffuseCont_prop expand="False" icon="" prop="diffuseCont_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <i_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/diffuseCont_prop:]@" type="LINK" />
+                    </i_row0>
+                                                   
+                    <j_row0 active="@[EVAL:not @[ATTR:///properties/emitmap_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <j_lb0 expand="False" icon="" prop="" slider="False" text="Emission Map" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <baseColor_prop expand="False" icon="" prop="emitmap_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <j_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/emitmap_prop:]@" type="LINK" />
+                    </j_row0>
+                                                   
+                    <k_row0 active="@[EVAL:not @[ATTR:///properties/lightgroup_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <k_lb0 expand="False" icon="" prop="" slider="False" text="Light Group" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <lightgroup_prop expand="False" icon="" prop="lightgroup_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <k_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/lightgroup_prop:]@" type="LINK" />
+                    </k_row0>
+                                                   
+                    <l_row0 active="@[EVAL:not @[ATTR:///properties/blockers_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <l_lb0 expand="False" icon="" prop="" slider="False" text="Blockers" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <blockers_prop expand="False" icon="" prop="blockers_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <l_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/blockers_prop:]@" type="LINK" />
+                    </l_row0>
+                                                   
+                    <m_row0 active="@[EVAL:not @[ATTR:///properties/coneAngle_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <m_lb0 expand="False" icon="" prop="" slider="False" text="Cone Angle" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <coneAngle_prop expand="False" icon="" prop="coneAngle_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <m_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/coneAngle_prop:]@" type="LINK" />
+                    </m_row0>
+                    
+                    <n_row0 active="@[EVAL:not @[ATTR:///properties/penAngle_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <n_lb0 expand="False" icon="" prop="" slider="False" text="Penumbra Angle" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <penExp_prop expand="False" icon="" prop="penAngle_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <n_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/penAngle_prop:]@" type="LINK" />
+                    </n_row0>
+                                                   
+                    <o_row0 active="@[EVAL:not @[ATTR:///properties/penExp_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <o_lb0 expand="False" icon="" prop="" slider="False" text="Penumbra Exponent" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <penExp_prop expand="False" icon="" prop="penExp_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <o_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/penExp_prop:]@" type="LINK" />
+                    </o_row0>
+                                                   
+                    <p_row0 active="@[EVAL:not @[ATTR:///properties/profMap_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <p_lb0 expand="False" icon="" prop="" slider="False" text="LatLong Emission Map" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <profMap_prop expand="False" icon="" prop="profMap_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <p_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/profMap_prop:]@" type="LINK" />
+                    </p_row0>
+                    
+                    <q_row0 active="@[EVAL:not @[ATTR:///properties/iesMap_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <q_lb0 expand="False" icon="" prop="" slider="False" text="IES emssion Map" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <iesMap_prop expand="False" icon="" prop="iesMap_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <q_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/iesMap_prop:]@" type="LINK" />
+                    </q_row0>
+                    
+                    <r_row0 active="@[EVAL:not @[ATTR:///properties/profRange_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <r_lb0 expand="False" icon="" prop="" slider="False" text="Profile Range" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <profRange_prop expand="False" icon="" prop="profRange_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <r_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/profRange_prop:]@" type="LINK" />
+                    </r_row0>
+                    
+                    <s_row0 active="@[EVAL:not @[ATTR:///properties/distAng_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <s_lb0 expand="False" icon="" prop="" slider="False" text="Distribution Angle" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <distAng_prop expand="False" icon="" prop="distAng_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <s_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/distAng_prop:]@" type="LINK" />
+                    </s_row0>
+                    
+                    <t_row0 active="@[EVAL:not @[ATTR:///properties/angVis_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <t_lb0 expand="False" icon="" prop="" slider="False" text="Angular Visibility" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <angVis_prop expand="False" icon="" prop="angVis_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <t_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/angVis_prop:]@" type="LINK" />
+                    </t_row0>
+                    
+                    <u_row0 active="@[EVAL:not @[ATTR:///properties/shadowColor.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <u_lb0 expand="False" icon="" prop="" slider="False" text="Shadow Color" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <shadowColor expand="False" icon="" prop="shadowColor" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <u_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/shadowColor:]@" type="LINK" />
+                    </u_row0>
+                    
+                    <v_row0 active="@[EVAL:not @[ATTR:///properties/traceShad_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <v_lb0 expand="False" icon="" prop="" slider="False" text="Enable Raytrace Shadow" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <traceShad_prop expand="False" icon="" prop="traceShad_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <v_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/traceShad_prop:]@" type="LINK" />
+                    </v_row0>
+                    
+                    <w_row0 active="@[EVAL:not @[ATTR:///properties/adapShadow_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <w_lb0 expand="False" icon="" prop="" slider="False" text="Adaptive Shadows" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <adapShadow_prop expand="False" icon="" prop="adapShadow_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <w_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/adapShadow_prop:]@" type="LINK" />
+                    </w_row0>
+                    
+                    <x_row0 active="@[EVAL:not @[ATTR:///properties/traceSub_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <x_lb0 expand="False" icon="" prop="" slider="False" text="Trace Subset" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <traceSub_prop expand="False" icon="" prop="traceSub_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <x_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/traceSub_prop:]@" type="LINK" />
+                    </x_row0>
+                    
+                    <y_row0 active="@[EVAL:not @[ATTR:///properties/donttraceSub_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <y_lb0 expand="False" icon="" prop="" slider="False" text="Dont\'t Trace Subset" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <donttraceSub_prop expand="False" icon="" prop="donttraceSub_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <y_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/donttraceSub_prop:]@" type="LINK" />
+                    </y_row0>
+                    
+                    <z_row0 active="@[EVAL:not @[ATTR:///properties/shadowMap_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <z_lb0 expand="False" icon="" prop="" slider="False" text="Shadow Map" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <shadowMap_prop expand="False" icon="" prop="shadowMap_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <z_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/shadowMap_prop:]@" type="LINK" />
+                    </z_row0>
+                    
+                    <aa_row0 active="@[EVAL:not @[ATTR:///properties/shadowJit_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <aa_lb0 expand="False" icon="" prop="" slider="False" text="Sample Base" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <shadowJit_prop expand="False" icon="" prop="shadowJit_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <aa_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/shadowJit_prop:]@" type="LINK" />
+                    </aa_row0>
+                    
+                    <bb_row0 active="@[EVAL:not @[ATTR:///properties/shadowTraceBias_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <bb_lb0 expand="False" icon="" prop="" slider="False" text="Shadow Trace Bias" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <shadowTraceBias_prop expand="False" icon="" prop="shadowTraceBias_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <bb_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/shadowTraceBias_prop:]@" type="LINK" />
+                    </bb_row0>
+                    
+                    <cc_row0 active="@[EVAL:not @[ATTR:///properties/shadowMapBias_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <cc_lb0 expand="False" icon="" prop="" slider="False" text="Shadow Map Bias" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <shadowMapBias_prop expand="False" icon="" prop="shadowMapBias_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <cc_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/shadowMapBias_prop:]@" type="LINK" />
+                    </cc_row0>
+                    
+                    <dd_row0 active="@[EVAL:not @[ATTR:///properties/shadowMapBias2_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <dd_lb0 expand="False" icon="" prop="" slider="False" text="Shadow Map Bias 2" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <shadowMapBias2_prop expand="False" icon="" prop="shadowMapBias2_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <dd_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/shadowMapBias2_prop:]@" type="LINK" />
+                    </dd_row0>
+
+
+                </layout>
+            </PxrAreaLight>
+    
+            
+            <PxrEnvMapLight delete="True" description="Authors: Pixar Renderman\nCopyright: Pixar\nDescription:\n" 
+                       duplicate="True" 
+                       enabled="False" 
+                       filter="LIGHT" 
+                       library="@[SLIB::RIB]@" 
+                       register="True" 
+                       slmeta="@[SLIB::]@PxrEnvMapLight.slmeta" type="LIGHT" windows="LAMP">
+                <rib target="">
+@[DATA:///properties/sl_type:]@ "PxrEnvMapLight" @[EVAL:.current_lightid:]@
+    "string envmap" @[DATA:///properties/envmap_prop:RIB]@
+    "float respectEnvMapRes" @[DATA:///properties/respectRes_prop:RIB]@
+    "string coordsys" @[DATA:///properties/coordsys_prop:RIB]@
+    #"color lightcolor" @[DATA:///properties/procColor_prop:RIB]@
+    "color envtint" @[DATA:///properties/tint_prop:RIB]@
+    "float temperature" @[DATA:///properties/colortemp_prop:RIB]@
+    "float intensity" @[DATA:///properties/intensity_prop:RIB]@
+    "float exposure" @[DATA:///properties/exposure_prop:RIB]@
+    "float localEnvLight" @[DATA:///properties/localMode_prop:RIB]@
+    "color specAmount" @[DATA:///properties/specularCont_prop:RIB]@
+    "color diffAmount" @[DATA:///properties/diffuseCont_prop:RIB]@
+    "string __group" @[DATA:///properties/lightgroup_prop:RIB]@
+    #"shaders[] __boundcoshaders" @[DATA:///properties/blockers_prop:]@
+    "float _radius" @[DATA:///properties/radius_prop:RIB]@
+    "int[2] _resolution" [ @[DATA:///properties/resx_prop:]@ @[DATA:///properties/resy_prop:]@ ]
+    "color shadowColor" @[DATA:///properties/shadowColor:RIB]@
+    "float traceShadows" @[DATA:///properties/traceShad_prop:RIB]@
+    "float adaptiveShadows" [ @[DATA:///properties/adapShadow_prop:]@ ]
+    "string shadowSubset" @[DATA:///properties/traceSub_prop:RIB]@
+    "string shadowExcludeSubset" @[DATA:///properties/donttraceSub_prop:RIB]@
+    "string shadowMap" @[DATA:///properties/shadowMap_prop:RIB]@
+    "float shadowSampleBase" @[DATA:///properties/shadowJit_prop:RIB]@
+    "float shadowTraceBias" @[DATA:///properties/shadowMapBias_prop:RIB]@
+    "float shadowMapBias" @[DATA:///properties/shadowMapBias_prop:RIB]@
+    "float shadowMapBias2" @[DATA:///properties/shadowMapBias2_prop:RIB]@
+
+                </rib>
+                <regexes target="">
+                </regexes>
+                <properties>
+                    
+                    <sl_name default="Light" description="Shader&apos;s name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+                    
+                    <sl_type default="AreaLightSource" description="Choose light type" 
+                            items="[(&apos;AreaLightSource&apos;, &apos;AreaLightSource&apos;, &apos;&apos;)]" 
+                            link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+                    
+                    <envmap_prop default="" description="Environment map to be used for IBL." items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+                    
+                    <respectRes_prop default="False" description="When off (0), we rely on shading rate to govern environment resolution. Otherwise we sample the environment map at the highest resolution in the map." link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="BOOL" />
+                    
+                    <coordsys_prop default="shader" description="Coordinate system of the image-based light." items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+                            
+                    <procColor_prop default="(0.0, 0.0, 0.0)" description="This parameter allows you to use a coshader input for the environment map. Use this as an alternative to an explicit map input. This allows you to use a file node, and manipulate the colors at runtime." items="" link="" max="" maxlen="" min="0.0" precision="" size="" softmax="" softmin="1.0" step="" type="COLOR" />
+                    
+                    <tint_prop default="(1.0, 1.0, 1.0)" description="Tint the environment color by this color." items="" link="" max="1.0" maxlen="" min="0.0" precision="" size="" softmax="1.0" softmin="0.0" step="" type="COLOR" />
+                    
+                    <colortemp_prop default="-1.0" description="Allows you choose the color temperature of the light. Unlike the basic light color this allows you to easily pick plausible light colors based on standard scientific temperature measurements. Typical color temperatures lie in the range 5000 through 8000. When -1, no color temperature correction is applied." items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    
+                    <intensity_prop default="1.0" description="Scale the total energy emitted by the light source." items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    
+                    <exposure_prop default="0.0" description="Specifies the intensity of the area light as a power of 2. Increasing the intensity by 1 will double the energy emitted by the light source. A value of 0 produces an intensity of 1, -1 produces .5." items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    
+                    <localMode_prop default="False" description="If local mode is enabled the light will be treated as a finite environment light, rather than a more traditional infinite environment." link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="BOOL" />
+                    
+                    <specularCont_prop default="(1.0, 1.0, 1.0)" description="Scale the specular contribution of this light." items="" link="" max="1.0" maxlen="" min="0.0" precision="" size="" softmax="1.0" softmin="0.0" step="" type="COLOR" />
+                    
+                    <diffuseCont_prop default="(1.0, 1.0, 1.0)" description="Scale the diffuse contribution of this light." items="" link="" max="1.0" maxlen="" min="0.0" precision="" size="" softmax="1.0" softmin="0.0" step="" type="COLOR" />
+                    
+                    <lightgroup_prop default="" description="The name of the group this light belongs to. The group is a special type of attribute which allows you to provide light category support for geometric area lights, as well as per group AOVs for the lighting on the surface." items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+                    
+                    <blockers_prop default="[]" description="Binds light blockers to the light." items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+         
+                    <radius_prop default="-1" description="Relevant only if there is no &apos;environmentmap&apos; passed to emit() or if the string is &apos;&apos;. This specifies an override on the automatic resolution computation." items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    <resx_prop default="-1" description="Relevant only if there is no &apos;environmentmap&apos; passed to emit() or if the string is &apos;&apos;. This specifies an override on the automatic resolution computation." items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    <resy_prop default="-1" description="Relevant only if there is no &apos;environmentmap&apos; passed to emit() or if the string is &apos;&apos;. This specifies an override on the automatic resolution computation." items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+
+                    <shadowColor default="(0.0, 0.0, 0.0)" description="The color of the shadows cast by emitted light." items="" link="" max="1.0" maxlen="" min="0.0" precision="" size="" softmax="1.0" softmin="0.0" step="" type="COLOR" />
+                    <traceShad_prop default="True" description="Enable raytraced shadows." link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="BOOL" />
+                    <adapShadow_prop default="1.0" description="Adaptively sample the lights shadows. Conservative mode will trace a larger percentage of the shadow rays, which will result in less acceleration, but potentially better quality shadows. Aggressive will trace fewer rays which can result in more significant speedups." 
+                            items="[(&apos;0.0&apos;, &apos;None&apos;, &apos;&apos;), 
+                                    (&apos;1.0&apos;, &apos;Conservative&apos;, &apos;&apos;),
+                                    (&apos;2.0&apos;, &apos;Aggressive&apos;, &apos;&apos;)
+                                     ]" 
+                            link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+                    <traceSub_prop default="" description="Set of geometry to consider for traced shadow intersection." items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+                    <donttraceSub_prop default="" description="Set of geometry to ignore for traced shadow intersection." items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+                    <shadowMap_prop default="" description="Name of the area shadow map." items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+                    <shadowJit_prop default="0.5" description="This parameter controls the &apos;samplebase&apos; parameter for area shadows. If you are having issues with dark lines at the concave junction of polygon faces, lower the value of this parameter." items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    <shadowTraceBias_prop default="-1.0" description="Raytracing bias for shadow computations. -1 uses automatically computed value value." items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    <shadowMapBias_prop default="1.0" description="Area shadow map bias. See documentation on area shadow for more information." items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    <shadowMapBias2_prop default="1.0" description="Second area shadow map bias. See documentation on area shadow for more information." items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+
+                </properties>
+                <layout>
+                    <info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
+                        <sl_name expand="False" icon="" prop="sl_name" slider="False" text="Name" toggle="False" trigger="" type="PROP" />
+                        <sl_type expand="False" icon="" prop="sl_type" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                    </info_row>
+                    
+
+                    <a_row0 active="@[EVAL:not @[ATTR:///properties/envmap_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <a_lb0 expand="False" icon="" prop="" slider="False" text="Environment Map" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <envmap_prop expand="False" icon="" prop="envmap_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <a_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/envmap_prop:]@" type="LINK" />
+                    </a_row0>
+                    
+                    <b_row0 active="@[EVAL:not @[ATTR:///properties/respectRes_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <b_lb0 expand="False" icon="" prop="" slider="False" text="Respect Env. Map Resolution" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <respectRes_prop expand="False" icon="" prop="respectRes_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <b_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/respectRes_prop:]@" type="LINK" />
+                    </b_row0>
+                    
+
+                    <c_row0 active="@[EVAL:not @[ATTR:///properties/coordsys_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <c_lb0 expand="False" icon="" prop="" slider="False" text="Coordinate System" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <coordsys_prop expand="False" icon="" prop="coordsys_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <c_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/coordsys_prop:]@" type="LINK" />
+                    </c_row0>
+                    
+                    <d_row0 active="@[EVAL:not @[ATTR:///properties/procColor_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <d_lb0 expand="False" icon="" prop="" slider="False" text="Procedural Color" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <procColor_prop expand="False" icon="" prop="procColor_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <d_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/procColor_prop:]@" type="LINK" />
+                    </d_row0>
+                    
+                     <d2_row0 active="@[EVAL:not @[ATTR:///properties/tint_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <d2_lb0 expand="False" icon="" prop="" slider="False" text="Tint" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <tint_prop expand="False" icon="" prop="tint_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <d2_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/tint_prop:]@" type="LINK" />
+                    </d2_row0>
+                    
+                    <d3_row0 active="@[EVAL:not @[ATTR:///properties/colortemp_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <d3_lb0 expand="False" icon="" prop="" slider="False" text="Color Temperatur" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <colortemp_prop expand="False" icon="" prop="colortemp_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <d3_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/colortemp_prop:]@" type="LINK" />
+                    </d3_row0>
+                                                   
+                    <e_row0 active="@[EVAL:not @[ATTR:///properties/intensity_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <e_lb0 expand="False" icon="" prop="" slider="False" text="Intensity" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <intensity_prop expand="False" icon="" prop="intensity_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <e_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/intensity_prop:]@" type="LINK" />
+                    </e_row0>
+                                                   
+                    <f_row0 active="@[EVAL:not @[ATTR:///properties/exposure_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <f_lb0 expand="False" icon="" prop="" slider="False" text="Exposure" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <exposure_prop expand="False" icon="" prop="exposure_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <f_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/exposure_prop:]@" type="LINK" />
+                    </f_row0>
+                                                   
+                    <g_row0 active="@[EVAL:not @[ATTR:///properties/localMode_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <g_lb0 expand="False" icon="" prop="" slider="False" text="Local Mode" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <localMode_prop expand="False" icon="" prop="localMode_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <g_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/localMode_prop:]@" type="LINK" />
+                    </g_row0>
+                                                   
+                    <h_row0 active="@[EVAL:not @[ATTR:///properties/specularCont_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <h_lb0 expand="False" icon="" prop="" slider="False" text="Specular" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <specularCont_prop expand="False" icon="" prop="specularCont_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <h_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/specularCont_prop:]@" type="LINK" />
+                    </h_row0>
+                                                   
+                    <i_row0 active="@[EVAL:not @[ATTR:///properties/diffuseCont_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <i_lb0 expand="False" icon="" prop="" slider="False" text="Diffuse" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <diffuseCont_prop expand="False" icon="" prop="diffuseCont_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <i_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/diffuseCont_prop:]@" type="LINK" />
+                    </i_row0>
+                                                   
+                                                   
+                    <k_row0 active="@[EVAL:not @[ATTR:///properties/lightgroup_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <k_lb0 expand="False" icon="" prop="" slider="False" text="Light Group" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <lightgroup_prop expand="False" icon="" prop="lightgroup_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <k_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/lightgroup_prop:]@" type="LINK" />
+                    </k_row0>
+                                                   
+                    <l_row0 active="@[EVAL:not @[ATTR:///properties/blockers_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <l_lb0 expand="False" icon="" prop="" slider="False" text="Blockers" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <blockers_prop expand="False" icon="" prop="blockers_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <l_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/blockers_prop:]@" type="LINK" />
+                    </l_row0>
+                                                   
+                    
+                    <s_row0 active="@[EVAL:not @[ATTR:///properties/radius_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <s_lb0 expand="False" icon="" prop="" slider="False" text="Radius" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <radius_prop expand="False" icon="" prop="radius_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <s_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/radius_prop:]@" type="LINK" />
+                    </s_row0>
+                    
+                    <t_row0 active="@[EVAL:not @[ATTR:///properties/resx_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <t_lb0 expand="False" icon="" prop="" slider="False" text="Resolution X" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <resx_prop expand="False" icon="" prop="resx_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <t_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/resx_prop:]@" type="LINK" />
+                    </t_row0>
+                    
+                     <t2_row0 active="@[EVAL:not @[ATTR:///properties/resy_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <t2_lb0 expand="False" icon="" prop="" slider="False" text="Resolution Y" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <resy_prop expand="False" icon="" prop="resy_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <t2_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/resy_prop:]@" type="LINK" />
+                    </t2_row0>
+                    
+                    <u_row0 active="@[EVAL:not @[ATTR:///properties/shadowColor.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <u_lb0 expand="False" icon="" prop="" slider="False" text="Shadow Color" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <shadowColor expand="False" icon="" prop="shadowColor" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <u_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/shadowColor:]@" type="LINK" />
+                    </u_row0>
+                    
+                    <v_row0 active="@[EVAL:not @[ATTR:///properties/traceShad_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <v_lb0 expand="False" icon="" prop="" slider="False" text="Enable Raytrace Shadow" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <traceShad_prop expand="False" icon="" prop="traceShad_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <v_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/traceShad_prop:]@" type="LINK" />
+                    </v_row0>
+                    
+                    <w_row0 active="@[EVAL:not @[ATTR:///properties/adapShadow_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <w_lb0 expand="False" icon="" prop="" slider="False" text="Adaptive Shadows" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <adapShadow_prop expand="False" icon="" prop="adapShadow_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <w_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/adapShadow_prop:]@" type="LINK" />
+                    </w_row0>
+                    
+                    <x_row0 active="@[EVAL:not @[ATTR:///properties/traceSub_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <x_lb0 expand="False" icon="" prop="" slider="False" text="Trace Subset" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <traceSub_prop expand="False" icon="" prop="traceSub_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <x_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/traceSub_prop:]@" type="LINK" />
+                    </x_row0>
+                    
+                    <y_row0 active="@[EVAL:not @[ATTR:///properties/donttraceSub_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <y_lb0 expand="False" icon="" prop="" slider="False" text="Dont\'t Trace Subset" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <donttraceSub_prop expand="False" icon="" prop="donttraceSub_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <y_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/donttraceSub_prop:]@" type="LINK" />
+                    </y_row0>
+                    
+                    <z_row0 active="@[EVAL:not @[ATTR:///properties/shadowMap_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <z_lb0 expand="False" icon="" prop="" slider="False" text="Shadow Map" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <shadowMap_prop expand="False" icon="" prop="shadowMap_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <z_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/shadowMap_prop:]@" type="LINK" />
+                    </z_row0>
+                    
+                    <aa_row0 active="@[EVAL:not @[ATTR:///properties/shadowJit_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <aa_lb0 expand="False" icon="" prop="" slider="False" text="Sample Base" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <shadowJit_prop expand="False" icon="" prop="shadowJit_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <aa_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/shadowJit_prop:]@" type="LINK" />
+                    </aa_row0>
+                    
+                    <bb_row0 active="@[EVAL:not @[ATTR:///properties/shadowTraceBias_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <bb_lb0 expand="False" icon="" prop="" slider="False" text="Shadow Trace Bias" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <shadowTraceBias_prop expand="False" icon="" prop="shadowTraceBias_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <bb_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/shadowTraceBias_prop:]@" type="LINK" />
+                    </bb_row0>
+                    
+                    <cc_row0 active="@[EVAL:not @[ATTR:///properties/shadowMapBias_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <cc_lb0 expand="False" icon="" prop="" slider="False" text="Shadow Map Bias" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <shadowMapBias_prop expand="False" icon="" prop="shadowMapBias_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <cc_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/shadowMapBias_prop:]@" type="LINK" />
+                    </cc_row0>
+                    
+                    <dd_row0 active="@[EVAL:not @[ATTR:///properties/shadowMapBias2_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <dd_lb0 expand="False" icon="" prop="" slider="False" text="Shadow Map Bias 2" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <shadowMapBias2_prop expand="False" icon="" prop="shadowMapBias2_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <dd_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/shadowMapBias2_prop:]@" type="LINK" />
+                    </dd_row0>
+
+
+                </layout>
+            </PxrEnvMapLight>
+    
+            
+    </shader_panels>
+
+    <utility_panels filter="UTILITY">
+    </utility_panels>
+
+    <command_panels filter="COMMAND">
+    </command_panels>
+</Library_RendermanLightRIS>
