@@ -1,0 +1,146 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Library_RendermanSurfaceRISGlass build="True" compile="True" 
+                 dependecies="" 
+                 enabled="True" 
+                 filepath="Library_RendermanSurfaceRISGlass.rmp" 
+                 filter="LIBRARY_SURFACE" 
+                 library="" version="0.1">
+                 
+
+	<python_scripts>
+	</python_scripts>
+
+	<shader_sources>
+    </shader_sources>
+
+
+
+
+<shader_panels filter="SHADER">
+            <PxrGlass delete="True" description="Authors:\nCopyright:\nDescription:\n" 
+                       duplicate="True" 
+                       enabled="False" 
+                       filter="SURFACE" 
+                       library="@[SLIB::RIB]@" 
+                       register="True" 
+                       slmeta="@[SLIB::]@PxrGlass.slmeta" type="SURFACE" windows="MATERIAL">
+                <rib target="">
+@[DATA:///properties/sl_type:]@ "PxrGlass" @[DATA:///properties/sl_name:STR]@
+    
+    "float ior" @[DATA:///properties/ior_prop:RIB]@
+    "float roughness" @[DATA:///properties/roughness_prop:RIB]@
+    "color reflectionColor" @[DATA:///properties/reflectionColor_prop:RIB]@
+    "float reflectionGain" @[DATA:///properties/reflectionGain_prop:RIB]@
+    "color transmissionColor" @[DATA:///properties/transmissionColor_prop:RIB]@
+    "float transmissionGain" @[DATA:///properties/transmissionGain_prop:RIB]@
+    "float absorptionGain" @[DATA:///properties/absorptionGain_prop:RIB]@
+    "color absorptionColor" @[DATA:///properties/absorptionColor_prop:RIB]@
+    "float lightSubset" @[DATA:///properties/lightSubset_prop:RIB]@
+
+                </rib>
+                <regexes target="">
+                </regexes>
+                <properties>
+                    <sl_name default="\@[EVAL:.data_name:\]@-bxdf" description="Bxdf&apos;s name" items="" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="STRING" />
+                    <sl_type default="Bxdf" description="Choose shader type" items="[(&apos;Bxdf&apos;, &apos;Bxdf&apos;, &apos;&apos;)]" link="" max="" maxlen="" min="" precision="" size="" softmax="" softmin="" step="" type="ENUM" />
+                    <ior_prop default="1.5" description="" items="" link="" max="4.0" maxlen="" min="1.0" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    <roughness_prop default="0.0" description="" items="" link="" max="1.0" maxlen="" min="0.0" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    <reflectionColor_prop default="(0.5, 0.5, 0.5)" description="" items="" link="" max="1.0" maxlen="" min="0.0" precision="" size="" softmax="1.0" softmin="0.0" step="" type="COLOR" />
+                    <reflectionGain_prop default="1.0" description="" items="" link="" max="1.0" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    <transmissionColor_prop default="(0.8, 0.8, 0.8)" description="" items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="COLOR" />
+                    <transmissionGain_prop default="1.0" description="" items="" link="" max="1" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    <absorptionGain_prop default="0.0" description="" items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                    <absorptionColor_prop default="(1.0, 1.0, 1.0)" description="" items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="COLOR" />
+                    <lightSubset_prop default="0" description="" items="" link="" max="" maxlen="" min="0" precision="" size="" softmax="" softmin="" step="" type="FLOAT" />
+                </properties>
+                <layout>
+                    <info_row active="True" align="True" box="False" enabled="True" percent="0.8" type="SPLIT" visible="True">
+                        <sl_name expand="False" icon="" prop="sl_name" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        <sl_type expand="False" icon="" prop="sl_type" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                    </info_row>
+                    
+
+                    <iC_row0 active="@[EVAL:not @[ATTR:///properties/ior_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <iC_lb0 expand="False" icon="" prop="" slider="False" text="IOR" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <ior_prop expand="False" icon="" prop="ior_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <iC_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/ior_prop:]@" type="LINK" />
+                    </iC_row0>
+                    
+                    <roughC_row0 active="@[EVAL:not @[ATTR:///properties/roughness_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <emitC_lb0 expand="False" icon="" prop="" slider="False" text="Roughness" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <roughness_prop expand="False" icon="" prop="roughness_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <emitC_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/roughness_prop:]@" type="LINK" />
+                    </roughC_row0>
+                    
+                    <rcC_row0 active="@[EVAL:not @[ATTR:///properties/reflectionColor_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <rcC_lb0 expand="False" icon="" prop="" slider="False" text="Reflection Color" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <reflectionColor_prop expand="False" icon="" prop="reflectionColor_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <rcC_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/reflectionColor_prop:]@" type="LINK" />
+                    </rcC_row0>
+                    
+                    <rg_row0 active="@[EVAL:not @[ATTR:///properties/reflectionGain_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <rg_lb0 expand="False" icon="" prop="" slider="False" text="Reflection Gain" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <reflectionGain_prop expand="False" icon="" prop="reflectionGain_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <rg_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/reflectionGain_prop:]@" type="LINK" />
+                    </rg_row0>
+                    
+					<tc_row0 active="@[EVAL:not @[ATTR:///properties/transmissionColor_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <tc_lb0 expand="False" icon="" prop="" slider="False" text="Transmission Color" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <transmissionColor_prop expand="False" icon="" prop="transmissionColor_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <tc_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/transmissionColor_prop:]@" type="LINK" />
+                    </tc_row0>
+					
+					<tg_row0 active="@[EVAL:not @[ATTR:///properties/transmissionGain_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <tg_lb0 expand="False" icon="" prop="" slider="False" text="Transmission Gain" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <transmissionGain_prop expand="False" icon="" prop="transmissionGain_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <tg_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/transmissionGain_prop:]@" type="LINK" />
+                    </tg_row0>
+					
+					<ag_row0 active="@[EVAL:not @[ATTR:///properties/absorptionGain_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <ag_lb0 expand="False" icon="" prop="" slider="False" text="Absorption Gain" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <absorptionGain_prop expand="False" icon="" prop="absorptionGain_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <ag_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/absorptionGain_prop:]@" type="LINK" />
+                    </ag_row0>
+					
+					<ac_row0 active="@[EVAL:not @[ATTR:///properties/absorptionColor_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <ac_lb0 expand="False" icon="" prop="" slider="False" text="Absorption Color" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <absorptionColor_prop expand="False" icon="" prop="absorptionColor_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <ac_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/absorptionColor_prop:]@" type="LINK" />
+                    </ac_row0>
+                    
+					<ls_row0 active="@[EVAL:not @[ATTR:///properties/lightSubset_prop.link:STR]@:]@" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
+                        <ls_lb0 expand="False" icon="" prop="" slider="False" text="Light Subset" toggle="False" trigger="" type="LABEL" />
+                        <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
+                            <lightSubset_prop expand="False" icon="" prop="lightSubset_prop" slider="False" text="" toggle="False" trigger="" type="PROP" />
+                        </prop_col>
+                        <ls_op0 expand="False" icon="" prop="" slider="False" text="" toggle="False" trigger="@[PATH:///properties/lightSubset_prop:]@" type="LINK" />
+                    </ls_row0>
+					
+                </layout>
+            </PxrGlass>
+    </shader_panels>
+
+
+
+    <utility_panels filter="UTILITY">
+    </utility_panels>
+
+    <command_panels filter="COMMAND">
+    </command_panels>
+</Library_RendermanSurfaceRISGlass>
