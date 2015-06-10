@@ -33,7 +33,7 @@
             
             <layout>
                     <b_row0 active="True" align="False" box="False" enabled="True" percent="" type="ROW" visible="True">
-                        <b_lb0 expand="False" icon="" prop="" slider="False" text="Additional RIB Code Beegin" toggle="False" trigger="" type="LABEL" />
+                        <b_lb0 expand="False" icon="" prop="" slider="False" text="Additional RIB Code Begin" toggle="False" trigger="" type="LABEL" />
                         <prop_col active="True" align="False" box="False" enabled="True" percent="" type="COLUMN" visible="True">
                             <hookStringBegin expand="False" icon="" prop="hookStringBegin" slider="False" text="" toggle="False" trigger="" type="PROP" />
                         </prop_col>
