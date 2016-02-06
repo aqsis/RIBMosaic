@@ -99,7 +99,7 @@ class Ribify():
         self.write_text('[', indent)
 
 
-    def _write_rib_array_item(self, item):
+    def _write_rib_array_item(self, item, debug=False):
 
         # if on the first item of the line then indent
         if self.itemcount == 0:
@@ -109,6 +109,8 @@ class Ribify():
             #  between items don't use indentation
             self.write_text(' ', False)
         # output the item in the list, indent if first item
+        if(debug):
+          print("write: ",item, "file:" , type(self.pointer_file))
         self.write_text(str(item), self.itemcount == 0)
         self.itemcount += 1
 
@@ -121,9 +123,9 @@ class Ribify():
         self.write_text('\n', False)
         self.write_text(']\n')
 
-    def _write_rib_array_list(self, vect):
+    def _write_rib_array_list(self, vect, debug=False):
         for v in vect:
-            self._write_rib_array_item(v)
+            self._write_rib_array_item(v,debug)
 
     def _export_faces(self, mesh):
         self.vertcount = 0
@@ -144,7 +146,7 @@ class Ribify():
         self._start_rib_array(10)
         for p in mesh.polygons:
             # keep track of the highest vertex index used
-            print("leng vertices: " , len(p.vertices))
+            #print("leng vertices: " , len(p.vertices))
             self.vertcount = max(self.vertcount,max(p.vertices))
             self._write_rib_array_list(p.vertices)
         self._end_rib_array()
@@ -229,33 +231,32 @@ class Ribify():
         self._end_rib_array()
 
 
-    def _export_uvs(self, primvar_rib, mesh):
-        try:
-            #FIXME should be exporting all the uv layers not just the active
-            uv_layer = mesh.uv_textures.active.data
-        except:
-            uv_layer = None
+    def _export_uvs(self, primvar_rib, mesh, name=""):
 
-        if uv_layer:
-            self.write_text(primvar_rib)
-            self._start_rib_array(1)
-            for fi, tf in enumerate(uv_layer):
-                # "1.0 -" because
-                # renderman? expects UVs flipped
-                # vertically from blender
-                # all uv data for a face must be on one line
-                uv_str = ""
-                uv_str += str(tf.uv1[0])
-                uv_str += " " + str(1.0 - tf.uv1[1])
-                uv_str += " " + str(tf.uv2[0])
-                uv_str += " " + str(1.0 - tf.uv2[1])
-                uv_str += " " + str(tf.uv3[0])
-                uv_str += " " + str(1.0 - tf.uv3[1])
-                if len(mesh.faces[fi].vertices) == 4:
-                    uv_str += " " + str(tf.uv4[0])
-                    uv_str += " " + str(1.0 - tf.uv4[1])
-                self._write_rib_array_item(uv_str)
-            self._end_rib_array()
+        uvs = []
+        if name == "":
+            uv_loop_layer = mesh.uv_layers.active
+        else:
+            # assuming uv loop layers and uv textures share identical indices
+            idx = mesh.uv_textures.keys().index(name)
+            uv_loop_layer = mesh.uv_layers[idx]
+
+        if uv_loop_layer is None:
+            return None
+
+        for uvloop in uv_loop_layer.data:
+            uvs.append(uvloop.uv.x)
+            uvs.append(1.0 - uvloop.uv.y)
+            # renderman expects UVs flipped vertically from blender
+        
+        print("Creating: uvs, count:",len(uvs), uvs)
+        
+        self.write_text(primvar_rib)
+        
+        self._start_rib_array()
+        uvs_str = " ".join([str(uv) for uv in uvs])
+        self._write_rib_array_list(uvs)
+        self._end_rib_array()
 
     # ### Public methods
 
@@ -276,9 +277,9 @@ class Ribify():
                     self.pointer_file.write(text.encode())
                 else:
                     self.pointer_file.write(text)
-            #else:
-            #    raise RibmosaicError("Archive already closed,"
-            #                         "cannot write text")
+            else:
+                raise RibmosaicError("Archive already closed,"
+                                     "cannot write text")
 
     def inc_indent(self):
         self.indent += 1

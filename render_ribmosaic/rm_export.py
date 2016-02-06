@@ -675,6 +675,7 @@ class ExporterManager():
         shader_library = Pipeline of shader library to process exclusively
         """
         if DEBUG_PRINT:
+            print("======================================")
             print("ExportManager.export_shaders")
 
         # Setup generic export context object
@@ -782,9 +783,11 @@ class ExporterManager():
                     if info:
                         self.build_shader_info_commands(ec)
 
-
         del ec
-
+        
+        if DEBUG_PRINT:
+            print("======================================")
+        
     def export_textures(self, render_object=None):
         """...
 
@@ -1110,9 +1113,7 @@ class ExporterArchive(rm_context.ExportContext):
         execute = Create archive with executable permissions (True/False)
         mode = File 'r', 'a', 'w' open mode (gzipped is always binary mode)
         """
-        if DEBUG_PRINT:
-            print("ExporterArchive.open_archive()")
-
+        
         if gzipped is not None:
             self.is_gzip = gzipped
 
@@ -1120,11 +1121,7 @@ class ExporterArchive(rm_context.ExportContext):
             self.is_exec = execute
 
         if self.archive_name:
-            print("Archive Name:", self.archive_name)
             filepath = self.archive_path + self.archive_name
-            
-            if DEBUG_PRINT:
-                print("open archive path: %s" % filepath)
             
             try:
                 if self.is_gzip:
@@ -1143,9 +1140,15 @@ class ExporterArchive(rm_context.ExportContext):
                 raise rm_error.RibmosaicError(
                         "Could not open archive \"" + filepath +
                         "\" for '" + mode + "'", sys.exc_info())
+            
+            if DEBUG_PRINT:
+                print("opened new rib archive at %s" % filepath)
+            
         else:
             raise rm_error.RibmosaicError(
                     "Archive's path and name must be specified")
+        
+       
 
     def close_archive(self):
         """Close archive object for writing and apply regex objects"""
@@ -1158,6 +1161,9 @@ class ExporterArchive(rm_context.ExportContext):
         if self.is_root:
             # Close down any archive pointers
             if self._pointer_file:
+              
+                if DEBUG_PRINT:
+                    print("close archive at: " , self._pointer_file.name)
                 try:
                     self._pointer_file.close()
                     self._pointer_file = None
@@ -1171,6 +1177,7 @@ class ExporterArchive(rm_context.ExportContext):
                         # Get text from archive
                         self.open_archive(mode='r')
                         text = self._pointer_file.read()
+                        filePath = self._pointer_file.name
                         self._pointer_file.close()
 
                         # Get each regexes element
@@ -1187,7 +1194,11 @@ class ExporterArchive(rm_context.ExportContext):
                                             regpath, "replace", True, "")
                                 matches = rm.pipeline_manager.get_attr(self,
                                             regpath, "matches", True, "0")
-
+                                            
+                                if DEBUG_PRINT:
+                                    print("applying regex to file at %s with:" % filePath )
+                                    print("\tpattern %s, replace: %s, matches: %s ", (regex, replace, matches))
+  
                                 # If gzipped setup binary regex
                                 if self.is_gzip:
                                     regex = bytes(regex.encode())
@@ -1199,10 +1210,12 @@ class ExporterArchive(rm_context.ExportContext):
 
                         # Write text back to archive
                         self.open_archive(mode='w')
+                        
+                        if DEBUG_PRINT:
+                            print("writing regex replacements back to file at" % self._pointer_file.name )
+                            
                         self.write_text(text)
                         self._pointer_file.close()
-                        #if DEBUG_PRINT:
-                            #print(text)
                         self._pointer_file = None
                     except:
                         rm_error.RibmosaicError(
@@ -1261,12 +1274,12 @@ class ExporterArchive(rm_context.ExportContext):
 
         target = rm.pipeline_manager.get_attr(self, xmlpath, "target", False)
         
-        if DEBUG_PRINT:
-            print("target: ", target)
+        #if DEBUG_PRINT:
+            #print("target: ", target)
             
         for t in self.list_targets(target):
-            if DEBUG_PRINT:
-                print("target: ", target)
+            #if DEBUG_PRINT:
+                #print("target: ", target)
             if t[0]:
                 self.target_path = t[0]
 
@@ -1275,8 +1288,8 @@ class ExporterArchive(rm_context.ExportContext):
 
             text = rm.pipeline_manager.get_text(self, xmlpath)
             
-            if DEBUG_PRINT:
-                print("text: ", text)
+            #if DEBUG_PRINT:
+                #print("text: ", text)
                 
             self.write_text(text)
 
@@ -1328,8 +1341,9 @@ class ExporterArchive(rm_context.ExportContext):
         else:
             matches = [("", "")]
 
-        if DEBUG_PRINT:
-            print("Matches: " , matches)
+        #if DEBUG_PRINT:
+            #print("Matches: " , matches)
+            
         return matches
 
     def add_regexes(self, xmlpath):
@@ -1407,19 +1421,13 @@ class ExporterArchive(rm_context.ExportContext):
                        INLINE, READARCHIVE, NOEXPORT, UNREADARCHIVE, INSTANCE,
                        DELAYEDARCHIVE, UNREADARCHIVE
         """
-        
-        if DEBUG_PRINT:
-            print("ExportArchive.open_rib_archive()")
-        
+
         # determine what type of export to do
-        archive_mode = getattr(self.pointer_datablock, "ribmosaic_rib_archive",
-            'DEFAULT')
+        archive_mode = getattr(self.pointer_datablock, "ribmosaic_rib_archive", 'DEFAULT')
     
 
         if DEBUG_PRINT:
             print("Export mode: ", archive_mode)
-            
-        if DEBUG_PRINT:
             print("Data Type: " , self.data_type)
             
         # for now just testing inline and readarchive
@@ -1460,12 +1468,9 @@ class ExporterArchive(rm_context.ExportContext):
                 # since in own archive, start indentation at the left margin
                 self.current_indent = 0
                 
-                if DEBUG_PRINT:
-                    print("open new rib archive with name: %s " % self.archive_name)
-                
             else:
                 if DEBUG_PRINT:
-                    print("archive with name: %s exists!" % self.archive_name)
+                    print("rib archive with name: %s exists!" % self.archive_name)
                 self._pointer_file = None
         elif archive_mode == 'NOEXPORT':
             self._pointer_file = None
@@ -1478,32 +1483,33 @@ class ExporterArchive(rm_context.ExportContext):
         return = True if cache did not exist and cache file is set to write
         """
         
-
         # all caches are placed in the TMP directory
         cache_path = rm.export_manager.make_export_path('TMP') + os.sep
-        
-        if DEBUG_PRINT:
-            print("ExporterArchive.open_cache() at % s" % cache_path)
         
         cache_name = self.data_name + '_' + self._archive_key + '.rib'
         # if cache already exists then open cache for reading only else open
         # for writing new cache
+        
 
         if self.file_exists(cache_name, cache_path):
             mode = 'r'
         else:
             mode = 'w'
-
-        self._pointer_cache = open(cache_path + cache_name, mode)
-
+        filePath = cache_path + cache_name
+        
+        self._pointer_cache = open(filePath, mode)
+        
+        if DEBUG_PRINT:
+            print("opened cache at %s" % filePath, " file exists: ", mode == 'r')
+            
         return mode == 'w'
 
     def close_cache(self):
 
-        if DEBUG_PRINT:
-            print("ExporterArchive.close_cache()")
         # Close down any cache pointers
         if self._pointer_cache:
+            if DEBUG_PRINT:
+               print("close cache file at ", self._pointer_cache.name)
             self._pointer_cache.close()
             self._pointer_cache = None
 
@@ -2131,14 +2137,14 @@ class ExportWorld(ExporterArchive):
 
         world_utilities = self.build_export_utilities_list('WORLD')
 
-
         scene = self.get_scene()
 
         if scene.ribmosaic_use_world:
             self.riWorldBegin()
-
+        
+      
         self.export_shaders('WORLD')
-
+        
         for p in world_utilities:
             p.current_indent = self.current_indent
             p.build_code("begin")
@@ -2148,14 +2154,17 @@ class ExportWorld(ExporterArchive):
         # light, camera, mesh, empty
         
         objects, lights, cameras = get_renderables(scene)
+        
         if DEBUG_PRINT:
+            print("======================================")
             print("Objects to export:")
-            print("Objects: ", [o.name for o in objects])
-            print("Lights: ", [o.name for o in lights])
-            print("Cameras: ", [o.name for o in cameras])
+            print("\tObjects: ", [o.name for o in objects])
+            print("\tLights: ", [o.name for o in lights])
+            print("\tCameras: ", [o.name for o in cameras])
+            print("======================================")
             
-        # first export lights to rib
-        self._export_lights(lights)
+        ## first export lights to rib
+        #self._export_lights(lights)
 
         # export all the objects to RIB
         self._export_objects(objects)
@@ -2665,7 +2674,7 @@ class ExportMeshdata(ExporterArchive):
             return False
 
     def _make_submesh_name(self, material_idx):
-        return self.data_name + '_m'  + str(material_idx) + '_GEO.rib'
+        return self.data_name + '_m'  + str(material_idx) + '-GEO.rib'
 
     def _open_submesh_file(self, material_idx, mode):
         """Open a submesh rib file associated with a material index
@@ -2685,20 +2694,29 @@ class ExportMeshdata(ExporterArchive):
         # if submesh is to be read then make sure it exists first
         if mode == 'r':
             if self.file_exists(file_name, geo_path):
-                self._pointer_file = open(geo_path + file_name, mode)
+                self._pointer_file = open(geo_path + file_name, mode)  
             else:
                 self._pointer_file = None
         else:
             self._pointer_file = open(geo_path + file_name, mode)
 
+        if DEBUG_PRINT:
+            if self._pointer_file is not None:
+              print("opened new submesh file at %s" % self._pointer_file.name )
+        
         return self._pointer_file is not None
 
     def _close_submesh_file(self):
         if self._pointer_file:
+            if DEBUG_PRINT:
+              print("close new submesh file at %s" % self._pointer_file.name )
             self._pointer_file.close()
+            
         self._pointer_file = self.old_pointer_file
 
     def _copy_submesh_file(self, material_idx):
+      
+        
         if self._pointer_file and self._open_submesh_file(material_idx, 'r'):
             # parent file pointer is in self.old_pointer_file
             # submesh file pointer is in self._pointer_file
@@ -2706,6 +2724,8 @@ class ExportMeshdata(ExporterArchive):
             submesh_pointer = self._pointer_file
             self._pointer_file = self.old_pointer_file
             # copy submesh file contents into parent rib file
+            if DEBUG_PRINT:
+                print("copy submesh file at %s ---> %s" % (submesh_pointer.name,self._pointer_file.name) )
             for l in submesh_pointer:
                 self.write_text(l)
             submesh_pointer.close()
@@ -2720,7 +2740,8 @@ class ExportMeshdata(ExporterArchive):
         """
         if DEBUG_PRINT:
             print("ExportMeshdata._ribify_cache")
-
+        
+        
         # all submesh caches are placed in the GEO directory
         self._open_submesh_file(material_idx, 'w')
         # only build rib if file pointer exists and cache can be read
@@ -2809,7 +2830,7 @@ class ExportMeshdata(ExporterArchive):
 
     def export_geometry_cache(self):
         if DEBUG_PRINT:
-            print("ExportObMeshdata.export_geometry_cache")
+            print("ExportMeshdata.export_geometry_cache")
         if self._cache_mesh():
             # export meshes for each material index used in mesh faces
             
@@ -2838,7 +2859,7 @@ class ExportMeshdata(ExporterArchive):
     def export_rib(self, material_index):
         
         if DEBUG_PRINT:
-            print('ExportMeshData.export_rib()')
+            print('ExportMeshData.export_rib() for materialIdx: ', material_index)
             
         # determine what type of object data needs to be exported
         if self.blender_object.type in ('MESH', 'EMPTY','FONT'):

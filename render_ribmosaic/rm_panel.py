@@ -52,7 +52,7 @@
 # END BLOCKS
 # #############################################################################
 
-import os
+import os, datetime
 import bpy
 
 
@@ -272,7 +272,9 @@ class RibmosaicRender(bpy.types.RenderEngine):
             c = scene.frame_current
             i = scene.frame_step
             s = scene.frame_start
-            
+            print("==================================RIB Mosaic Rendering =================================")
+            print("========================================================================================")
+            print("========== Time: %s " % datetime.datetime.now().time())
             print("Export Frame: ", rm.export_manager.export_frame)
             # Only prepare export if on start frame or not in a frame sequence
             if c == s or not ((c - i) == rm.export_manager.export_frame):
@@ -335,6 +337,9 @@ class RibmosaicRender(bpy.types.RenderEngine):
         except rm_error.RibmosaicError as err:
             self.update_stats("", rmv + ": Process terminated")
             err.ReportError()
+            
+        print("========================================================================================")
+        print("========================================================================================")
 
 
 class RibmosaicPropertiesPanel(rm_context.ExportContext):

@@ -196,7 +196,7 @@ class PipelineLink(rm_context.ExportContext):
             # join all strings together and inclose between brackets [ ]
             return bracketS + delim.join(l) + bracketE;
             
-        print("Resolve path:", self.pipeline_link)
+        #print("Resolve path:", self.pipeline_link)
         
         if "@[" in self.pipeline_link:
             link = self.pipeline_link.replace("@[", "").replace("]@", "")
@@ -425,7 +425,7 @@ class PipelineLink(rm_context.ExportContext):
         else:
             text = str(text)
             
-        print("Resolved: " , text, type(text))
+        #print("Resolved: " , text, type(text))
         return text
 
     # #### Public methods

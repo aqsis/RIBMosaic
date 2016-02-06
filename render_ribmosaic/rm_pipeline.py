@@ -1084,10 +1084,10 @@ class PipelineManager():
 
             parent = self.get_element(parentpath)
 
-            if DEBUG_PRINT:
-                print("parentpath: ", parentpath)
-                print("parent: ", parent)
-                print("element: ", element)
+            #if DEBUG_PRINT:
+                #print("parentpath: ", parentpath)
+                #print("parent: ", parent)
+                #print("element: ", element)
 
             # Retrieve filepath attribute for return if exists
             if element is not None and "filepath" in element.attrib:
@@ -2446,7 +2446,6 @@ class PipelineManager():
             raise rm_error.RibmosaicError("PipelineManager.get_text: " + \
                                           "Invalid path syntax for " + xmlpath)
         
-        print("element: ", element)
             
         if element is None:
             segs = xmlpath.split("/")

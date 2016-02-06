@@ -370,7 +370,7 @@ class ExportContext():
         #links = eval("[" + q + t[1:-1].replace("\@", q + "@" ).replace("@[", q + ", [" + q).replace("]@", q + "], " + q) + q + "]")
         links = makeLinkHierachy(text)
         
-        print("links:",links)
+        #print("links:",links)
         return walk_links(links)
 
     def _panel_enabled(self, do_filter=True, do_pass_filter=False):
