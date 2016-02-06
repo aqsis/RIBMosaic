@@ -132,7 +132,7 @@ class Ribify():
         self.materials_used = []
         self.inc_indent()
         # output the number of vertices for each face
-        self._start_rib_array(10)
+        self._start_rib_array(1)
         for p in mesh.polygons:
             self._write_rib_array_item(p.loop_total)
 
@@ -143,12 +143,14 @@ class Ribify():
         self._end_rib_array()
 
         # output the vertex index for each face corner
-        self._start_rib_array(10)
+        # all vertex indices per face need to be on one line 
+        # --> due to submesh cache ( ExportMeshdata._ribify_cache )
+        
+        self._start_rib_array(1)
         for p in mesh.polygons:
             # keep track of the highest vertex index used
-            #print("leng vertices: " , len(p.vertices))
             self.vertcount = max(self.vertcount,max(p.vertices))
-            self._write_rib_array_list(p.vertices)
+            self._write_rib_array_item(" ".join([str(v) for v in p.vertices]))
         self._end_rib_array()
 
     def _export_creases(self, mesh):
@@ -234,28 +236,38 @@ class Ribify():
     def _export_uvs(self, primvar_rib, mesh, name=""):
 
         uvs = []
+        
+        # uv_loop_layer is of type MeshUVLoopLayer
+        
         if name == "":
-            uv_loop_layer = mesh.uv_layers.active
+            uv_loop_layer = mesh.uv_layers.active  
         else:
             # assuming uv loop layers and uv textures share identical indices
             idx = mesh.uv_textures.keys().index(name)
-            uv_loop_layer = mesh.uv_layers[idx]
+            uv_loop_layer = mesh.uv_layers[idx] 
 
         if uv_loop_layer is None:
             return None
-
-        for uvloop in uv_loop_layer.data:
-            uvs.append(uvloop.uv.x)
-            uvs.append(1.0 - uvloop.uv.y)
-            # renderman expects UVs flipped vertically from blender
         
-        print("Creating: uvs, count:",len(uvs), uvs)
+        # get all uvs for each polygon
+        for poly in mesh.polygons:
+            poly_uvs = []
+            for loop_index in poly.loop_indices:
+                poly_uvs.append(       uv_loop_layer.data[loop_index].uv.x )
+                poly_uvs.append( 1.0 - uv_loop_layer.data[loop_index].uv.y )
+                ## renderman expects UVs flipped vertically from blender
+            uvs.append(poly_uvs)  
         
+        print("Creating: uvs, poly count:",len(uvs), uvs)
+        
+        # write rib
         self.write_text(primvar_rib)
+        self._start_rib_array(1)
+        # all uv data for a face must be on one line
+        for polyuv in uvs:
+            polyuv_str = " ".join([str(v) for v in polyuv]) #     8 values "x y x y x y x y" for quad polygons
+            self._write_rib_array_item(polyuv_str)
         
-        self._start_rib_array()
-        uvs_str = " ".join([str(uv) for uv in uvs])
-        self._write_rib_array_list(uvs)
         self._end_rib_array()
 
     # ### Public methods

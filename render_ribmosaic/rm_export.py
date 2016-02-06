@@ -1062,8 +1062,8 @@ class ExporterArchive(rm_context.ExportContext):
                                         self._queque_priority)
             self._pointer_file = getattr(export_object, "_pointer_file",
                                         self._pointer_file)
-            #self._pointer_cache = getattr(export_object, "_pointer_cache",
-            #                            self._pointer_cache)
+            self._pointer_cache = getattr(export_object, "_pointer_cache",
+                                        self._pointer_cache)
             self._archive_regexes = getattr(export_object, "_archive_regexes",
                                         self._archive_regexes)
             self._target_regexes = getattr(export_object, "_target_regexes",
@@ -2164,7 +2164,7 @@ class ExportWorld(ExporterArchive):
             print("======================================")
             
         ## first export lights to rib
-        #self._export_lights(lights)
+        self._export_lights(lights)
 
         # export all the objects to RIB
         self._export_objects(objects)
@@ -2702,7 +2702,7 @@ class ExportMeshdata(ExporterArchive):
 
         if DEBUG_PRINT:
             if self._pointer_file is not None:
-              print("opened new submesh file at %s" % self._pointer_file.name )
+              print("opened new submesh file at %s for material idx %s" % (self._pointer_file.name,material_idx) )
         
         return self._pointer_file is not None
 
@@ -2743,6 +2743,11 @@ class ExportMeshdata(ExporterArchive):
         
         
         # all submesh caches are placed in the GEO directory
+        
+        # TODO this is ugly, since the code below copies from the cached file
+        # assuming that all stuff is written correctly, all vertex indices on one line > rm_ribigy.py
+        # all uv per face on one line and so on, this is not good code!
+        
         self._open_submesh_file(material_idx, 'w')
         # only build rib if file pointer exists and cache can be read
         # most of this codes comes from RibMosaic Beta-0.4.7 for Blender
@@ -2754,8 +2759,7 @@ class ExportMeshdata(ExporterArchive):
             # for unused materials
             if ("PointsPolygons" in firstLine):
                 # List all faces using current material
-                solids = [p for p in self.mesh_exportdata.polygons if \
-                    p.material_index == material_idx]
+                solids = [p for p in self.mesh_exportdata.polygons if p.material_index == material_idx]
                 # make a List of used face indices
                 faces = [p.index for p in solids]
                 # Find highest used vert index
@@ -2765,8 +2769,7 @@ class ExportMeshdata(ExporterArchive):
                 fIndex  = 0
                 vIndex  = 0
                 for l in self._pointer_cache:
-                    if ("uniform" in l or "facevarying" in l or
-                      "facevertex" in l):
+                    if ("uniform" in l or "facevarying" in l or "facevertex" in l):
                         self.write_text(l)
                         perFace = 1
                     elif ("[" in l):
