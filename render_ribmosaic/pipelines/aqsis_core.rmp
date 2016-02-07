@@ -60,11 +60,30 @@ Display "+@[EVAL:.pass_output:]@" "exr" "float _z" "string layername" "RenderLay
             <layout>
             </layout>
         </Multi_Display>
+        <ZFile_Display delete="False" description="" duplicate="False" enabled="False" filter="" register="True" type="DISPLAY" windows="RENDER">
+            <read target="">
+            </read>
+            <begin target="">
+Display "+@[EVAL:.pass_output:]@" "zfile" "z"
+Hider "hidden" "depthfilter" "midpoint"
+Hider "hidden" "jitter" [ 0 ]
+
+            </begin>
+            <end target="">
+MakeShadow "@[EVAL:.pass_output:]@" "@[EVAL:.pass_output:]@.tx"
+
+            </end>
+            <regexes target="">
+            </regexes>
+            <properties>
+            </properties>
+            <layout>
+            </layout>
+        </ZFile_Display>
         <Options delete="False" description="Aqsis render Options" duplicate="False" enabled="True" filter="" register="True" type="OPTION" windows="RENDER">
             <read target="">
             </read>
             <begin target="">
-@[EVAL:"Hider \"hidden\" \"depthfilter\" [\"midpoint\"]" if @[DATA:///properties/multipass:]@ else "":]@
 Option "shadow" "bias" [@[DATA:///properties/shadowbias:RIB]@]
 Option "shadow" "bias0" [@[DATA:///properties/shadowbias0:RIB]@]
 Option "shadow" "bias1" [@[DATA:///properties/shadowbias1:RIB]@]

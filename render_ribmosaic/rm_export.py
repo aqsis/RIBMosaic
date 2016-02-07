@@ -66,6 +66,7 @@ import mathutils
 import math
 import time
 
+
 # #### Global variables
 
 MODULE = os.path.dirname(__file__).split(os.sep)[-1]
@@ -76,7 +77,7 @@ exec("import " + MODULE + " as rm")
 
 # if DEBUG_PRINT set true then each method with print its method name
 # and important vars to console io
-DEBUG_PRINT = False
+DEBUG_PRINT = True
 
 # ------------- RIB formatting Helpers -------------
 # taken from Matt Ebb's Blender to 3Delight exporter
@@ -95,14 +96,6 @@ def rib_param_val(data_type, val):
             return str(val)
     elif data_type == 'string':
         return '"%s"' % val
-
-
-def rib_mat_str(m):
-    return '[ %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f ]' % \
-            (m[0][0], m[0][1], m[0][2], m[0][3],
-            m[1][0], m[1][1], m[1][2], m[1][3],
-            m[2][0], m[2][1], m[2][2], m[2][3],
-            m[3][0], m[3][1], m[3][2], m[3][3])
 
 
 # ------------- Data Access Helpers -------------
@@ -127,7 +120,7 @@ def get_renderables(scene):
 
     for ob in scene.objects:
         if is_renderable(scene, ob):
-            if ob.type in ['MESH', 'EMPTY']:
+            if ob.type in ['MESH', 'EMPTY', 'FONT']:
                 objects += [ob]
             elif ob.type in ['LAMP']:
                 lights += [ob]
@@ -155,6 +148,7 @@ def is_subdmesh(ob):
 
 
 def detect_primitive(ob):
+    
     if ob.type == 'MESH':
         # if the rm primitive is auto
         if ob.data.ribmosaic_primitive == 'AUTOSELECT':
@@ -164,8 +158,15 @@ def detect_primitive(ob):
                 return 'POINTSPOLYGONS'
         else:
             return ob.data.ribmosaic_primitive
-#   else:
-#        return rm.primitive
+            
+    if ob.type == 'FONT':
+        # if the rm primitive is auto
+        if ob.data.ribmosaic_primitive == 'AUTOSELECT':
+            return 'POINTSPOLYGONS'
+        else:
+            return ob.data.ribmosaic_primitive
+    
+    return None;
 
 
 def create_mesh(scene, ob, matrix=None):
@@ -196,7 +197,7 @@ class DummyPass():
     pass_enabled = True
     pass_type = 'BEAUTY'
     # Pass output properties
-    pass_display_file = 'Renders/P@[EVAL:.current_pass:####]@' \
+    pass_display_file = 'renders/P@[EVAL:.current_pass:####]@' \
                         '_F@[EVAL:.current_frame:####]@.tif'
     pass_multilayer = False
     pass_shadingrate = 1
@@ -210,8 +211,8 @@ class DummyPass():
     pass_camera_group = False
     pass_camera_persp = 'CAMERA'
     pass_camera_lensadj = 0.0
-    pass_camera_nearclip = 0.005
-    pass_camera_farclip = 500
+    pass_camera_nearclip = 0
+    pass_camera_farclip = 0
     # Pass samples properties
     pass_samples_x = 0
     pass_samples_y = 0
@@ -272,17 +273,17 @@ class ExporterManager():
     # Dictionary of all export path combinations
     export_paths = {'DIR': [],
                     'COM': ['.'],
-                    'FRA': ["Archives"],
-                    'WLD': ["Archives", "Worlds"],
-                    'LAM': ["Archives", "Lights"],
-                    'OBJ': ["Archives", "Objects"],
-                    'GEO': ["Archives", "Objects", "Geometry"],
-                    'MAT': ["Archives", "Objects", "Materials"],
-                    'MAP': ["Maps"],
-                    'SHD': ["Shaders"],
-                    'TEX': ["Textures"],
-                    'RND': ["Renders"],
-                    'TMP': ["Cache"]}
+                    'FRA': ["archives"],
+                    'WLD': ["archives", "worlds"],
+                    'LAM': ["archives", "lights"],
+                    'OBJ': ["archives", "objects"],
+                    'GEO': ["archives", "objects", "geometry"],
+                    'MAT': ["archives", "objects", "materials"],
+                    'MAP': ["maps"],
+                    'SHD': ["shaders"],
+                    'TEX': ["textures"],
+                    'RND': ["renders"],
+                    'TMP': ["cache"]}
     # Dictionary of generated command objects
     command_scripts = {'OPTIMIZE': [],
                        'COMPILE': [],
@@ -406,8 +407,8 @@ class ExporterManager():
           subname = name of shader sub directory, defualts to "Text_Editor"
           Returns the relative path
         """
-        path = ("." + os.sep + self.make_export_path('SHD') +
-            os.sep + subname + os.sep)
+        path = os.path.join(".", self.make_export_path('SHD'), subname) + \
+                os.sep
         try:
             os.makedirs(path)
         except:
@@ -574,13 +575,13 @@ class ExporterManager():
         for e in rm.pipeline_manager.list_elements(pipeline +
                  "/shader_sources"):
             xmlp = pipeline + "/shader_sources/" + e
-            name = rm.pipeline_manager.get_attr(ec, xmlp,
+            name = rm.pipeline_manager.get_attr(e, xmlp,
                                              "filepath", False)
             name = os.path.basename(name)
 
             if name:
                 if self.export_scene.ribmosaic_purgeshd:
-                    source = rm.pipeline_manager.get_text(ec, xmlp)
+                    source = rm.pipeline_manager.get_text(e, xmlp)
                     path = self.make_shader_export_path(pipeline)
                     f = open(path + name, 'w')
                     f.write(source)
@@ -610,7 +611,7 @@ class ExporterManager():
             ec.context_panel = segs[2]
 
             # Only export enabled command panels
-            if ec._panel_enabled():
+            if ec._panel_enabled(True, True):
                 ec.current_command += 1
                 name = ec._resolve_links(
                        "COMPILE_S@[EVAL:.current_library:#####]@"
@@ -647,7 +648,7 @@ class ExporterManager():
             ec.context_panel = segs[2]
 
             # Only export enabled command panels
-            if ec._panel_enabled():
+            if ec._panel_enabled(True, True):
                 ec.current_command += 1
                 name = ec._resolve_links(
                        "INFO_S@[EVAL:.current_library:#####]@"
@@ -674,6 +675,7 @@ class ExporterManager():
         shader_library = Pipeline of shader library to process exclusively
         """
         if DEBUG_PRINT:
+            print("======================================")
             print("ExportManager.export_shaders")
 
         # Setup generic export context object
@@ -695,6 +697,9 @@ class ExporterManager():
             pipelines = []
 
         # Create folders, export sources and generate command scripts
+        if DEBUG_PRINT:
+            print("Shader pipelines:" , pipelines)
+            
         for p in pipelines:
             libraries = []
 
@@ -778,9 +783,11 @@ class ExporterManager():
                     if info:
                         self.build_shader_info_commands(ec)
 
-
         del ec
-
+        
+        if DEBUG_PRINT:
+            print("======================================")
+        
     def export_textures(self, render_object=None):
         """...
 
@@ -849,15 +856,15 @@ class ExporterManager():
                 ec.pointer_render = render_object
                 ec.current_pass = i + 1
                 ec.current_frame = f
-                if p.pass_type != 'BEAUTY':
-                    if p.pass_res_x > 0:
-                        x = p.pass_res_x
-                    if p.pass_res_y > 0:
-                        y = p.pass_res_y
+                # default to using the render dimension settings
                 ec.dims_resx = x
                 ec.dims_resy = y
-                target_name = ec._resolve_links("P@[EVAL:.current_pass:#####]@"
-                                         "_F@[EVAL:.current_frame:#####]@.rib")
+                if p.pass_type != 'BEAUTY':
+                    if p.pass_res_x > 0:
+                        ec.dims_resx = p.pass_res_x
+                    if p.pass_res_y > 0:
+                        ec.dims_resy = p.pass_res_y
+                target_name = ec._resolve_links(ec.pass_ribfilename)
 
                 # Add to display list if a beauty pass
                 if ec.pass_type == 'BEAUTY':
@@ -866,9 +873,11 @@ class ExporterManager():
                         {'file': display_output,
                          'layer': ec.pass_layer,
                          'multilayer': ec.pass_multilayer})
+                
 
                 # Do not build RIB if disabled in export options
                 if export_rib and (not only_active or p == self.active_pass):
+
                     try:
                         pa = ExportPass(ec, target_name)
                         pa.export_rib()
@@ -890,7 +899,7 @@ class ExporterManager():
                     ec.target_name = target_name
 
                     # Only export enabled command panels
-                    if ec._panel_enabled():
+                    if ec._panel_enabled(True, True):
                         ec.current_command += 1
                         name = ec._resolve_links(
                                 "RENDER_P@[EVAL:.current_pass:#####]@"
@@ -920,7 +929,7 @@ class ExporterManager():
                     ec.target_name = ""
 
                     # Only export enabled command panels
-                    if ec._panel_enabled():
+                    if ec._panel_enabled(True, True):
                         ec.current_command += 1
                         name = ec._resolve_links(
                                 "RENDER_P@[EVAL:.current_pass:#####]@"
@@ -941,6 +950,8 @@ class ExporterManager():
                         self.command_scripts['POSTRENDER'].append(s)
 
                 del ec
+            else:
+                raise rm_error.RibmosaicError("Frame %i to render not in sequence!" % f, sys.exc_info())
 
         self._exporting_scene = False
 
@@ -957,13 +968,14 @@ class ExporterManager():
         o = self.export_scene.ribmosaic_optimizetex
         r = self.export_scene.ribmosaic_renderrib
 
+        print("RENDERRIB " , r)
         # If in interactive mode ALWAYS render archives
         if self.export_scene.ribmosaic_interactive:
             r = True
 
         # Create one root shell script to rule them all
         root = ExporterCommand(None, "", False, "", "START.sh.bat", 'a')
-
+        print("RENDERRIB " , r)
         try:
             # Cycle through commands of each type and execute
             for t in ['OPTIMIZE', 'COMPILE', 'INFO', 'RENDER', 'POSTRENDER']:
@@ -972,6 +984,7 @@ class ExporterManager():
                     if (((t == 'RENDER' or t == 'POSTRENDER') and r) or
                             ((t == 'COMPILE' or t == 'INFO') and c) or
                             (t == 'OPTIMIZE' and o)):
+                                
                         s.execute_command()
 
                     if t != 'INFO':
@@ -1062,24 +1075,23 @@ class ExporterArchive(rm_context.ExportContext):
 
         self.archive_path = rm.export_manager.make_export_path(
                             self._archive_key) + os.sep
-
+        
         # If archive name specified use it
         if archive_name:
             self.archive_name = archive_name
 
     # #### Public methods
 
-    def archive_exists(self):
+    def file_exists(self, name, path):
         """
         check to see if the archive already exists as a file.
-        Sets _archive_exists to True if archive exists as a file.
         Returns True if archive already exits.
         """
 
         exists = False # indicates that the archive already exits
 
         if self.archive_name:
-            filepath = self.archive_path + self.archive_name
+            filepath = path + name
 
             try:
                 exists = os.path.isfile(filepath)
@@ -1089,7 +1101,7 @@ class ExporterArchive(rm_context.ExportContext):
                         "Could not check archive " + filepath, sys.exc_info())
         else:
             raise rm_error.RibmosaicError(
-                "archive_exists: Archive's path and name must be specified")
+                "archive_exists: Archive's path and name must be specified, got: %s" % filepath )
 
         return exists
 
@@ -1101,9 +1113,7 @@ class ExporterArchive(rm_context.ExportContext):
         execute = Create archive with executable permissions (True/False)
         mode = File 'r', 'a', 'w' open mode (gzipped is always binary mode)
         """
-        if DEBUG_PRINT:
-            print("ExporterArchive.open_archive()")
-
+        
         if gzipped is not None:
             self.is_gzip = gzipped
 
@@ -1112,7 +1122,7 @@ class ExporterArchive(rm_context.ExportContext):
 
         if self.archive_name:
             filepath = self.archive_path + self.archive_name
-
+            
             try:
                 if self.is_gzip:
                     self._pointer_file = gzip.open(filepath, mode)
@@ -1130,9 +1140,15 @@ class ExporterArchive(rm_context.ExportContext):
                 raise rm_error.RibmosaicError(
                         "Could not open archive \"" + filepath +
                         "\" for '" + mode + "'", sys.exc_info())
+            
+            if DEBUG_PRINT:
+                print("opened new rib archive at %s" % filepath)
+            
         else:
             raise rm_error.RibmosaicError(
                     "Archive's path and name must be specified")
+        
+       
 
     def close_archive(self):
         """Close archive object for writing and apply regex objects"""
@@ -1140,15 +1156,14 @@ class ExporterArchive(rm_context.ExportContext):
         if DEBUG_PRINT:
             print("ExporterArchive.close_archive()")
 
+        self.close_cache()
         # Only allow root object to close file
         if self.is_root:
-            # Close down any cache pointers
-            if self._pointer_cache:
-                self._pointer_cache.close()
-                self._pointer_cache = None
-
             # Close down any archive pointers
             if self._pointer_file:
+              
+                if DEBUG_PRINT:
+                    print("close archive at: " , self._pointer_file.name)
                 try:
                     self._pointer_file.close()
                     self._pointer_file = None
@@ -1162,6 +1177,7 @@ class ExporterArchive(rm_context.ExportContext):
                         # Get text from archive
                         self.open_archive(mode='r')
                         text = self._pointer_file.read()
+                        filePath = self._pointer_file.name
                         self._pointer_file.close()
 
                         # Get each regexes element
@@ -1178,7 +1194,11 @@ class ExporterArchive(rm_context.ExportContext):
                                             regpath, "replace", True, "")
                                 matches = rm.pipeline_manager.get_attr(self,
                                             regpath, "matches", True, "0")
-
+                                            
+                                if DEBUG_PRINT:
+                                    print("applying regex to file at %s with:" % filePath )
+                                    print("\tpattern %s, replace: %s, matches: %s ", (regex, replace, matches))
+  
                                 # If gzipped setup binary regex
                                 if self.is_gzip:
                                     regex = bytes(regex.encode())
@@ -1190,16 +1210,22 @@ class ExporterArchive(rm_context.ExportContext):
 
                         # Write text back to archive
                         self.open_archive(mode='w')
+                        
+                        if DEBUG_PRINT:
+                            print("writing regex replacements back to file at" % self._pointer_file.name )
+                            
                         self.write_text(text)
                         self._pointer_file.close()
-                        if DEBUG_PRINT:
-                            print(text)
                         self._pointer_file = None
                     except:
                         rm_error.RibmosaicError(
                                 "Cannot apply regex to archive",
                                 sys.exc_info())
-
+    
+    def write_comment(self,text="", use_indent=True, close=False):
+        self.write_text("# " + text + "\n", use_indent, close)
+        
+            
     def write_text(self, text="", use_indent=True, close=False):
         """Writes text to this archive's open file handle.
            Also properly writes text as either encoded binary or text
@@ -1209,8 +1235,8 @@ class ExporterArchive(rm_context.ExportContext):
         use_indent = if true then indent the text
         close = If true closes script archive when complete
         """
-        if DEBUG_PRINT:
-            print("ExporterArchive.write_text()")
+        #if DEBUG_PRINT:
+            #print("ExporterArchive.write_text()")
 
         if text:
             # split the text up into lines
@@ -1247,8 +1273,13 @@ class ExporterArchive(rm_context.ExportContext):
             print("ExporterArchive.write_code()")
 
         target = rm.pipeline_manager.get_attr(self, xmlpath, "target", False)
-
+        
+        #if DEBUG_PRINT:
+            #print("target: ", target)
+            
         for t in self.list_targets(target):
+            #if DEBUG_PRINT:
+                #print("target: ", target)
             if t[0]:
                 self.target_path = t[0]
 
@@ -1256,7 +1287,10 @@ class ExporterArchive(rm_context.ExportContext):
                 self.target_name = t[1]
 
             text = rm.pipeline_manager.get_text(self, xmlpath)
-
+            
+            #if DEBUG_PRINT:
+                #print("text: ", text)
+                
             self.write_text(text)
 
         if close:
@@ -1307,8 +1341,9 @@ class ExporterArchive(rm_context.ExportContext):
         else:
             matches = [("", "")]
 
-        if DEBUG_PRINT:
-            print(matches)
+        #if DEBUG_PRINT:
+            #print("Matches: " , matches)
+            
         return matches
 
     def add_regexes(self, xmlpath):
@@ -1375,11 +1410,11 @@ class ExporterArchive(rm_context.ExportContext):
         return rm.export_manager.export_scene
 
     # helper methods for outputting RIB code
-    def open_rib_archive(self, archive_mode='DEFAULT'):
+    def open_rib_archive(self):
         """
         Determine the open action to be taken with rib archive export.  This
         is based on the ribmosaic_rib_archive property and the scene's
-        ribmosaic_object_archives, ribmosaic_data_archives,
+        ribmosaic_object_archives, ribmosaic_geometry_archives,
         ribmosaic_material_archives properties.
 
         archive_mode = the mode in which the archive will be used:
@@ -1388,33 +1423,153 @@ class ExporterArchive(rm_context.ExportContext):
         """
 
         # determine what type of export to do
-        archive_mode = self.pointer_datablock.ribmosaic_rib_archive
+        archive_mode = getattr(self.pointer_datablock, "ribmosaic_rib_archive", 'DEFAULT')
+    
+
+        if DEBUG_PRINT:
+            print("Export mode: ", archive_mode)
+            print("Data Type: " , self.data_type)
+            
         # for now just testing inline and readarchive
         if archive_mode == 'DEFAULT':
-            if self.data_type in ['MESH']:
-                archive_mode = self.get_scene().ribmosaic_data_archives
-            elif self.data_type == 'MATERIAL':
+            if self._archive_key in ['OBJ']:
+                archive_mode = self.get_scene().ribmosaic_object_archives
+            elif self._archive_key == 'GEO':
+                archive_mode = self.get_scene().ribmosaic_geometry_archives
+            elif self._archive_key  == 'MAT':
                 archive_mode = self.get_scene().ribmosaic_material_archives
+                    
 
         if archive_mode in ['READARCHIVE', 'DELAYEDARCHIVE', 'INSTANCE']:
+            
             # make archive name
-            self.archive_name = (self.data_name + '_' + self._archive_key +
-                '.rib')
+            postfix =""
+            useprefix = getattr(self.pointer_datablock, "ribmosaic_archives_usenamepostfix", 'DEFAULT')
+            if useprefix  == 'CUSTOM' :
+                postfix = getattr(self.pointer_datablock, "ribmosaic_archives_namepostfix")
+            elif useprefix  == 'DEFAULT':
+                if self._archive_key  == 'OBJ':
+                    postfix = self.get_scene().ribmosaic_object_archives_namepostfix
+                elif self._archive_key == 'GEO':
+                    postfix = self.get_scene().ribmosaic_geometry_archives_namepostfix
+                elif self._archive_key == 'MAT':
+                    postfix = self.get_scene().ribmosaic_material_archives_namepostfix
+                    
+            self.archive_name = self.data_name + '-' + self._archive_key + self._resolve_links(postfix) + '.rib'
+                
             # setup readarchive in parent archive
             # rely on the file pointer still setup for the parent
             self.riReadArchive()
             # if archive does not exist then allow export
-            if not self.archive_exists():
+            if not self.file_exists(self.archive_name, self.archive_path):
                 # Determine if compressed RIB is enabled
                 self.open_archive(
                     gzipped=self.get_scene().ribmosaic_compressrib)
+                # since in own archive, start indentation at the left margin
+                self.current_indent = 0
+                
             else:
+                if DEBUG_PRINT:
+                    print("rib archive with name: %s exists!" % self.archive_name)
                 self._pointer_file = None
-            # since in own archive, start indentation at the left margin
-            self.current_indent = 0
         elif archive_mode == 'NOEXPORT':
             self._pointer_file = None
         # all other modes default to inline
+
+    def open_cache(self):
+        """
+        Determine the open action to be taken with rib cache export.
+
+        return = True if cache did not exist and cache file is set to write
+        """
+        
+        # all caches are placed in the TMP directory
+        cache_path = rm.export_manager.make_export_path('TMP') + os.sep
+        
+        cache_name = self.data_name + '_' + self._archive_key + '.rib'
+        # if cache already exists then open cache for reading only else open
+        # for writing new cache
+        
+
+        if self.file_exists(cache_name, cache_path):
+            mode = 'r'
+        else:
+            mode = 'w'
+        filePath = cache_path + cache_name
+        
+        self._pointer_cache = open(filePath, mode)
+        
+        if DEBUG_PRINT:
+            print("opened cache at %s" % filePath, " file exists: ", mode == 'r')
+            
+        return mode == 'w'
+
+    def close_cache(self):
+
+        # Close down any cache pointers
+        if self._pointer_cache:
+            if DEBUG_PRINT:
+               print("close cache file at ", self._pointer_cache.name)
+            self._pointer_cache.close()
+            self._pointer_cache = None
+
+    def build_exporter_list(self, panel_type, exporter, windows):
+        """
+        Build a list of Exporter objects.
+        panel_type = type of panel to build exporter for
+        exporter = exporter class to build
+        windows = string of blender window names to get panels from
+        return = list of Exporter objects.
+        """
+        # Push objects attributes
+        pipeline = self.context_pipeline
+        category = self.context_category
+        panel = self.context_panel
+
+        exporters = []
+        if DEBUG_PRINT:
+            print("build_exporter_list, panel_type:", panel_type)
+            print("build_exporter_list, windows:", windows)
+            
+        for p in rm.pipeline_manager.list_panels(panel_type,
+                                                 window=windows):
+            
+            if DEBUG_PRINT:
+                print("build_exporter_list, panel:", p)
+            segs = p.split("/")
+            self.context_pipeline = segs[0]
+            self.context_category = segs[1]
+            self.context_panel = segs[2]
+
+            if self._panel_enabled(True, True):
+                exporters.append(exporter(self, p))
+
+        # Pop objects attributes
+        self.context_pipeline = pipeline
+        self.context_category = category
+        self.context_panel = panel
+
+        return exporters
+
+    def build_export_utilities_list(self, windows):
+        """
+        Build a list of ExporterUtility objects.
+
+        windows = string of blender window names to get utility panels from
+        return = list of ExporterUtility objects.
+        """
+        return self.build_exporter_list('utility_panels', ExporterUtility,
+                                        windows)
+
+    def build_export_commands_list(self, windows):
+        """
+        Build a list of ExporterCommand objects.
+
+        windows = string of blender window names to get utility panels from
+        return = list of ExporterCommand objects.
+        """
+        return self.build_exporter_list('command_panels', ExporterCommand,
+                                        windows)
 
     def export_shaders(self, windows):
         """
@@ -1422,33 +1577,15 @@ class ExporterArchive(rm_context.ExportContext):
 
         windows = string of blender window names to get shader panels from
 
-        returns True if shaders were exported.
+        return = True if shaders were exported.
         """
 
-        # Push objects attributes that will get changed
-        pipeline = self.context_pipeline
-        category = self.context_category
-        panel = self.context_panel
-
         # Shader Panel lists
-        shaders = []
-
-        # export all enabled shader panels for this archive
-        for p in rm.pipeline_manager.list_panels("shader_panels",
-                                                 window=windows):
-            segs = p.split("/")
-            self.context_pipeline = segs[0]
-            self.context_category = segs[1]
-            self.context_panel = segs[2]
-
-            if self._panel_enabled():
-                shaders.append(ExporterShader(self, p))
-
-        # Pop objects attributes
-        self.context_pipeline = pipeline
-        self.context_category = category
-        self.context_panel = panel
-
+        shaders = self.build_exporter_list('shader_panels', ExporterShader,
+                                        windows)
+        if DEBUG_PRINT:
+            print("Shader panels:" , shaders)
+            
         # output rib code for the shaders
         for p in shaders:
             p.current_indent = self.current_indent
@@ -1468,6 +1605,7 @@ class ExporterArchive(rm_context.ExportContext):
         self.write_text("version 3.03\n")
 
     def riReadArchive(self):
+        #relpathto = self.get_scene().ribmosaic_readarchive_relpathto
         self.write_text('ReadArchive "%s"\n' % self.archive_name)
 
     def riFrameBegin(self):
@@ -1505,7 +1643,15 @@ class ExporterArchive(rm_context.ExportContext):
                         color[2]))
 
     def riTransform(self, mat):
-        self.write_text('Transform %s\n' % rib_mat_str(mat))
+        self.write_text('Transform ')
+        # set the file pointer for ribify
+        rm.ribify.pointer_file = self._pointer_file
+        # set the indent level of the rib output
+        rm.ribify.indent = self.current_indent
+        rm.ribify.matrix4x4(mat)
+
+    def riSides(self, useTwoSides=True):
+        self.write_text('Sides %s\n' % (2 if useTwoSides else 1))
 
 
 
@@ -1729,11 +1875,10 @@ class ExporterShader(ExporterArchive):
         element = The panels code element to build
         close = If true closes archive when complete
         """
-
+        xml = self.shader_xmlpath + "/" + element;
         if DEBUG_PRINT:
-            print("ExporterShader.build_code()")
-
-        self.write_code(self.shader_xmlpath + "/" + element, close)
+            print("ExporterShader.build_code() for %s" % xml)
+        self.write_code(xml, close)
 
 
 # #### Exporter object sub classes (all derived from ExporterArchive)
@@ -1857,49 +2002,21 @@ class ExportPass(ExporterArchive):
         if DEBUG_PRINT:
             print("ExportPass.export_rib()")
 
-        # Push objects attributes
-        pipeline = self.context_pipeline
-        category = self.context_category
-        panel = self.context_panel
-        datablock = self.pointer_datablock
-
         # Render and Scene Utility Panel object lists
-        scene_utilities = []
-        render_utilities = []
-
-        # Initialize objects for enabled panels in render and scene
-        for p in rm.pipeline_manager.list_panels("utility_panels",
-                                                 window='SCENE'):
-            segs = p.split("/")
-            self.context_pipeline = segs[0]
-            self.context_category = segs[1]
-            self.context_panel = segs[2]
-
-            if self._panel_enabled():
-                scene_utilities.append(ExporterUtility(self, p))
-
-        for p in rm.pipeline_manager.list_panels("utility_panels",
-                                                 window='RENDER'):
-            segs = p.split("/")
-            self.context_pipeline = segs[0]
-            self.context_category = segs[1]
-            self.context_panel = segs[2]
-
-            if self._panel_enabled():
-                render_utilities.append(ExporterUtility(self, p))
-
-        # Pop objects attributes
-        self.context_pipeline = pipeline
-        self.context_category = category
-        self.context_panel = panel
-        self.pointer_datablock = datablock
-
+        scene_utilities = self.build_export_utilities_list('SCENE')
+        render_utilities = self.build_export_utilities_list('RENDER')
+        
+        if DEBUG_PRINT:
+            print("scene_utilities: ", [ u.utility_xmlpath for u in scene_utilities] )
+            print("render_utilities: ", [ u.utility_xmlpath for u in render_utilities]  )
+        
         scene = self.get_scene()
 
         # output rib header
         self.ribHeader()
 
-        self._export_searchpaths()
+        if scene.ribmosaic_export_searchpaths:
+            self._export_searchpaths()
 
         # Write everything to archive
         for p in scene_utilities:
@@ -1920,7 +2037,11 @@ class ExportPass(ExporterArchive):
         # TODO the pass camera overrides the scene's camera
         # make use of ExportObject to do the dirty work
         try:
-            cam = ExportObject(self, scene.camera)
+            if self.pointer_pass.pass_camera:
+                camobj = scene.objects[self.pointer_pass.pass_camera]
+            else:
+                camobj = scene.camera
+            cam = ExportObject(self, camobj, as_camera=True)
             cam.export_rib()
             del cam
         except:
@@ -1929,9 +2050,7 @@ class ExportPass(ExporterArchive):
             raise rm_error.RibmosaicError("Failed to build camera " +
                                          sys.exc_info())
 
-        self.write_text("Sides 1\n")
-
-        world = ExportWorld(self, datablock.world)
+        world = ExportWorld(self, self.pointer_datablock.world)
         world.export_rib()
         del world
 
@@ -1966,11 +2085,16 @@ class ExportWorld(ExporterArchive):
 
     def _export_objects(self, objects):
         if DEBUG_PRINT:
-            print("ExportPass._export_objects()")
+            print("ExportWorld._export_objects()")
 
         for ob in objects:
+            
             target_name = ob.name + ".rib"
             try:
+                
+                if DEBUG_PRINT:
+                    print("Exporting Object: %s ===============================" % ob.name)
+                    
                 eo = ExportObject(self, ob)
                 eo.export_rib()
                 eo.close_archive()
@@ -1980,10 +2104,13 @@ class ExportWorld(ExporterArchive):
                 del eo
                 raise rm_error.RibmosaicError("Failed to build object RIB " +
                                               target_name, sys.exc_info())
+            if DEBUG_PRINT:
+                    print("=====================================================")
+            
 
     def _export_lights(self, lights):
         if DEBUG_PRINT:
-            print("ExportPass._export_lights()")
+            print("ExportWorld._export_lights()")
 
         for idx, light in enumerate(lights):
             target_name = light.name + ".rib"
@@ -2008,37 +2135,16 @@ class ExportWorld(ExporterArchive):
         if self._pointer_file == None:
             return
 
-        # Push objects attributes
-        pipeline = self.context_pipeline
-        category = self.context_category
-        panel = self.context_panel
-        datablock = self.pointer_datablock
-
-        world_utilities = []
-
-        for p in rm.pipeline_manager.list_panels("utility_panels",
-                                                 window='WORLD'):
-            segs = p.split("/")
-            self.context_pipeline = segs[0]
-            self.context_category = segs[1]
-            self.context_panel = segs[2]
-
-            if self._panel_enabled():
-                world_utilities.append(ExporterUtility(self, p))
-
-        # Pop objects attributes
-        self.context_pipeline = pipeline
-        self.context_category = category
-        self.context_panel = panel
-        self.pointer_datablock = datablock
-
-        self.export_shaders('WORLD')
+        world_utilities = self.build_export_utilities_list('WORLD')
 
         scene = self.get_scene()
 
         if scene.ribmosaic_use_world:
             self.riWorldBegin()
-
+        
+      
+        self.export_shaders('WORLD')
+        
         for p in world_utilities:
             p.current_indent = self.current_indent
             p.build_code("begin")
@@ -2046,9 +2152,18 @@ class ExportWorld(ExporterArchive):
         # figure out what objects in the scene are renderable
         # build a collection of all renderable objects which includes:
         # light, camera, mesh, empty
+        
         objects, lights, cameras = get_renderables(scene)
-
-        # first export lights to rib
+        
+        if DEBUG_PRINT:
+            print("======================================")
+            print("Objects to export:")
+            print("\tObjects: ", [o.name for o in objects])
+            print("\tLights: ", [o.name for o in lights])
+            print("\tCameras: ", [o.name for o in cameras])
+            print("======================================")
+            
+        ## first export lights to rib
         self._export_lights(lights)
 
         # export all the objects to RIB
@@ -2074,17 +2189,26 @@ class ExportObject(ExporterArchive):
     automatically handles nesting of CSG through parenting.
     """
 
+    as_camera = False # export the object as a camera if set True
+
     # #### Private methods
 
-    def __init__(self, export_object=None, pointer_object=None):
+    def __init__(self, export_object=None, pointer_object=None,
+                 as_camera=False):
         """Initialize attributes using export_object and parameters.
         Automatically create the RIB this object represents.
 
         export_object = ExportObject subclassed from ExportContext
+        pointer_object = the blender object to be exported
+        as_camera = export the object as a camera
        """
 
         ExporterArchive.__init__(self, export_object, 'OBJ')
         self._set_pointer_datablock(pointer_object)
+        if as_camera:
+            self.as_camera = as_camera
+            # override object type
+            self.data_type = 'CAMERA'
         self.open_rib_archive()
 
     def _export_camera_rib(self):
@@ -2108,7 +2232,9 @@ class ExportObject(ExporterArchive):
             xaspect = 1.0
             yaspect = aspectratio
 
-        if camera.ribmosaic_dof:
+        # only blender camera supports DOF
+        dof = getattr(camera, "ribmosaic_dof", False)
+        if dof:
             # allow an object to be used for dof distance
             if camera.dof_object:
                 dof_distance = (ob.location -
@@ -2127,19 +2253,35 @@ class ExportObject(ExporterArchive):
         #        (rm.shutter_efficiency_open, rm.shutter_efficiency_close))
 
         if scene.ribmosaic_use_clipping:
+            if self.pointer_pass.pass_camera_nearclip > 0.0:
+                near_clip = self.pointer_pass.pass_camera_nearclip
+            else:
+                near_clip = getattr(camera, "clip_start", 0.05)
+
+            if self.pointer_pass.pass_camera_farclip > 0.0:
+                far_clip = self.pointer_pass.pass_camera_farclip
+            else:
+                far_clip = getattr(camera, "clip_end", 500)
+
             self.write_text('Clipping %f %f\n'
-                % (camera.clip_start, camera.clip_end))
+                % (near_clip, far_clip))
 
         if scene.ribmosaic_use_projection:
-            if camera.type == 'PERSP':
-                lens = camera.lens
+            persp = self.pointer_pass.pass_camera_persp
+            if persp == "CAMERA":
+                # use camera perspective setting
+                # note: this only works if the object is a blender camera
+                persp = getattr(camera, "type", "PERSP")
+
+            if persp == 'PERSP':
+                lens = getattr(camera, "lens", 35.0)
                 fov = 360.0 * math.atan(16.0 / lens / aspectratio) / math.pi
                 self.write_text('Projection "perspective" "fov" %f\n' % fov)
             else:
-                lens = camera.ortho_scale
+                lens = getattr(camera, "ortho_scale", 1.0)
                 xaspect = xaspect * lens / (aspectratio * 2.0)
                 yaspect = yaspect * lens / (aspectratio * 2.0)
-                self.write('Projection "orthographic"\n')
+                self.write_text('Projection "orthographic"\n')
 
         if scene.ribmosaic_use_screenwindow:
             self.write_text('ScreenWindow %f %f %f %f\n' %
@@ -2147,43 +2289,35 @@ class ExportObject(ExporterArchive):
 
         # build a transform matrix that is looking at the scene
         mat = ob.matrix_world
+        #print("Camera Matrix: " , str(mat))
         loc = mat.to_translation()
-        rot = mat.to_euler()
-
+        r = mat.to_quaternion().to_matrix().transposed().to_4x4()
+        
         # setup the look vector which defaults to looking down the Z axis
         s = mathutils.Matrix(([1, 0, 0, 0], [0, 1, 0, 0],
                             [0, 0, -1, 0], [0, 0, 0, 1]))
-        r = mathutils.Matrix.Rotation(-rot[0], 4, 'X')
-        r *= mathutils.Matrix.Rotation(-rot[1], 4, 'Y')
-        r *= mathutils.Matrix.Rotation(-rot[2], 4, 'Z')
+                            
         l = mathutils.Matrix.Translation(-loc)
-
+        
+        # m = R_RC * R_CI^T  |  R_t_RI
+        # s*r = R_RC^T * R_IC  =R_IR =  A_RI
+        #   m = s*r * [ 1 | -(I_t_IR) ]
+        #   m = [ R_RI  |  R_t_RI]
         m = s * r * l
-
+        
         self.riTransform(m)
 
+        # setup for camera data block
+        self._set_pointer_datablock(camera)
+
+        # export attached shaders that are for CAMERA
+        self.export_shaders('CAMERA')
+        # restore ob
+        self._set_pointer_datablock(ob)
+
+
+
     # #### Public methods
-
-    def export(self):
-        """ """
-
-        print("Exporting objects...")
-
-        light = ExportLight(self)
-        light.export_rib()
-        del light
-
-        material = ExportMaterial(self)
-        material.export_rib()
-        del material
-
-        objdata = ExportObjdata(self)
-        objdata.export_rib()
-        del objdata
-
-        particles = ExportParticles(self)
-        particles.export_rib()
-        del particles
 
     def export_rib(self):
         """ """
@@ -2195,58 +2329,92 @@ class ExportObject(ExporterArchive):
 
         ob = self.get_object()
 
-        # if a camera object then do special camera output
-        if ob.type == 'CAMERA':
+        # if defined as a camera object then do special camera output
+        if self.as_camera:
             self._export_camera_rib()
         else:
-
-            # TODO
-            # need to group mesh data with associated material
-            # if the mesh uses more than one material then mesh has to be
-            # split up. For now we just spit out the first material only
-            # for testing purposes.
-
-            if len(ob.material_slots) > 0:
-                try:
-                    # There may be a material slot but there may be no
-                    # material so need to check.
-                    if ob.material_slots[0].material is not None:
-                        em = ExportMaterial(self,
-                                            ob.material_slots[0].material)
-                        em.export_rib()
-                        del em
-                except:
-                    em.close_archive()
-                    raise rm_error.RibmosaicError(
-                            "Failed to build object material RIB " +
-                            self.data_name, sys.exc_info())
-
-            if ob.parent:
-                mat = ob.parent.matrix_world * ob.matrix_local
-            else:
-                mat = ob.matrix_world
-            #print(mat)
-
+            
+            
+            
+            # assume to be some form of mesh object
             self.riAttributeBegin()
             self.write_text('Attribute "identifier" "name" [ "%s" ]\n' %
                             self.data_name)
-            self.riTransform(mat)
+                            
+                            
+            # Initialize objects for enabled panels in object
+            # build Object Utility Panel objects list
+            object_utilities = self.build_export_utilities_list('OBJECT')
+            print("Export Utility type:" , type(object_utilities))
+            for p in object_utilities:
+                p.current_indent = self.current_indent
+                p.build_code("begin")                
+            
+                            
+            if ob.ribmosaic_transform :                
+                # setup object transform to be exported if enabled (default true)
+                if ob.parent:
+                    mat = ob.parent.matrix_world * ob.matrix_local
+                else:
+                    mat = ob.matrix_world
 
-            # export object data
-            # let the ExportObjdata instance decide how to export
-            # the object data
-            try:
-                eod = ExportObjdata(self)
-                eod.export_rib()
-                del eod
-            except:
-                eod.close_archive()
-                raise rm_error.RibmosaicError(
-                        "Failed to build object data RIB " +
-                        self.data_name, sys.exc_info())
+                self.riTransform(mat)
 
-            # create ExportObjectData
+            # Export only objects which have some sort of mesh data, EMPTY objects have no data!
+            primType = detect_primitive(ob)
+            if self.data_type != "EMPTY" :
 
+                # export object data
+                # let the ExportObjdata instance decide how to export
+                # the mesh object data
+                try:
+                    emd = ExportMeshdata(self)
+                    emd.export_geometry_cache()
+                    # TODO
+                    # need to group mesh data with associated material
+                    # if the mesh uses more than one material then mesh has to be
+                    # split up. For now we just spit out the first material only
+                    # for testing purposes.
+
+                    if len(ob.material_slots) > 0:
+                        for mat_idx, matslot in enumerate(ob.material_slots):
+                            try:
+                                # There may be a material slot but there may be no
+                                # material so need to check.
+                                # Also need to check if there is a submesh that
+                                # uses this material.  Just because the material
+                                # is in the slot does not mean that it is being
+                                # used.
+                                if matslot.material is not None:
+                                    if emd.has_submesh(mat_idx):
+                                        em = ExportMaterial(self, matslot.material)
+                                        em.export_rib()
+                                        emd.export_rib(mat_idx)
+                                        del em
+                            except:
+                                em.close_archive()
+                                del em
+                                raise rm_error.RibmosaicError(
+                                        "Failed to build object material RIB " +
+                                        self.data_name, sys.exc_info())
+                    else:
+                        raise rm_error.RibmosaicError(
+                                        "Failed to build object material RIB: trying to export mesh with no material assigned!" +
+                                        self.data_name, sys.exc_info())
+                        
+                    del emd
+                except:
+                    emd.close_archive()
+                    raise rm_error.RibmosaicError(
+                            "Failed to build mesh data RIB " +
+                            self.data_name, sys.exc_info())
+            else:
+                self.write_comment("This is is an empty object")
+            
+            for p in object_utilities:
+                p.current_indent = self.current_indent
+                p.build_code("end")
+            
             self.riAttributeEnd()
             self.write_text('\n')
 
@@ -2259,15 +2427,20 @@ class ExportObject(ExporterArchive):
 class ExportLight(ExporterArchive):
     """Represents shaders on lamp data-blocks"""
 
+    blender_object = None
+
     def __init__(self, export_object=None, pointer_object=None):
         """Initialize attributes using export_object and parameters.
         Automatically create the RIB this object represents.
 
         export_object = ExportObject subclassed from ExportContext
+        pointer_object = Blender Light Object
        """
 
         ExporterArchive.__init__(self, export_object, 'LAM')
         self._set_pointer_datablock(pointer_object)
+        self.blender_object = self.pointer_datablock
+        self._set_pointer_datablock(self.pointer_datablock.data)
         self.open_rib_archive()
 
     def _export_lightcolor(self, color=(1, 1, 1)):
@@ -2275,7 +2448,8 @@ class ExportLight(ExporterArchive):
                         % rib_param_val('float', color))
 
     def _export_intensity(self, energy=1):
-        self.write_text('"float intensity" %s\n' % (energy * 50))
+        
+        self.write_text('"float intensity" %s\n' % (energy * self.get_scene().ribmosaic_globallightscale))
 
     # #### Public methods
 
@@ -2283,57 +2457,35 @@ class ExportLight(ExporterArchive):
         if DEBUG_PRINT:
             print("ExportLight.export_rib()")
 
+        if self._pointer_file == None:
+            return
 
         self.riAttributeBegin()
-        ob = self.pointer_datablock
-        lamp = ob.data
+        ob = self.blender_object
+        lamp = self.pointer_datablock
 
-        # Push objects attributes
-        pipeline = self.context_pipeline
-        category = self.context_category
-        panel = self.context_panel
-
-        # Panel object lists
-        light_utilities = []
 
         # Initialize objects for enabled panels in light data
-        self.pointer_datablock = lamp
-        # Initialize objects for enabled panels in render and scene
-        for p in rm.pipeline_manager.list_panels("utility_panels",
-                                                 window='LAMP'):
-            segs = p.split("/")
-            self.context_pipeline = segs[0]
-            self.context_category = segs[1]
-            self.context_panel = segs[2]
-
-            if self._panel_enabled():
-                light_utilities.append(ExporterUtility(self, p))
-
-        # Pop objects attributes
-        self.context_pipeline = pipeline
-        self.context_category = category
-        self.context_panel = panel
-        #self.pointer_datablock =
+        # build Lamp Utility Panel objects list
+        light_utilities = self.build_export_utilities_list('LAMP')
 
         for p in light_utilities:
             p.current_indent = self.current_indent
             p.build_code("begin")
 
         # TODO add support for all light types
-        if ob.parent:
-            m = ob.parent.matrix_world * ob.matrix_local
-        else:
-            m = ob.matrix_world
+        if ob.ribmosaic_transform :
+            if ob.parent:
+                m = ob.parent.matrix_world * ob.matrix_local
+            else:
+                m = ob.matrix_world
 
-        # Note: up vector for renderman light is opposite of Blender
-        m *= mathutils.Matrix.Rotation(math.pi, 4, 'X')
-        self.riTransform(m)
+            # Note: up vector for renderman light is opposite of Blender
+            m *= mathutils.Matrix.Rotation(math.pi, 4, 'X')
+            self.riTransform(m)
 
-        # in order to get shaders set pointer_datablock to ob.data
-        self.pointer_datablock = lamp
         # if a shader is attached then don't use auto light export
         shaders_exported = self.export_shaders('LAMP')
-        self.pointer_datablock = ob
 
         if not shaders_exported:
 
@@ -2344,14 +2496,15 @@ class ExportLight(ExporterArchive):
                 self.inc_indent()
                 self._export_intensity(lamp.energy)
                 self._export_lightcolor(lamp.color)
-
+                self.dec_indent()
+                
             elif lamp.type == 'SUN':
                 self.write_text('LightSource "distantlight" %s\n' %
                                 self.current_lightid)
                 self.inc_indent()
                 self._export_intensity(lamp.energy)
                 self._export_lightcolor(lamp.color)
-
+                self.dec_indent()
             elif lamp.type == 'SPOT':
                 self.write_text('LightSource "spotlight" %s\n' %
                                 self.current_lightid)
@@ -2362,7 +2515,7 @@ class ExportLight(ExporterArchive):
                     coneangle = lamp.spot_size / 2.0
                     self.write_text('"float coneangle" %s\n' %
                                 (rib_param_val('float', coneangle)))
-
+                self.dec_indent()
             else:
                 # default to a pointlight if no lamp type match
                 self.write_text('LightSource "pointlight" %s\n' %
@@ -2370,13 +2523,13 @@ class ExportLight(ExporterArchive):
                 self.inc_indent()
                 self._export_intensity(lamp.energy)
                 self._export_lightcolor(lamp.color)
-
-        self.dec_indent()
-
+                self.dec_indent() 
+                   
         for p in light_utilities:
             p.current_indent = self.current_indent
             p.build_code("end")
 
+        
         self.riAttributeEnd()
         self.riIlluminate(self.current_lightid)
         self.write_text('\n', False)
@@ -2427,17 +2580,27 @@ class ExportMaterial(ExporterArchive):
                 ' "string coordinatesystem" ["%s"]\n'
                 % (material.ribmosaic_disp_pad, material.ribmosaic_disp_coor))
 
-        self.export_shaders('MATERIAL')
-
+        if self.get_scene().ribmosaic_use_sides:
+            self.riSides(material.ribmosaic_two_sided)
+        
+        
+        s = self.export_shaders('MATERIAL')
+        
+        if DEBUG_PRINT:
+            print("Shaders exported: ", s)
+        
         self.close_archive()
 
 
-class ExportObjdata(ExporterArchive):
-    """Represents geometry, lights and cameras using objectdata data-blocks.
+class ExportMeshdata(ExporterArchive):
+    """Represents geometry using objectdata data-blocks.
     Can also handle export of multiple meshes setup in LOD list
     """
 
     blender_object = None
+    materials_used = [] # list of material indexes used
+    mesh_exportdata = None
+    old_pointer_file = None
 
     def __init__(self, export_object=None):
         """Initialize attributes using export_object and parameters.
@@ -2449,90 +2612,279 @@ class ExportObjdata(ExporterArchive):
         ExporterArchive.__init__(self, export_object, 'GEO')
         self.blender_object = self.pointer_datablock
         self._set_pointer_datablock(self.pointer_datablock.data)
-        self.open_rib_archive()
 
+    def _cache_mesh(self):
+        """Generate RIB code cache for poly, mesh, points and sds geometry.
+        Also generates a list of material indexes used.
 
+        mesh_exportdata = blender mesh data that is to be exported
+        return = True if cache is new, False if cache already existed
 
-    def _export_geometry(self):
+        """
         if DEBUG_PRINT:
-            print("ExportObjdata._export_geometry")
+            print("ExportMeshdata._cache_mesh")
 
-        # determine whate type of geometry is to be exported
-        prim = detect_primitive(self.blender_object)
+        # build the mesh cache if it does not exist
+        if self.open_cache():
+            # create a mesh that has all modifiers applied to mesh data
+            # but make sure subdiv modifier render option is false
+            
+            self.mesh_exportdata = create_mesh(
+                self.get_scene(), self.blender_object)
+                
+            # determine what type of geometry is to be exported
+            prim = detect_primitive(self.blender_object)
 
-        # create a mesh that has all modifiers applied to mesh data
-        # but make sure subdiv modifier render option is false
-        mesh = create_mesh(self.get_scene(), self.blender_object)
-        # set the file pointer for ribify
-        rm.ribify.pointer_file = self._pointer_file
-        # set the indent level of the rib output
-        rm.ribify.indent = self.current_indent
+            # set the file pointer for ribify
+            rm.ribify.pointer_file = self._pointer_cache
+            # set the indent level of the rib output
+            rm.ribify.indent = self.current_indent
+            if DEBUG_PRINT:
+                print("Primitive: ", prim)
+            if prim == 'POINTSPOLYGONS':
+                rm.ribify.mesh_pointspolygons(self.mesh_exportdata)
+            elif prim == 'SUBDIVISIONMESH':
+                rm.ribify.mesh_subdivisionmesh(self.mesh_exportdata)
+            elif prim == 'POINTS':
+                rm.ribify.mesh_points(self.mesh_exportdata)
+            else:
+                rm.RibmosaicError(" Trying to convert primitive: %s for object %s " % ( prim , self.blender_object) , " which is not supported!" )
 
-        if prim == 'POINTSPOLYGONS':
-            rm.ribify.mesh_pointspolygons(mesh)
-        elif prim == 'SUBDIVISIONMESH':
-            rm.ribify.mesh_subdivisionmesh(mesh)
-        elif prim == 'POINTS':
-            rm.ribify.mesh_points(mesh)
+            meshdata = self.pointer_datablock
+            # check if normal primvar is to be exported
+            if meshdata.ribmosaic_n_export:
+                pv_class = meshdata.ribmosaic_n_class
+                if prim in ['POINTS']:
+                    # face class not supported in these primitives
+                    if pv_class[:4] == 'face':
+                        pv_class = pv_class[4:]
 
-        meshdata = self.pointer_datablock
-        # check if normal primvar is to be exported
-        if meshdata.ribmosaic_n_export:
-            pv_class = meshdata.ribmosaic_n_class
-            if prim in ['POINTS']:
-                # face class not supported in these primitives
-                if pv_class[:4] == 'face':
-                    pv_class = pv_class[4:]
+                rm.ribify.data_to_primvar(self.mesh_exportdata, member="N",
+                    define="N", ptype="normal", pclass=pv_class)
+            # check if st primvar is to be exported
+            if meshdata.ribmosaic_st_export:
+                rm.ribify.data_to_primvar(self.mesh_exportdata, member="UV",
+                    define="st", ptype="float[2]",
+                    pclass=meshdata.ribmosaic_st_class)
 
-            rm.ribify.data_to_primvar(mesh, member="N", define="N",
-                                     ptype="normal", pclass=pv_class)
-        # check if st primvar is to be exported
-        if meshdata.ribmosaic_st_export:
-            rm.ribify.data_to_primvar(mesh, member="UV", define="st",
-                                     ptype="float[2]", pclass=meshdata.ribmosaic_st_class)
-        # don't need the mesh data anymore so tell blender to
-        # get rid of it
-        bpy.data.meshes.remove(mesh)
+            self.close_cache()
+            return True
+        else:
+            self.close_cache()
+            return False
+
+    def _make_submesh_name(self, material_idx):
+        return self.data_name + '_m'  + str(material_idx) + '-GEO.rib'
+
+    def _open_submesh_file(self, material_idx, mode):
+        """Open a submesh rib file associated with a material index
+
+        material_idx = index of blender material that is to be used
+        mode = w for write, r for read
+
+        return = True if file was successfully opened.
+                 False if mode == 'r' and file does not exist
+
+        """
+        geo_path = rm.export_manager.make_export_path('GEO') + os.sep
+        file_name = self._make_submesh_name(material_idx)
+
+        self.old_pointer_file = self._pointer_file
+
+        # if submesh is to be read then make sure it exists first
+        if mode == 'r':
+            if self.file_exists(file_name, geo_path):
+                self._pointer_file = open(geo_path + file_name, mode)  
+            else:
+                self._pointer_file = None
+        else:
+            self._pointer_file = open(geo_path + file_name, mode)
+
+        if DEBUG_PRINT:
+            if self._pointer_file is not None:
+              print("opened new submesh file at %s for material idx %s" % (self._pointer_file.name,material_idx) )
+        
+        return self._pointer_file is not None
+
+    def _close_submesh_file(self):
+        if self._pointer_file:
+            if DEBUG_PRINT:
+              print("close new submesh file at %s" % self._pointer_file.name )
+            self._pointer_file.close()
+            
+        self._pointer_file = self.old_pointer_file
+
+    def _copy_submesh_file(self, material_idx):
+      
+        
+        if self._pointer_file and self._open_submesh_file(material_idx, 'r'):
+            # parent file pointer is in self.old_pointer_file
+            # submesh file pointer is in self._pointer_file
+            # flip the pointer around so we can make writing easier
+            submesh_pointer = self._pointer_file
+            self._pointer_file = self.old_pointer_file
+            # copy submesh file contents into parent rib file
+            if DEBUG_PRINT:
+                print("copy submesh file at %s ---> %s" % (submesh_pointer.name,self._pointer_file.name) )
+            for l in submesh_pointer:
+                self.write_text(l)
+            submesh_pointer.close()
+
+    def _ribify_cache(self, material_idx=0):
+        """Assemble RIB code as archive or inline for current open archive
+        handle from a cache RIB generated by the Cache* functions (used to
+        quickly assemble from cache mult-material and motion blur RIBs)
+
+        material_idx = index of blender material that is to be used
+
+        """
+        if DEBUG_PRINT:
+            print("ExportMeshdata._ribify_cache")
+        
+        
+        # all submesh caches are placed in the GEO directory
+        
+        # TODO this is ugly, since the code below copies from the cached file
+        # assuming that all stuff is written correctly, all vertex indices on one line > rm_ribigy.py
+        # all uv per face on one line and so on, this is not good code!
+        
+        self._open_submesh_file(material_idx, 'w')
+        # only build rib if file pointer exists and cache can be read
+        # most of this codes comes from RibMosaic Beta-0.4.7 for Blender
+        # 2.49b
+        if self._pointer_file and not self.open_cache():
+            firstLine   = self._pointer_cache.readline()
+            self.write_text(firstLine)
+            # If geometry is polygons then remove faces from cache
+            # for unused materials
+            if ("PointsPolygons" in firstLine):
+                # List all faces using current material
+                solids = [p for p in self.mesh_exportdata.polygons if p.material_index == material_idx]
+                # make a List of used face indices
+                faces = [p.index for p in solids]
+                # Find highest used vert index
+                lastV   = max([v for p in solids for v in p.vertices])
+                tagMode = 0
+                perFace = 0
+                fIndex  = 0
+                vIndex  = 0
+                for l in self._pointer_cache:
+                    if ("uniform" in l or "facevarying" in l or "facevertex" in l):
+                        self.write_text(l)
+                        perFace = 1
+                    elif ("[" in l):
+                        self.write_text(l)
+                        fIndex  = 0
+                        tagMode += 1
+                        if (tagMode < 3):
+                            perFace = 1
+                    elif ("]" in l):
+                        self.write_text(l)
+                        fIndex  = 0
+                        perFace = 0
+                    # export parameter list item per face
+                    elif (perFace):
+                        if (fIndex in faces):
+                            self.write_text(l)
+                        fIndex  += 1
+                    # check if exporting vertex data in "P" tag
+                    elif (tagMode == 3):
+                        if (vIndex <= lastV):
+                            self.write_text(l)
+                        vIndex  += 1
+                    else:
+                        self.write_text(l)
+            # If geometry is SDS then insert hole tags to disable faces
+            # for unused materials
+            elif ("SubdivisionMesh" in firstLine):
+                holes = [p.index for p in self.mesh_exportdata.polygons if \
+                    p.material_index != material_idx]
+                tagMode = 0
+                for l in self._pointer_cache:
+                    if (tagMode == 3):
+                        self.write_text(l)
+                    else:
+                        self.write_text(l)
+                        if (tagMode == 0 and "interpolateboundary" in l):
+                            for h in holes:
+                                self.write_text("\t\t\"hole\"\n")
+                            tagMode = 1
+                        elif (tagMode == 1 and "0 0" in l):
+                            for h in holes:
+                                self.write_text("\t\t1 0\n")
+                            tagMode = 2
+                        elif (tagMode == 2 and "[" in l):
+                            for h in holes:
+                                self.write_text("\t\t"+str(h)+"\n")
+                            tagMode = 3
+            # For anything else just write data straight through
+            else:
+                for l in self._pointer_cache:
+                    self.write_text(l)
+            self._close_submesh_file()
+            self.close_cache()
+
+
+        self._pointer_file = self.old_pointer_file
+
+
 
     # #### Public methods
 
-    # TODO just a test method
-    def export(self):
-        """ """
-
+    def export_geometry_cache(self):
         if DEBUG_PRINT:
-            print("Exporting object data...")
+            print("ExportMeshdata.export_geometry_cache")
+        if self._cache_mesh():
+            # export meshes for each material index used in mesh faces
+            
+            for mi in rm.ribify.materials_used:
+                # create a unique mesh file for each material/sub-mesh
+                # material index is used in mesh name ie _m0 for material
+                # index 0.
+                self._ribify_cache(mi)
+        # don't need the mesh data anymore so tell blender to
+        # get rid of it
+        if self.mesh_exportdata is not None:
+            bpy.data.meshes.remove(self.mesh_exportdata)
+            self.mesh_exportdata = None
 
-        rm.ribify.mesh_pointspolygons(None)
-        rm.ribify.mesh_subdivisionmesh(None)
-        rm.ribify.mesh_points(None)
-        rm.ribify.mesh_curves(None)
-        rm.ribify.curve_cyclic_poly(None)
-        rm.ribify.curve_cyclic_bezier(None)
-        rm.ribify.curve_cyclic_nurbs(None)
-        rm.ribify.curve_noncyclic_poly(None)
-        rm.ribify.curve_noncyclic_bezier(None)
-        rm.ribify.curve_noncyclic_nurbs(None)
-        rm.ribify.curve_points(None)
-        rm.ribify.surface_nupatch(None)
-        rm.ribify.surface_points(None)
-        rm.ribify.metaball_blobby(None)
-        rm.ribify.metaball_points(None)
-        rm.ribify.data_to_primvar(None, member="N", define="N",
-                                     ptype="normal", pclass="varying")
+    def has_submesh(self, material_idx):
+        """ Check if a submesh rib file using a specific material index exists
+
+        material_idx = index of the material used by a submesh
+
+        """
+        tmp_path = rm.export_manager.make_export_path('GEO') + os.sep
+        file_name = self._make_submesh_name(material_idx)
+        return self.file_exists(file_name, tmp_path)
 
     # export the blender object data into RIB format
-    def export_rib(self):
+    def export_rib(self, material_index):
+        
         if DEBUG_PRINT:
-            print('ExportObjData.export_rib()')
-
-        # if no file pointer which indicates no export required then exit
-        if self._pointer_file == None:
-            return
-
+            print('ExportMeshData.export_rib() for materialIdx: ', material_index)
+            
         # determine what type of object data needs to be exported
-        if self.blender_object.type in ('MESH', 'EMPTY'):
-            self. _export_geometry()
+        if self.blender_object.type in ('MESH', 'EMPTY','FONT'):
+            # set data name to include material index so that if
+            # using readarchive or some varient then the submesh rib will be
+            # used.
+            self.data_name = getattr(self.pointer_datablock, "name", "") + \
+                 '_m'  + str(material_index)
+            # open_rib_archive will set _pointer_file to None if no archive
+            # but since export_rib could be called multiple times we
+            # need to keep _pointer_file original value intact
+            self.old_pointer_file = self._pointer_file
+            self.open_rib_archive()
+            # set data name back to normal datablock name
+            self.data_name = getattr(self.pointer_datablock, "name", "")
+            # if _pointer_file is set then it means that the mesh is to
+            # be inlined in the parent so must open the submesh file and
+            # copy it into the parent rib.
+            if self._pointer_file:
+                self._copy_submesh_file(material_index)
+            # restore parent file pointer
+            self._pointer_file = self.old_pointer_file
 
         self.close_archive()
 

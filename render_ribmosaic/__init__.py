@@ -55,8 +55,8 @@ bl_info = {
     "name": "RIB Mosaic",
     "author": "Eric Back (WHiTeRaBBiT)",
     "version": (0, 1, 1),
-    "blender": (2, 5, 7),
-    "api": 36103,
+    "blender": (2, 7, 2),
+    "api": 44646,
     "location": "Info Header (engine dropdown)",
     "description": "RenderMan production environment for Blender",
     "warning": "GIT Alpha",
@@ -113,10 +113,10 @@ def RibmosaicInfo(message, operator=None):
     print(ENGINE + " Info: " + message)
 
 
+import hashlib
 def PropertyHash(name):
     """Converts long property names into a 30 character or less hash"""
-
-    return "P" + str(hash(name))[:30].replace("-", "N")
+    return "ribmosaic_P" + hashlib.md5(name.encode()).hexdigest()
 
 
 def RibPath(path):
@@ -130,7 +130,6 @@ def RibPath(path):
 # #############################################################################
 
 from bl_ui import space_text
-
 
 def register():
     """Register Blender classes and setup class properties"""
@@ -167,7 +166,12 @@ def register():
         RibmosaicInfo("ribify module not found, using script level exporter")
 
     bpy.utils.register_module(__name__)
-    bpy.ops.wm.ribmosaic_modal_sync()
+
+    # FIX ME: What should that do here (does not work with blender since the context is restricted access :
+    # http://wiki.blender.org/index.php/Extensions:2.6/Py/API_Changes 
+    # ? We want that the pipeline to set up according to the .blend file (all shaders pinned to materials should be loaded as well, can we do this?)
+
+    #bpy.ops.wm.ribmosaic_pipeline_sync()
 
 
 def unregister():
@@ -179,16 +183,22 @@ def unregister():
     bpy.context.scene.render.engine = 'BLENDER_RENDER'
 
     # Destroy our manager objects
-    pipeline_manager = None
-    export_manager = None
-    ribify = None
+    del pipeline_manager
+    del export_manager
+    del ribify
 
     # Remove draw functions
     space_text.TEXT_MT_toolbox.remove(rm_panel.ribmosaic_text_menu)
 
     # Destroy our properties
     rm_property.destroy_props()
-
+    
+    # FIX ME: remove alll call backs registered with this addon, make some call back  holder class for this addon which has an unregister /register function
+    # remove call back
+    if  rm_operator.load_callback in bpy.app.handlers.load_post:
+        bpy.app.handlers.load_post.remove(rm_operator.load_callback)
+    
+    
     bpy.utils.unregister_module(__name__)
 
 

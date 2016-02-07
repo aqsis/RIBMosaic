@@ -52,7 +52,7 @@
 # END BLOCKS
 # #############################################################################
 
-import os
+import os, datetime
 import bpy
 
 
@@ -272,8 +272,11 @@ class RibmosaicRender(bpy.types.RenderEngine):
             c = scene.frame_current
             i = scene.frame_step
             s = scene.frame_start
-
-            # Only prepare export if on start frame of not in a frame sequence
+            print("==================================RIB Mosaic Rendering =================================")
+            print("========================================================================================")
+            print("========== Time: %s " % datetime.datetime.now().time())
+            print("Export Frame: ", rm.export_manager.export_frame)
+            # Only prepare export if on start frame or not in a frame sequence
             if c == s or not ((c - i) == rm.export_manager.export_frame):
                 self.update_stats("", rmv + ": Preparing export...")
                 rm.export_manager.prepare_export(active_scene=scene,
@@ -334,6 +337,9 @@ class RibmosaicRender(bpy.types.RenderEngine):
         except rm_error.RibmosaicError as err:
             self.update_stats("", rmv + ": Process terminated")
             err.ReportError()
+            
+        print("========================================================================================")
+        print("========================================================================================")
 
 
 class RibmosaicPropertiesPanel(rm_context.ExportContext):
@@ -371,10 +377,15 @@ class RibmosaicPropertiesPanel(rm_context.ExportContext):
 
             # If filter_type check object type against filter
             if cls.filter_type and context.object:
+                
+                #print("cls:" ,cls)
+                #print("obj: ", context.object.type, "filter:", cls.filter_type)
                 show_panel = context.object.type in cls.filter_type
-
+                
                 if cls.invert_filter:
                     show_panel = not show_panel
+                    
+                #print("showpanel",show_panel)
 
             # If validate_context then check context actually exists
             if cls.validate_context:
@@ -605,9 +616,10 @@ class RibmosaicPipelinePanels(RibmosaicPropertiesPanel):
             rows = 2
 
         row = layout.row()
-        row.operator("wm.ribmosaic_modal_sync")
+        row.operator("wm.ribmosaic_pipeline_sync")
         row = layout.row()
-        row.template_list(wm.ribmosaic_pipelines, "collection",
+        
+        row.template_list("UI_UL_list","wm.ribmosaic_pipelines", wm.ribmosaic_pipelines, "collection",
                           wm.ribmosaic_pipelines, "active_index", rows=rows)
         col = row.column()
         sub = col.column(align=True)
@@ -842,7 +854,7 @@ class RENDER_PT_ribmosaic_passes(RibmosaicPropertiesPanel, bpy.types.Panel):
     bl_region_type = 'WINDOW'
     bl_label = "RenderMan Passes"
     bl_context = "render"
-    bl_options = 'DEFAULT_CLOSED'
+    bl_options = {'DEFAULT_CLOSED'}
 
     pass_clipboard = {}
 
@@ -861,7 +873,7 @@ class RENDER_PT_ribmosaic_passes(RibmosaicPropertiesPanel, bpy.types.Panel):
 
         layout = self.layout
         row = layout.row()
-        row.template_list(ribmosaic_passes, "collection", ribmosaic_passes,
+        row.template_list("UI_UL_list","ribmosaic_passes",ribmosaic_passes, "collection", ribmosaic_passes,
                         "active_index", rows=5)
 
         col = row.column()
@@ -889,6 +901,12 @@ class RENDER_PT_ribmosaic_passes(RibmosaicPropertiesPanel, bpy.types.Panel):
 
             split = grp.split()
             sub = split.column()
+            
+            sub.label(text="Output RIB:")
+            row = sub.row(align=True)
+            row.prop(active_pass, "pass_ribfilename", text="")
+            sub.separator()
+            
             sub.label(text="Output:")
             row = sub.row(align=True)
             row.prop(active_pass, "pass_display_file", text="")
@@ -976,7 +994,7 @@ class RENDER_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
     bl_region_type = 'WINDOW'
     bl_label = "Export Options"
     bl_context = "render"
-    bl_options = 'DEFAULT_CLOSED'
+    bl_options = {'DEFAULT_CLOSED'}
 
     # ### Public methods
 
@@ -1042,7 +1060,7 @@ class SCENE_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
     bl_region_type = 'WINDOW'
     bl_label = "Export Options"
     bl_context = "scene"
-    bl_options = 'DEFAULT_CLOSED'
+    bl_options = {'DEFAULT_CLOSED'}
 
     # ### Public methods
 
@@ -1096,6 +1114,10 @@ class SCENE_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
                            icon='FILESEL', text="")
         op.filepath = "//"
         op.searchpath = "bpy.context.scene.ribmosaic_resource_searchpath"
+        
+        row = col.row(align=True)
+        row.prop(scene, "ribmosaic_export_searchpaths")
+        
         layout.separator()
 
         layout.label(text="RIB Archive Options")
@@ -1106,12 +1128,21 @@ class SCENE_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
         col.separator()
         row = col.row()
         row.prop(scene, "ribmosaic_object_archives")
+        row.prop(scene, "ribmosaic_object_archives_namepostfix")
         row = col.row()
-        row.prop(scene, "ribmosaic_data_archives")
+        row.prop(scene, "ribmosaic_geometry_archives")
+        row.prop(scene, "ribmosaic_geometry_archives_namepostfix")
         row = col.row()
         row.prop(scene, "ribmosaic_material_archives")
+        row.prop(scene, "ribmosaic_material_archives_namepostfix")    
         layout.separator()
-
+        
+        layout.label(text="Light Options")
+        col = layout.box().column()
+        row = col.row()
+        row.prop(scene, "ribmosaic_globallightscale")
+        
+        
         layout.label(text="Compatibility Options")
         col = layout.box().column()
         row = col.row()
@@ -1156,7 +1187,7 @@ class WORLD_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
     bl_region_type = 'WINDOW'
     bl_label = "Export Options"
     bl_context = "world"
-    bl_options = 'DEFAULT_CLOSED'
+    bl_options = {'DEFAULT_CLOSED'}
 
     # ### Public methods
 
@@ -1179,6 +1210,11 @@ class WORLD_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
         col = sub.column()
         col.label(text="RIB Archive:")
         col.prop(ob, "ribmosaic_rib_archive", text="")
+        if ob.ribmosaic_rib_archive not in ["INLINE","NOEXPORT"]:
+            col = col.column(align=True)
+            col.prop(ob, "ribmosaic_archives_usenamepostfix")
+            if ob.ribmosaic_archives_usenamepostfix == "CUSTOM":
+                col.prop(ob, "ribmosaic_archives_namepostfix")
 
 
 class WORLD_PT_ribmosaic_preview(RibmosaicPreviewPanel, bpy.types.Panel):
@@ -1224,9 +1260,9 @@ class OBJECT_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
     bl_region_type = 'WINDOW'
     bl_label = "Export Options"
     bl_context = "object"
-    bl_options = 'DEFAULT_CLOSED'
+    bl_options = {'DEFAULT_CLOSED'}
 
-    filter_type = ('MESH', 'CURVE', 'SURFACE', 'META', 'EMPTY', 'LAMP')
+    filter_type = ('MESH', 'CURVE', 'SURFACE', 'META', 'EMPTY', 'LAMP', 'FONT', 'CAMERA')
     validate_context = "object"
 
     # ### Public methods
@@ -1236,14 +1272,18 @@ class OBJECT_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
         ob = self._context_data(context, self.bl_context)['data']
         layout = self.layout
 
-        if ob.type != 'LAMP' and ob.ribmosaic_rib_archive != 'NOEXPORT':
+        if ob.type not in ['LAMP','CAMERA'] and ob.ribmosaic_rib_archive != 'NOEXPORT':
             if ob.type != 'EMPTY':
                 layout.prop(ob, "ribmosaic_csg", expand=True)
                 layout.separator()
-
+        
+        if ob.type not in ['CAMERA']:
+            layout.prop(ob,"ribmosaic_transform")
+        
         sub = layout.row()
-
-        if ob.type != 'LAMP' and ob.ribmosaic_rib_archive != 'NOEXPORT':
+        
+            
+        if ob.type not in ['LAMP'] and ob.ribmosaic_rib_archive != 'NOEXPORT':
             col = sub.column()
             col.prop(ob, "ribmosaic_mblur")
             col = col.column(align=True)
@@ -1251,10 +1291,15 @@ class OBJECT_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
             col.prop(ob, "ribmosaic_mblur_steps")
             col.prop(ob, "ribmosaic_mblur_start")
             col.prop(ob, "ribmosaic_mblur_end")
-
+        
         col = sub.column()
         col.label(text="RIB Archive:")
         col.prop(ob, "ribmosaic_rib_archive", text="")
+        if ob.ribmosaic_rib_archive not in ["INLINE","NOEXPORT"]:
+            col = col.column(align=True)
+            col.prop(ob, "ribmosaic_archives_usenamepostfix")
+            if ob.ribmosaic_archives_usenamepostfix == "CUSTOM":
+                col.prop(ob, "ribmosaic_archives_namepostfix")
 
 
 class OBJECT_PT_ribmosaic_panels(RibmosaicPipelinePanels, bpy.types.Panel):
@@ -1266,7 +1311,7 @@ class OBJECT_PT_ribmosaic_panels(RibmosaicPipelinePanels, bpy.types.Panel):
     bl_region_type = 'WINDOW'
     bl_context = "object"
 
-    filter_type = ('MESH', 'CURVE', 'SURFACE', 'META', 'EMPTY')
+    filter_type = ('MESH', 'CURVE', 'SURFACE', 'META', 'EMPTY','LAMP','CAMERA')
     validate_context = "object"
     shader_panels = True
     utility_panels = True
@@ -1284,24 +1329,12 @@ class OBJECT_PT_ribmosaic_warning1(RibmosaicWarningPanel, bpy.types.Panel):
     bl_context = "object"
 
     filter_type = ('MESH', 'CURVE', 'SURFACE', 'META', 'EMPTY',
-                   'LAMP', 'CAMERA')
+                   'LAMP', 'CAMERA', 'FONT')
     invert_filter = True
     validate_context = "object"
     warning_message = ["This object is ignored by exporter"]
 
 
-class OBJECT_PT_ribmosaic_warning2(RibmosaicWarningPanel, bpy.types.Panel):
-    """Warning message for camera object types"""
-
-    # ### Public attributes
-
-    bl_space_type = 'PROPERTIES'
-    bl_region_type = 'WINDOW'
-    bl_context = "object"
-
-    filter_type = ('CAMERA')
-    validate_context = "object"
-    warning_message = ["Not exported as object, use Object Data instead"]
 
 
 # #############################################################################
@@ -1331,9 +1364,9 @@ class DATA_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
     bl_region_type = 'WINDOW'
     bl_label = "Export Options"
     bl_context = "data"
-    bl_options = 'DEFAULT_CLOSED'
+    bl_options = {'DEFAULT_CLOSED'}
 
-    filter_type = ('MESH', 'CURVE', 'SURFACE', 'META', 'LAMP', 'CAMERA')
+    filter_type = ('MESH', 'CURVE', 'SURFACE', 'META', 'LAMP', 'CAMERA','FONT')
 
     # ### Public methods
 
@@ -1348,8 +1381,8 @@ class DATA_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
         if  data.ribmosaic_rib_archive != 'NOEXPORT':
             if ob.type != 'CAMERA' and ob.type != 'LAMP':
                 layout.prop(data, "ribmosaic_primitive")
-
-            if ob.type == 'MESH':
+            
+            if ob.type in ['MESH' , 'FONT']:
                 sub = layout.split()
                 sub.prop(data, "ribmosaic_n_export")
                 row = sub.row()
@@ -1421,6 +1454,7 @@ class DATA_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
         elif ob.type == 'LAMP' or data.ribmosaic_rib_archive != 'NOEXPORT':
             layout.separator()
 
+        
         sub = layout.row()
         col = sub.column()
         col.prop(data, "ribmosaic_mblur")
@@ -1429,11 +1463,16 @@ class DATA_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
         col.prop(data, "ribmosaic_mblur_steps")
         col.prop(data, "ribmosaic_mblur_start")
         col.prop(data, "ribmosaic_mblur_end")
-
-        col = sub.column()
-        col.label(text="RIB Archive:")
-        col.prop(data, "ribmosaic_rib_archive", text="")
-
+        
+        if ob.type != 'CAMERA': # camera has no rib archive option in data!
+            col = sub.column()
+            col.label(text="RIB Archive:")
+            col.prop(ob, "ribmosaic_rib_archive", text="")
+            if ob.ribmosaic_rib_archive not in ["INLINE","NOEXPORT"]:
+                col = col.column(align=True)
+                col.prop(ob, "ribmosaic_archives_usenamepostfix")
+                if ob.ribmosaic_archives_usenamepostfix == "CUSTOM":
+                    col.prop(ob, "ribmosaic_archives_namepostfix")
 
 class DATA_PT_ribmosaic_panels(RibmosaicPipelinePanels, bpy.types.Panel):
     """Pipeline shader and utility control panel for object data"""
@@ -1460,7 +1499,7 @@ class DATA_PT_ribmosaic_message(RibmosaicWarningPanel, bpy.types.Panel):
     bl_region_type = 'WINDOW'
     bl_context = "data"
 
-    filter_type = ('MESH', 'CURVE', 'SURFACE', 'META', 'LAMP', 'CAMERA')
+    filter_type = ('MESH', 'CURVE', 'SURFACE', 'META', 'LAMP', 'CAMERA', 'FONT')
     invert_filter = True
     warning_message = ["This object data type is ignored by exporter"]
 
@@ -1492,7 +1531,7 @@ class MATERIAL_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
     bl_region_type = 'WINDOW'
     bl_label = "Export Options"
     bl_context = "material"
-    bl_options = 'DEFAULT_CLOSED'
+    bl_options = {'DEFAULT_CLOSED'}
 
     validate_context = "material"
 
@@ -1530,6 +1569,10 @@ class MATERIAL_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
             row.active = mat.ribmosaic_ri_opacity
             row.prop(mat, "alpha", text="Opacity")
 
+            split = layout.split()
+            sub = split.column()
+            sub.prop(mat, "ribmosaic_two_sided")
+
             ### FIXME ###
             # can't modify material data block during draw call
             #if not strand.use_blender_units:
@@ -1564,6 +1607,9 @@ class MATERIAL_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
         col = sub.column()
         col.label(text="RIB Archive:")
         col.prop(mat, "ribmosaic_rib_archive", text="")
+        col.prop(mat, "ribmosaic_archives_usenamepostfix")
+        if mat.ribmosaic_archives_usenamepostfix == "CUSTOM":
+            col.prop(mat, "ribmosaic_archives_namepostfix")
 
 
 class MATERIAL_PT_ribmosaic_panels(RibmosaicPipelinePanels, bpy.types.Panel):
@@ -1646,7 +1692,7 @@ class PARTICLE_PT_ribmosaic_export(RibmosaicPropertiesPanel, bpy.types.Panel):
     bl_region_type = 'WINDOW'
     bl_label = "Export Options"
     bl_context = "particle"
-    bl_options = 'DEFAULT_CLOSED'
+    bl_options = {'DEFAULT_CLOSED'}
 
     validate_context = "particle_system"
 

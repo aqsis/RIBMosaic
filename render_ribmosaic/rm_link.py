@@ -51,7 +51,7 @@
 # END BLOCKS
 # #############################################################################
 
-import os
+import os,re
 import sys
 import bpy
 
@@ -113,7 +113,7 @@ class PipelineLink(rm_context.ExportContext):
     unspecified = Data is converted to string
     *# = Sets the recursion limit for current link
     """
-
+    
     # #### Public attributes
 
     pipeline_link = ""  # pipeline link this object represents
@@ -157,17 +157,47 @@ class PipelineLink(rm_context.ExportContext):
     def _resolve_path(self):
         """Resolve data from destination of this object's link"""
 
-        def unfold_list(data):
-            """Convert all iterable data into list, otherwise return as is"""
+        def flatten_list(data, app=None):
+            """Convert input data into one single list"""
+            if app is None:
+                app = []
+            if not isinstance(data,str):
+                    try:
+                        for e in data:
+                            flatten_list(e,app)
+                    except:
+                        app.append(data)
+            else:
+                app.append(data)
+            return app
+            
+        def convert_to_string(l,bracketS="[",bracketE="]", delim=" "): 
+            """ convert each type in the list l to a total string delimited
+            string types are additionaly quoted by spaces and inclosed 
+            in brackets"""
+            for i,v in enumerate(l):
+                
+                if isinstance(v,float):
+                    # convert float to precision format
+                    # don't quote numbers
+                    l[i] = "%.9f" % v
+                elif isinstance(v,int):
+                    l[i] = "%i" % v
+                elif isinstance(v,bool):
+                    # no bools in rib , just 1 or 0
+                    if v:
+                        l[i] = "1"
+                    else:
+                        l[i] = "0"
+                else: # all other types convert to string and quote
+                    # quote rib strings
+                    l[i] = '"'+ str(v) + '"'
 
-            try:
-                if type(data) != str:
-                    return [unfold_list(e) for e in data]
-                else:
-                    return data
-            except:
-                return data
-
+            # join all strings together and inclose between brackets [ ]
+            return bracketS + delim.join(l) + bracketE;
+            
+        #print("Resolve path:", self.pipeline_link)
+        
         if "@[" in self.pipeline_link:
             link = self.pipeline_link.replace("@[", "").replace("]@", "")
         else:
@@ -355,7 +385,7 @@ class PipelineLink(rm_context.ExportContext):
                                           sys.exc_info())
 
         # If link result is text and has links resolve them
-        if type(text) == str and "@[" in text:
+        if isinstance(text,str) and "@[" in text:
             text = self._resolve_links(text)
 
         # Filter output text according to token option
@@ -370,39 +400,23 @@ class PipelineLink(rm_context.ExportContext):
                 else:
                     rm.RibmosaicInfo("Link must return numbers to"
                                      " use # option")
+                                     
             elif option == 'RIB':  # Parse text for RIB output
+                
                 if token == 'STXT' or token == 'SXML' or token == 'SLIB' or \
                   (token == 'EVAL' and path.startswith(".") and \
                   "path" in path):
                     export = rm.export_manager.export_directory
                     text = rm.RibPath(os.path.relpath(text, export)) + "/"
                 else:
-                    if type(text) == str:
-                        text = "\"" + str(text) + "\""
-                    else:
-                        data = unfold_list(text)
-                        text = str(data)
-
-                        if type(data) == list:
-                            text = text.replace(",", "")
-                            text = text.replace("'", "\"")
-                            text = text.replace("[", "").replace("]", "")
-                            text = "[ " + text + " ]"
-
-                        text = text.replace("True", "1").replace("False", "0")
+                    # text might be a list [ "asd", ["asd","3"]] -> output '[ "asd" "asd" "3"]'
+                    # unfold into one list, containing all non-iterable types
+                    # and combine all types in the array to a total RIB string
+                    text = convert_to_string(flatten_list(text),"[","]")
+                    
             elif option == 'RSL':  # Parse text for RSL output
-                if type(text) == str:
-                    text = "\"" + str(text) + "\""
-                else:
-                    data = unfold_list(text)
-                    text = str(data)
-
-                    if type(data) == list:
-                        text = text.replace("'", "\"")
-                        text = text.replace("[", "").replace("]", "")
-                        text = "{" + text + "}"
-
-                    text = text.replace("True", "1").replace("False", "0")
+                text = convert_to_string(flatten_list(text),"{","}")
+                
             elif option == 'PY':  # Parse text for Python output
                 text = repr(text)
             else:  # Parse text as string (do not resolve links)
@@ -410,7 +424,8 @@ class PipelineLink(rm_context.ExportContext):
 
         else:
             text = str(text)
-
+            
+        #print("Resolved: " , text, type(text))
         return text
 
     # #### Public methods

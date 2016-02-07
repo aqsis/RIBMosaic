@@ -61,10 +61,10 @@ import string
 
 # #### Global variables
 
-MODULE = os.path.dirname(__file__).split(os.sep)[-1]
-exec("import " + MODULE + " as rm")
+#MODULE = os.path.dirname(__file__).split(os.sep)[-1]
+#exec("import " + MODULE + " as rm")
 
-DEBUG_PRINT = False
+DEBUG_PRINT = True
 
 
 
@@ -85,72 +85,73 @@ class Ribify():
     is_gzip = False  # If file gzipped
     indent = 0  # how many tabs to indent from the left
     vertcount = 0 # highest vertex index used by faces
+    materials_used = [] # list of material indexes used by faces
 
     # vars for tracking array items output
     itemcount = 0  # number of array items that have been outputed
-    firstline = True  # output of array items on first line
     items_per_line = 3  # number of array items per line
 
 
-    def _start_rib_array(self, items_per_line=3):
+    def _start_rib_array(self, items_per_line=3, indent=True):
         self.itemcount = 0
         self.firstline = True
         self.items_per_line = items_per_line
-        self.write_text('[')
+        self.write_text('[', indent)
 
 
-    def _write_rib_array_item(self, item):
+    def _write_rib_array_item(self, item, debug=False):
 
         # if on the first item of the line then indent
-        if self.itemcount == 0 and not self.firstline:
+        if self.itemcount == 0:
             self.write_text('\n', False)
-            self.write_text('  ')
         else:
             # adding another item on the line so just put a space
             #  between items don't use indentation
             self.write_text(' ', False)
-        # output the item in the list but with no indentation
-        self.write_text(str(item), False)
+        # output the item in the list, indent if first item
+        if(debug):
+          print("write: ",item, "file:" , type(self.pointer_file))
+        self.write_text(str(item), self.itemcount == 0)
         self.itemcount += 1
 
         # only allow so many items per line
         if self.itemcount == self.items_per_line:
             self.itemcount = 0
-            self.firstline = False
 
     def _end_rib_array(self):
         # end of the RIB array list block
-        self.write_text(' ]\n', False)
+        self.write_text('\n', False)
+        self.write_text(']\n')
 
-    def _write_rib_array_list(self, vect):
+    def _write_rib_array_list(self, vect, debug=False):
         for v in vect:
-            self._write_rib_array_item(v)
+            self._write_rib_array_item(v,debug)
 
     def _export_faces(self, mesh):
         self.vertcount = 0
-
+        self.materials_used = []
         self.inc_indent()
         # output the number of vertices for each face
-        self._start_rib_array(10)
-        for face in mesh.faces:
-            self._write_rib_array_item(len(face.vertices))
+        self._start_rib_array(1)
+        for p in mesh.polygons:
+            self._write_rib_array_item(p.loop_total)
+
+            # Populate materials_used list with faces material indexes
+            if (not p.material_index in self.materials_used):
+                self.materials_used.append(p.material_index)
+            
         self._end_rib_array()
 
         # output the vertex index for each face corner
-        self._start_rib_array(9)
-        for face in mesh.faces:
-            n = len(face.vertices)
-            # iterate through each vertex index in the face
-            for idx in range(0, n):
-                #get the index of the vertiex
-                vi = face.vertices[idx]
-                # keep track of the highest vertex index used
-                if vi > self.vertcount:
-                    self.vertcount = vi
-                # add the index to the verts list of indices
-                self._write_rib_array_item(vi)
+        # all vertex indices per face need to be on one line 
+        # --> due to submesh cache ( ExportMeshdata._ribify_cache )
+        
+        self._start_rib_array(1)
+        for p in mesh.polygons:
+            # keep track of the highest vertex index used
+            self.vertcount = max(self.vertcount,max(p.vertices))
+            self._write_rib_array_item(" ".join([str(v) for v in p.vertices]))
         self._end_rib_array()
-        self.write_text('\n')
 
     def _export_creases(self, mesh):
         # export blender mesh edges that have a crease value != 0
@@ -161,7 +162,7 @@ class Ribify():
             self._write_rib_array_item('"crease"')
         self._end_rib_array()
 
-        self._start_rib_array(10)
+        self._start_rib_array(1)
         self._write_rib_array_item("0 0")
         # write out data arrangement for creases:
         # first array set has 2 values for each crease
@@ -172,13 +173,13 @@ class Ribify():
 
         # output first array set:
         # use two vertex indices to define each crease
-        self._start_rib_array(10)
+        self._start_rib_array(1)
         for edge in Creases:
             self._write_rib_array_item('%i %i' % (edge.vertices[0], edge.vertices[1]))
         self._end_rib_array()
 
         # output second array set which is the crease sharpness weight value
-        self._start_rib_array(10)
+        self._start_rib_array(1)
         for edge in Creases:
             #Calculate crease up to 5.5
             #(looks the same as blenders up to that point)
@@ -190,13 +191,14 @@ class Ribify():
         self._end_rib_array()
 
     def _export_vertices(self, mesh):
+
         # rare that these conditions occur but check to make sure
         # there are faces and vertices to export
         if len(mesh.vertices) == 0:
             return
 
         self.write_text('"P"\n')
-        self._start_rib_array(6)
+        self._start_rib_array(3)
         for i in range(0, self.vertcount + 1):
             self._write_rib_array_list(mesh.vertices[i].co)
         self._end_rib_array()
@@ -205,55 +207,68 @@ class Ribify():
     def _export_normals(self, primvar_rib, mesh, per_vertex=True):
         # rare that these conditions occur but check to make sure
         # there are faces and vertices to export
-        if len(mesh.vertices) == 0 or len(mesh.faces) == 0:
+        if len(mesh.vertices) == 0 or len(mesh.polygons) == 0:
             return
 
         self.write_text(primvar_rib)
-        self._start_rib_array(6)
         if per_vertex:
+            self._start_rib_array(3)
             for i in range(0, self.vertcount + 1):
                 self._write_rib_array_list(mesh.vertices[i].normal)
         else:
-            for face in mesh.faces:
-                n = len(face.vertices)
+            self._start_rib_array(1)
+            for p in mesh.polygons:
                 # iterate through each vertex index in the face
-                for idx in range(0, n):
+                norm_str = ""
+                for vi in p.vertices:
                     # build the normals list
                     # if face is smooth then use the vertex normal
-                    if face.use_smooth:
-                        #get the index of the vertex
-                        vi = face.vertices[idx]
-                        self._write_rib_array_list(mesh.vertices[vi].normal)
+                    if p.use_smooth:
+                        norm_str += " ".join([str(c) for c in mesh.vertices[vi].normal])
                     else:
                         # otherwise the face is flat so use the face normal
-                        self._write_rib_array_list(face.normal)
+                        norm_str += " ".join([str(c) for c in p.normal])
+                    norm_str += " "
+                self._write_rib_array_item(norm_str)
         self._end_rib_array()
 
 
-    def _export_uvs(self, primvar_rib, mesh):
-        try:
-            #FIXME should be exporting all the uv layers not just the active
-            uv_layer = mesh.uv_textures.active.data
-        except:
-            uv_layer = None
+    def _export_uvs(self, primvar_rib, mesh, name=""):
 
-        if uv_layer:
-            self.write_text(primvar_rib)
-            self._start_rib_array(8)
-            for fi, tf in enumerate(uv_layer):
-                # "1.0 -" because
-                # renderman? expects UVs flipped
-                # vertically from blender
-                self._write_rib_array_item(tf.uv1[0])
-                self._write_rib_array_item(1.0 - tf.uv1[1])
-                self._write_rib_array_item(tf.uv2[0])
-                self._write_rib_array_item(1.0 - tf.uv2[1])
-                self._write_rib_array_item(tf.uv3[0])
-                self._write_rib_array_item(1.0 - tf.uv3[1])
-                if len(mesh.faces[fi].vertices) == 4:
-                    self._write_rib_array_item(tf.uv4[0])
-                    self._write_rib_array_item(1.0 - tf.uv4[1])
-            self._end_rib_array()
+        uvs = []
+        
+        # uv_loop_layer is of type MeshUVLoopLayer
+        
+        if name == "":
+            uv_loop_layer = mesh.uv_layers.active  
+        else:
+            # assuming uv loop layers and uv textures share identical indices
+            idx = mesh.uv_textures.keys().index(name)
+            uv_loop_layer = mesh.uv_layers[idx] 
+
+        if uv_loop_layer is None:
+            return None
+        
+        # get all uvs for each polygon
+        for poly in mesh.polygons:
+            poly_uvs = []
+            for loop_index in poly.loop_indices:
+                poly_uvs.append(       uv_loop_layer.data[loop_index].uv.x )
+                poly_uvs.append( 1.0 - uv_loop_layer.data[loop_index].uv.y )
+                ## renderman expects UVs flipped vertically from blender
+            uvs.append(poly_uvs)  
+        
+        print("Creating: uvs, poly count:",len(uvs), uvs)
+        
+        # write rib
+        self.write_text(primvar_rib)
+        self._start_rib_array(1)
+        # all uv data for a face must be on one line
+        for polyuv in uvs:
+            polyuv_str = " ".join([str(v) for v in polyuv]) #     8 values "x y x y x y x y" for quad polygons
+            self._write_rib_array_item(polyuv_str)
+        
+        self._end_rib_array()
 
     # ### Public methods
 
@@ -303,8 +318,6 @@ class Ribify():
             print("Creating", primvar['define'], "as", primvar['ptype'],
                   "sorted as", primvar['pclass'], "for", primvar['member'],
                   "in", datablock, "...")
-
-        self.write_text('\n')
 
         member = primvar['member']
         primvar_rib = '"%s %s %s"\n' % (primvar['pclass'], primvar['ptype'], primvar['define'])
@@ -425,3 +438,14 @@ class Ribify():
         """ """
 
         print("Creating meta points...")
+
+    def matrix4x4(self, mat):
+        """ Export a blender 4x4 matrix in RIB format"""
+        self.inc_indent()
+        self.inc_indent()
+        self._start_rib_array(4, False)
+        for i in range(4):
+            for j in range(4):
+                self._write_rib_array_item(mat[j][i])
+        self._end_rib_array()
+        self.write_text('\n')
